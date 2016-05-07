@@ -40,13 +40,20 @@ function myFunction() {
     var x, text;
 
     x = document.getElementById("website").value;
+
     document.getElementById("output").innerHTML = x;
 
+
+    var xhr = new XMLHttpRequest();
     xhr.open("GET", x , false);
     xhr.send()
     text = xhr.status;
 
-    document.getElementById("output2").innerHTML = text;
+    xhr.open("GET", "https://www.codecademy.com/doesnt_exist", false);
+    xhr.send();
+
+
+    document.getElementById("output2").innerHTML = xhr.status;
 
 }
 
