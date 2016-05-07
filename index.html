@@ -54,13 +54,13 @@ function myFunction() {
     document.getElementById("output2").innerHTML = xhr.response;
 
     var xhr = new XMLHttpRequest();
-xhr.open("GET", "https://www.codecademy.com/files/samples/javascript_learn_apis.xml", false);
+    xhr.open("GET", "https://www.codecademy.com/files/samples/javascript_learn_apis.xml", true);
 
-xhr.setRequestHeader('Content-Type', 'text/xml');
-xhr.send();
+    xhr.setRequestHeader('Content-Type', 'text/xml');
+    xhr.send();
 
-xmlDocument = xhr.responseXML;
-console.log(xmlDocument.childNodes['0'].textContent);
+    xmlDocument = xhr.responseXML;
+    console.log(xmlDocument.childNodes['0'].textContent);
 
 }
 
