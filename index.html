@@ -47,7 +47,8 @@ function myFunction() {
     var xhr = new XMLHttpRequest();
 
 
-    xhr.open("GET", "https://www.codecademy.com/doesnt_exist", false);
+    xhr.open("GET", "https://www.codecademy.com/doesnt_exist", true);
+    xhr.setRequestHeader('Access-Control-Allow-Origin');
     xhr.send();
 
 
