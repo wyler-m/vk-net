@@ -47,11 +47,11 @@ function myFunction() {
     var xhr = new XMLHttpRequest();
 
 
-    xhr.open("GET", "https://www.codecademy.com", true);
+    xhr.open("GET", "https://www.codecademy.com/", true);
     xhr.send();
     console.log(xhr.responseType);
 
-    document.getElementById("output2").innerHTML = xhr.responseType;
+    document.getElementById("output2").innerHTML = xhr.response;
 
 }
 
