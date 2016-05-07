@@ -39,17 +39,11 @@ function myFunction() {
     var x, text;
 
     // Get the value of the input field with id="numb"
-    x = document.getElementById("numb").value;
-
-    // If x is Not a Number or less than one or greater than 10
-    if (isNaN(x) || x < 1 || x > 10) {
-        text = "Input not valid";
-    } else {
-        text = "Input OK";
-    }
+    x = document.getElementById("website").value;
+    xhr.open("GET", x , false);
+    xhr.send()
+    text = xhr.status;
     document.getElementById("output").innerHTML = text;
-
-
 
 }
 
