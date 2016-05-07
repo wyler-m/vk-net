@@ -16,6 +16,7 @@
 
 <p id="demo"></p>
 <p id="output"></p>
+<p id="output2"></p>
 
 <script>
 function myFunction() {
@@ -39,8 +40,13 @@ function myFunction() {
     var x, text;
 
     x = document.getElementById("website").value;
-
     document.getElementById("output").innerHTML = x;
+
+    xhr.open("GET", x , false);
+    xhr.send()
+    text = xhr.status;
+
+    document.getElementById("output2").innerHTML = text;
 
 }
 
