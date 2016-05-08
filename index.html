@@ -64,6 +64,16 @@ function myFunction() {
 
 }
 
+var script = document.createElement('SCRIPT');
+
+script.src = "https://api.vk.com/method/getProfiles?uid=66748&access_token=533bacf01e11f55b536a565b57531ac114461ae8736d6506a3&callback=callbackFunc&callback=callbackFunc";
+
+document.getElementsByTagName("head")[0].appendChild(script);
+
+function callbackFunc(result) {
+    console.log(xmlDocument.childNodes['0'].textContent);
+}
+
 
 
 
