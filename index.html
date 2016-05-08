@@ -37,32 +37,12 @@ function myFunction() {
 
 
     function myFunction1() {
-    var x, text;
+        var x, text;
 
-    x = document.getElementById("website").value;
+        x = document.getElementById("website").value;
 
-    document.getElementById("output").innerHTML = x;
-
-
-    var xhr = new XMLHttpRequest();
-
-
-    xhr.open("GET", "https://www.codecademy.com/", true);
-    xhr.send();
-    console.log(xhr.response);
-
-    document.getElementById("output2").innerHTML = xhr.response;
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://www.codecademy.com/files/samples/javascript_learn_apis.xml", true);
-
-    xhr.setRequestHeader('Content-Type', 'text/xml');
-    xhr.send();
-
-    xmlDocument = xhr.responseXML;
-    console.log(xmlDocument.childNodes['0'].textContent);
-
-}
+        document.getElementById("output").innerHTML = x;
+    }
 
 var script = document.createElement('SCRIPT');
 
