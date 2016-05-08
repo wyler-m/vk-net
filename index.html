@@ -46,7 +46,8 @@ function myFunction() {
 
 var script = document.createElement('SCRIPT');
 
-script.src = "https://api.vk.com/method/getProfiles?uid=66748&callback=callbackFunc";
+//script.src = "https://api.vk.com/method/getProfiles?uid=66748&callback=callbackFunc";
+script.src = 'https://api.vk.com/method/friends.get?uid=66748&callback=callbackFunc';
 
 document.getElementsByTagName("head")[0].appendChild(script);
 
