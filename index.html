@@ -49,7 +49,7 @@ function myFunction() {
 //script.src = 'https://api.vk.com/method/friends.get?uid=66748&callback=callbackFunc';
         script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
-        document.getElementsByTagName("head")[0].appendChild(script.stringify());
+        document.getElementsByTagName("head")[0].appendChild(script);
 
     }
 
@@ -57,7 +57,7 @@ function myFunction() {
 
 function callbackFunc(result) {
     console.log(result);
-    document.getElementById("output2").innerHTML = result;
+    document.getElementById("output2").innerHTML = result.stringify();
 }
 
 
