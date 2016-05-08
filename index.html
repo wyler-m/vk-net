@@ -42,15 +42,18 @@ function myFunction() {
         x = document.getElementById("website").value;
 
         document.getElementById("output").innerHTML = x;
-    }
 
-var script = document.createElement('SCRIPT');
+        var script = document.createElement('SCRIPT');
 
 //script.src = "https://api.vk.com/method/getProfiles?uid=66748&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=66748&callback=callbackFunc';
-script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
+        script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
-document.getElementsByTagName("head")[0].appendChild(script);
+        document.getElementsByTagName("head")[0].appendChild(script.stringify());
+
+    }
+
+
 
 function callbackFunc(result) {
     console.log(result);
