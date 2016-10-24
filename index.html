@@ -6,7 +6,7 @@
 <center><p>Enter An ID number</p></center>
 
 
-<center><input id="vkId" value="218868103"></center>
+<center><input id="vkId" value="218868103"></input></center>
 
 <center><button type="button" onclick="fetchFriends()">go</button></center>
 
@@ -33,7 +33,7 @@ function myFunction() {
 }
 
 function fetchDetails() {
-    var x;
+    var x, text;
     x = document.getElementById("vkId").value;
     document.getElementById("output").innerHTML = x;
     var script = document.createElement('SCRIPT');
