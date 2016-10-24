@@ -8,7 +8,7 @@
 
 <center><input id="vkId" value="218868103"></input></center>
 
-<center><button type="button" onclick="fetchFriends()">go</button></center>
+<center><button type="button" onclick="fetchDetails()">go</button></center>
 
 <!-- <p id="demo"></p> -->
 <!-- <center><p id="output"></p><center> -->
@@ -33,9 +33,9 @@ function myFunction() {
 }
 
 function fetchDetails() {
-    var x, text;
+    var x;
     x = document.getElementById("vkId").value;
-    document.getElementById("output").innerHTML = x;
+    // document.getElementById("output").innerHTML = x;
     var script = document.createElement('SCRIPT');
 
 //script.src = "https://api.vk.com/method/getProfiles?uid=66748&callback=callbackFunc";
