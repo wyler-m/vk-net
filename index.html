@@ -14,6 +14,10 @@
 <!-- <center><p id="output"></p><center> -->
 <center><p>Who is this person?</p></center>
 <center><p id="friendDetails">let's find out</p></center>
+<center><p>Who are the friends?</p></center>
+<center><button type="button" onclick="fetchFriendList()">find out</button></center>
+<center><p id="friendList"></p></center>
+
 
 <script>
 
@@ -43,13 +47,25 @@ function fetchDetails() {
 //script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
     script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=api_FetchDetails');
+    document.getElementsByTagName("head")[0].appendChild(script);
 
-        document.getElementsByTagName("head")[0].appendChild(script);
+    fetchFriendList();
     }
 
-
+function fetchFriendList() {
+    var x;
+    x = document.getElementById("vkId").value;
+    var script = document.createElement('SCRIPT');
+    script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,'&callback=api_FetchFriendList');
+    document.getElementsByTagName("head")[0].appendChild(script);
+    }
 
 function api_FetchDetails(result) {
+    console.log(result);
+    document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
+}
+
+function api_FetchFriendList(result) {
     console.log(result);
     document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
 }
