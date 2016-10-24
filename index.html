@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html>
     
-<h1><center>The VK visualizer</center></h1>
+<center><h1>The VK visualizer</h1></center>
 
-<p>Please input a number between 1 and 10:</p>
+<center><p>Enter An ID number</p></center>
 
-<input id="numb">
 
-<button type="button" onclick="myFunction()">Submit</button>
+<input id="vkId">
 
-<input id="website">
-
-<button type="button" onclick="myFunction1()">Second</button>
+<center><button type="button" onclick="fetchFriends()">GO!</button></center>
 
 <p id="demo"></p>
-<p id="output">what's in the thing</p>
-<p id="output2">none</p>
+<p>center<p id="output">what's in the thing</p></p>
+<p>Who is this person?</p>
+<p id="friendDetails">let's find out</p>
 
 <script>
+
 function myFunction() {
     var x, text;
 
@@ -33,21 +32,18 @@ function myFunction() {
     document.getElementById("demo").innerHTML = text;
 }
 
-
-
-    function myFunction1() {
-        var x, text;
-
-        x = document.getElementById("website").value;
-
-        document.getElementById("output").innerHTML = x;
-
-        var script = document.createElement('SCRIPT');
+function fetchFriends() {
+    var x, text;
+    x = document.getElementById("vkId").value;
+    document.getElementById("output").innerHTML = x;
+    var script = document.createElement('SCRIPT');
 
 //script.src = "https://api.vk.com/method/getProfiles?uid=66748&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=66748&callback=callbackFunc';
-//        script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
-          script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc');
+//script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
+
+
+    script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc');
 
         document.getElementsByTagName("head")[0].appendChild(script);
 
@@ -57,7 +53,7 @@ function myFunction() {
 
 function callbackFunc(result) {
     console.log(result);
-    document.getElementById("output2").innerHTML = JSON.stringify(result);
+    document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
 }
 
 
