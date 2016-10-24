@@ -34,7 +34,7 @@ function fetchDetails() {
     
     result = document.getElementsByTagName("head")[0].appendChild(script);
 
-    document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
+    document.getElementById("friendDetails").innerHTML = result;
 
     fetchFriendList();
     }
@@ -49,8 +49,8 @@ function fetchFriendList() {
 
 function api_FetchDetails(result) {
     console.log(result);
-    return result 
-    // document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
+    return JSON.stringify(result); 
+    // document.getElementById("friendDetails").innerHTML = ;
 }
 
 function api_FetchFriendList(result) {
