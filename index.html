@@ -44,13 +44,12 @@ function fetchFriendList() {
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-
-function api_FetchFriendList(result) {
+function api_FetchDetails(result) {
     console.log(result);
     document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
 }
 
-function api_FetchDetails(result) {
+function api_FetchFriendList(result) {
     console.log(result);
     document.getElementById("friendList").innerHTML = JSON.stringify(result);
 }
