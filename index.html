@@ -44,7 +44,7 @@ function fetchDetails() {
 
     script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=api_FetchDetails');
 
-        document.getElementsByTagName("head")[0].appendChild(script);
+        document.getElementsByTagName("head")[0]["response"].appendChild(script);
     }
 
 
