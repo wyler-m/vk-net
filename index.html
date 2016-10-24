@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
-<>
-
+    
 <h1>JavaScript Can Validate Input</h1>
 
 <p>Please input a number between 1 and 10:</p>
@@ -47,7 +46,8 @@ function myFunction() {
 
 //script.src = "https://api.vk.com/method/getProfiles?uid=66748&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=66748&callback=callbackFunc';
-        script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
+//        script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
+          script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc');
 
         document.getElementsByTagName("head")[0].appendChild(script);
 
