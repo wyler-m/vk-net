@@ -21,30 +21,14 @@
 
 <script>
 
-function myFunction() {
-    var x, text;
-
-    // Get the value of the input field with id="numb"
-    x = document.getElementById("numb").value;
-
-    // If x is Not a Number or less than one or greater than 10
-    if (isNaN(x) || x < 1 || x > 10) {
-        text = "Input not valid";
-    } else {
-        text = "Input OK";
-    }
-    document.getElementById("demo").innerHTML = text;
-}
+//script.src = "https://api.vk.com/method/getProfiles?uid=218868103&callback=callbackFunc";
+//script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
+//script.src = 'https://api.vk.com/method/users.get?uids=218868103&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
 function fetchDetails() {
     var x;
     x = document.getElementById("vkId").value;
-    // document.getElementById("output").innerHTML = x;
     var script = document.createElement('SCRIPT');
-
-//script.src = "https://api.vk.com/method/getProfiles?uid=66748&callback=callbackFunc";
-//script.src = 'https://api.vk.com/method/friends.get?uid=66748&callback=callbackFunc';
-//script.src = 'https://api.vk.com/method/users.get?uids=66748&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
     script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=api_FetchDetails');
     document.getElementsByTagName("head")[0].appendChild(script);
@@ -60,17 +44,16 @@ function fetchFriendList() {
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-function api_FetchDetails(result) {
-    console.log(result);
-    document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
-}
 
 function api_FetchFriendList(result) {
     console.log(result);
     document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
 }
 
-
+function api_FetchDetails(result) {
+    console.log(result);
+    document.getElementById("friendList").innerHTML = JSON.stringify(result);
+}
 
 
 </script>
