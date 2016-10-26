@@ -82,31 +82,9 @@ function build_friend_list(){
       j = 0; 
   }
 window.map_file = {"nodes":nodes,"links":links};
+console.log(window.map_file)
+
 }
-
-function dataProvider(){
-  var a = {
-  "nodes": [
-    {"id": 1, "group": 1},
-    {"id": 2, "group": 1},
-    {"id": 3, "group": 1},
-    {"id": 4, "group": 1},
-    {"id": 5, "group": 4},
-    {"id": 6, "group": 8}
-  ],
-  "links": [
-    {"source": 1, "target": 3, "value": 1},
-    {"source": 2, "target": 3, "value": 8},
-    {"source": 3, "target": 3, "value": 1},
-    {"source": 4, "target": 5, "value": 1},
-    {"source": 5, "target": 6, "value": 1},
-    {"source": 6, "target": 1, "value": 1}
-  ]
-};
-
-return a;
-}
-
 
 
 
@@ -124,9 +102,7 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 3));
 
-// d3.json("wylers copy.json", function(error, graph) {
-// d3.json(window.map_file, function(error, graph) {
-d3.json(dataProvider(), function(error, graph) {
+d3.json("wylers copy.json", function(error, graph) {
   if (error) throw error;
 
   simulation
