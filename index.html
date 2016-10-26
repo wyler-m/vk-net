@@ -17,6 +17,7 @@
 <center><p>Who are the friends?</p></center>
 <center><button type="button" onclick="fetchFriendList()">find out</button></center>
 <center><p id="friendList"></p></center>
+<center><p id="testBox">Test</p></center>
 <canvas width="960" height="600"></canvas>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
@@ -26,17 +27,14 @@
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
 //script.src = 'https://api.vk.com/method/users.get?uids=218868103&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
+window.friends_list = 0;
+
 function fetchDetails() {
-    var x, result;
+    var x;
     x = document.getElementById("vkId").value;
     var script = document.createElement('SCRIPT');
-
-    script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=api_FetchDetails');
-    
-    result = document.getElementsByTagName("head")[0].appendChild(script);
-
-    document.getElementById("friendDetails").innerHTML = result.toString();
-
+    script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=api_FetchDetails');   
+    document.getElementsByTagName("head")[0].appendChild(script); 
     fetchFriendList();
     }
 
@@ -49,16 +47,44 @@ function fetchFriendList() {
     }
 
 function api_FetchDetails(result) {
-    console.log(result);
-    // return result.toString(); 
     document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
+    document.getElementById("testBox").innerHTML = result["response"][0]["first_name"];
 }
 
 function api_FetchFriendList(result) {
-    console.log(result);
     document.getElementById("friendList").innerHTML = JSON.stringify(result);
+    window.friends_list =  result["response"];
+    console.log(window.friends_list);
+    set_test_box();
+    build_friend_list();
 }
 
+function set_test_box(){
+
+    document.getElementById("testBox").innerHTML = window.friends_list;
+
+}
+
+function build_friend_list(){
+  var i,j = 0;
+var nodes,links= [];
+
+  while (window.friends_list[i]){
+    while (window.friends_list[j]){
+          links.push( [ "source" : window.friends_list[i] , "target" : window.friends_list[j] ];
+          
+
+
+    j++;
+    }
+
+    nodes.push({"id": window.friends_list[i]  , "group": i},)
+    i++; 
+    j = 0; 
+}
+
+
+}
 
 
 // ------------------------------------------------------------
@@ -74,7 +100,7 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-d3.json("miserables.json", function(error, graph) {
+d3.json("wylers copy.json", function(error, graph) {
   if (error) throw error;
 
   simulation
