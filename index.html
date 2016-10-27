@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html>
-<script src="https://d3js.org/d3.v4.min.js"></script> 
-<center><h1>The VK visualizer</h1></center>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+ <head><link rel="stylesheet" href="style.css"></head>
+ <div1></div1>
+ <div> 
+  <body>
+    
+    <center>
+    <h1>The VK visualizer</h1>
+    <p>Enter An ID number</p>
+    <input id="vkId" value="218868103"></input>
+    <button type="button" onclick="fetchDetails()">go</button>
+    <!-- <p id="demo"></p> -->
+    <!-- <p id="output"></p> -->
+    <p>Who is this person?</p>
+    <p id="friendDetails">let's find out</p>
+    <p>Who are the friends?</p>
+    <button type="button" onclick="fetchFriendList()">find out</button>
+    <p id="friendList"></p>
+    <p id="testBox">Test</p>
+    </center>
+    <canvas width="960" height="600"></canvas>
+    
+  </body>
+  </div>
+  
 
-<center><p>Enter An ID number</p></center>
-
-
-<center><input id="vkId" value="218868103"></input></center>
-
-<center><button type="button" onclick="fetchDetails()">go</button></center>
-
-<!-- <p id="demo"></p> -->
-<!-- <center><p id="output"></p><center> -->
-<center><p>Who is this person?</p></center>
-<center><p id="friendDetails">let's find out</p></center>
-<center><p>Who are the friends?</p></center>
-<center><button type="button" onclick="fetchFriendList()">find out</button></center>
-<center><p id="friendList"></p></center>
-<center><p id="testBox">Test</p></center>
-<canvas width="960" height="600"></canvas>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-
-<script>
+  <script>
 
 //script.src = "https://api.vk.com/method/getProfiles?uid=218868103&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
@@ -91,16 +96,47 @@ console.log(window.map_file)
 
 // ------------------------------------------------------------
 
+// d3.select("div1").insert("p").text("hui");
+var dataset = [1,2,3,4];
+var dataset2 = [];
+for (var i = 0; i < 25; i++) {           //Loop 25 times
+    var newNumber = Math.random() * 30;  //New random number (0-30)
+    dataset2.push(newNumber);             //Add new number to array
+}
+d3.select("div1")
+  .selectAll("p")
+  .data(dataset).enter()
+  .append("p").append("center")
+  .text(function (c) {return c+" dogs"})
+  .style("color",function(d) {
+    if (d%2==0){
+      return "red"
+    } else {
+      return "green"
+    }
+  });
+  d3.select("div1").selectAll("p").attr("class","test");
+  d3.select("div1").selectAll("div1").data(dataset2).enter().append("div1").attr("class","bar")
+  .style("height", function(d){
+    // var r = Math.Random();
+    var r = 2;
+    return d*10*r+"px";
+  })
+  .style("margin-right",5+"px")
 
+//draw canvas
 var canvas = document.querySelector("canvas"),
     context = canvas.getContext("2d"),
     width = canvas.width,
     height = canvas.height;
 
+//build simulation
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 3));
+
+d3.select()
 
 d3.json("wylers copy.json", function(error, graph) {
   if (error) throw error;
@@ -170,7 +206,5 @@ function drawNode(d) {
 
 
 </script>
-
-</body>
 
 </html> 

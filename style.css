@@ -1,0 +1,17 @@
+
+/*h1           Selects level 1 headings              */
+/*p            Selects paragraphs                    */
+/*.caption     Selects elements with class "caption" */
+/*#subnav      Selects element with ID "subnav"      */
+.test {
+    font-size: 32px;
+    line-height: 24px;
+    color: orange;
+}
+
+div1.bar {
+	display: inline-block;
+    width: 20px;
+    height: 75px;   /* We'll override this later */
+    background-color: teal;
+}
