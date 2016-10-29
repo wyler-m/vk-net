@@ -6,9 +6,11 @@
  <div id="left"> 
   <body>
     <center>
+    <canvas width="800" height="800"></canvas>
     <h1>The VK visualizer</h1>
     <p>Enter An ID number</p>
     <input id="vkId" value="218868103"></input>
+    <button type="button" onclick="set_nodes()">set nodes</button>
     <button type="button" onclick="fetchDetails()">go</button>
     <p>Who is this person?</p>
     <p id="friendDetails">let's find out</p>
@@ -16,9 +18,9 @@
     <button type="button" onclick="fetchFriendList()">find out</button>
     <p id="friendList"></p>
     <p id="testBox">Test</p>
-    </center>
-    <canvas width="960" height="600"></canvas>
     
+
+    </center>
   </body>
   </div>
   
@@ -31,12 +33,16 @@
 
 window.friends_list = 0;
 
+function set_nodes(){
+
+}
+
 function fetchDetails() {
     var x;
     x = document.getElementById("vkId").value;
     var script = document.createElement('SCRIPT');
     script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=api_FetchDetails');   
-    document.getElementsByTagName("head")[0].appendChild(script); 
+    document.getElementsByTagName("head")[0].appendChild(script);
     fetchFriendList();
     }
 
@@ -56,25 +62,16 @@ function api_FetchDetails(result) {
 function api_FetchFriendList(result) {
     document.getElementById("friendList").innerHTML = JSON.stringify(result);
     window.friends_list =  result["response"];
-    
-    set_test_box();
-    build_friend_list();
+    graph_friend_list()
 }
 
-function set_test_box(){
-
-    document.getElementById("testBox").innerHTML = window.friends_list;
-
-}
-
-
-function build_friend_list(){
+function graph_friend_list(){
   var i = 0;
   var j = 0;
   var nodes = []
   var links= [];
 
-  while ( window.friends_list[i] ){
+    while ( window.friends_list[i] ){
       while (window.friends_list[j]){
           links.push( { "source" : window.friends_list[i] , "target" : window.friends_list[j] });        
           j++;
@@ -83,44 +80,11 @@ function build_friend_list(){
       i++; 
       j = 0; 
   }
-window.map_file = {"nodes":nodes,"links":links};
-console.log(window.map_file)
 
-}
+friends_list_something = {"nodes":nodes,"links":links}; 
 
+  //draw canvas
 
-
-
-// ------------------------------------------------------------
-
-// d3.select("div1").insert("p").text("hui");
-var dataset = [1,2,3,4];
-var dataset2 = [];
-for (var i = 0; i < 25; i++) {           //Loop 25 times
-    var newNumber = Math.random() * 30;  //New random number (0-30)
-    dataset2.push(newNumber);             //Add new number to array
-}
-// d3.select("div")
-//   .selectAll("p")
-//   .data(dataset).enter()
-//   .append("p").append("center")
-//   .text(function (c) {return c+" dogs"})
-//   .style("color",function(d) {
-//     if (d%2==0){
-//       return "red"
-//     } else {
-//       return "green"
-//     }
-//   });
-d3.selectAll("div").attr("width",100)
-  d3.select("div").selectAll("p").attr("class","test");
-  d3.select("div").selectAll("div1").data(dataset2).enter().append("div1").attr("class","bar")
-  .style("height", function(d){
-    return d+"px";
-  })
-  .style("margin-right",5+"px")
-
-//draw canvas
 var canvas = document.querySelector("canvas"),
     context = canvas.getContext("2d"),
     width = canvas.width,
@@ -131,18 +95,25 @@ var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 3));
-
 d3.select()
 
-d3.json("wylers copy.json", function(error, graph) {
-  if (error) throw error;
+
+console.log(friends_list_something);
+
+
+d3.json(friends_list_something, function(error, graph) {
+//   if (error) {
+// console.log("fuck");
+//     throw error};
+
+console.log(friends_list_something);
 
   simulation
-      .nodes(graph.nodes)
+      .nodes(friends_list_something.nodes)
       .on("tick", ticked);
 
   simulation.force("link")
-      .links(graph.links);
+      .links(friends_list_something.links);
 
   d3.select(canvas)
       .call(d3.drag()
@@ -156,12 +127,12 @@ d3.json("wylers copy.json", function(error, graph) {
     context.clearRect(0, 0, width, height);
 
     context.beginPath();
-    graph.links.forEach(drawLink);
+    friends_list_something.links.forEach(drawLink);
     context.strokeStyle = "#aaa";
     context.stroke();
 
     context.beginPath();
-    graph.nodes.forEach(drawNode);
+    friends_list_something.nodes.forEach(drawNode);
     context.fill();
     context.strokeStyle = "#fff";
     context.stroke();
@@ -198,6 +169,121 @@ function drawNode(d) {
   context.moveTo(d.x + 3, d.y);
   context.arc(d.x, d.y, 3, 0, 2 * Math.PI);
 }
+}
+
+
+
+
+// ------------------------------------------------------------
+
+// d3.select("div1").insert("p").text("hui");
+// var dataset = [1,2,3,4];
+// var dataset2 = [];
+// for (var i = 0; i < 25; i++) {           //Loop 25 times
+//     var newNumber = Math.random() * 30;  //New random number (0-30)
+//     dataset2.push(newNumber);             //Add new number to array
+// }
+// d3.select("div")
+//   .selectAll("p")
+//   .data(dataset).enter()
+//   .append("p").append("center")
+//   .text(function (c) {return c+" dogs"})
+//   .style("color",function(d) {
+//     if (d%2==0){
+//       return "red"
+//     } else {
+//       return "green"
+//     }
+//   });
+// d3.selectAll("div").attr("width",100)
+//   d3.select("div").selectAll("p").attr("class","test");
+//   d3.select("div").selectAll("div1").data(dataset2).enter().append("div1").attr("class","bar")
+//   .style("height", function(d){
+//     return d+"px";
+//   })
+//   .style("margin-right",5+"px")
+
+
+//draw canvas
+
+// var canvas = document.querySelector("canvas"),
+//     context = canvas.getContext("2d"),
+//     width = canvas.width,
+//     height = canvas.height;
+
+// //build simulation
+// var simulation = d3.forceSimulation()
+//     .force("link", d3.forceLink().id(function(d) { return d.id; }))
+//     .force("charge", d3.forceManyBody())
+//     .force("center", d3.forceCenter(width / 2, height / 3));
+
+// d3.select()
+
+// d3.json("wylers copy.json", function(error, graph) {
+// // d3.json(friends_list_something, function(error, graph) {
+//   if (error) throw error;
+
+//   simulation
+//       .nodes(graph.nodes)
+//       .on("tick", ticked);
+
+//   simulation.force("link")
+//       .links(graph.links);
+
+//   d3.select(canvas)
+//       .call(d3.drag()
+//           .container(canvas)
+//           .subject(dragsubject)
+//           .on("start", dragstarted)
+//           .on("drag", dragged)
+//           .on("end", dragended));
+
+//   function ticked() {
+//     context.clearRect(0, 0, width, height);
+
+//     context.beginPath();
+//     graph.links.forEach(drawLink);
+//     context.strokeStyle = "#aaa";
+//     context.stroke();
+
+//     context.beginPath();
+//     graph.nodes.forEach(drawNode);
+//     context.fill();
+//     context.strokeStyle = "#fff";
+//     context.stroke();
+//   }
+
+//   function dragsubject() {
+//     return simulation.find(d3.event.x, d3.event.y);
+//   }
+// });
+
+// function dragstarted() {
+//   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+//   d3.event.subject.fx = d3.event.subject.x;
+//   d3.event.subject.fy = d3.event.subject.y;
+// }
+
+// function dragged() {
+//   d3.event.subject.fx = d3.event.x;
+//   d3.event.subject.fy = d3.event.y;
+// }
+
+// function dragended() {
+//   if (!d3.event.active) simulation.alphaTarget(0);
+//   d3.event.subject.fx = null;
+//   d3.event.subject.fy = null;
+// }
+
+// function drawLink(d) {
+//   context.moveTo(d.source.x, d.source.y);
+//   context.lineTo(d.target.x, d.target.y);
+// }
+
+// function drawNode(d) {
+//   context.moveTo(d.x + 3, d.y);
+//   context.arc(d.x, d.y, 3, 0, 2 * Math.PI);
+// }
 
 
 
