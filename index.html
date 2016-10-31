@@ -10,6 +10,8 @@
             VK.init({
               apiId: 4966960
             });
+
+            // https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.59
 </script>
 
  </head>
@@ -21,6 +23,7 @@
     <canvas width="800" height="400"></canvas>
     <h1>The VK visualizer</h1>
     <p>Enter An ID number</p>
+    <p id="urlBar">11</p>
     <input id="vkId" value="218868103">
     <button type="button" onclick="fetchDetails()">Get Info</button>
     <button type="button" onclick="fetchFriendList()">Build Graph</button>
@@ -38,7 +41,7 @@
   
 
   <script>
-
+// https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
 //script.src = "https://api.vk.com/method/getProfiles?uid=218868103&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
 //script.src = 'https://api.vk.com/method/users.get?uids=218868103&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
@@ -48,7 +51,29 @@ window.friends = null;
 window.unChecked = null;
 window.graph = null;
 
+window.urlParams = parseURLParams();
 
+function parseURLParams() {
+    var params = {};
+    var param_array = window.location.href.split('#')[1].split('&');
+    for(var i in param_array){
+        x = param_array[i].split('=');
+        params[x[0]] = x[1];
+    }
+    return params;
+}
+
+function set_nodes(){  
+  var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').window.urlParams.access_token;
+  $.get(url, function(data, status){
+            alert("Data: " + data + "\nStatus: " + status);
+        });
+
+}
+// document.getElementById("urlBar").innerHTML = parseURLParams(location);
+console.log(parseURLParams());
+
+function
  
 function fetchDetails() {
     var x;
@@ -111,17 +136,6 @@ function fetchFriend_of_friend_List(friend_id) {
 function api_fetchFriend_of_friend_List(result) {
        window.data = result;
       }
-
-function set_nodes(){  
-    window.data = null
-    fetchFriend_of_friend_List( document.getElementById("vkId").value);
-        var intvl = setInterval(function() {
-         if (window.data) { 
-            clearInterval(intvl);
-            console.log(window.data);
-          }}, 100);
-            console.log("first");
-}
 
 function buildLinks(){
 
