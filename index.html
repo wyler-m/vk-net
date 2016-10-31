@@ -12,10 +12,9 @@
  <div id="left"> 
   <body>
     <center>
-    <canvas width="800" height="400"></canvas>
+    <canvas width="1000" height="1000"></canvas>
     <h1>The VK visualizer</h1>
     <p>Enter An ID number</p>
-    <p id="urlBar">11</p>
     <input id="vkId" value="218868103">
     <button type="button" onclick="fetchDetails()">Get Info</button>
     <button type="button" onclick="fetchFriendList()">get friends</button>
@@ -125,36 +124,14 @@ function api_FetchFriendList(result) {
       } else {return};
     }
   //lanch when done
-    // launch_graph();
-console.log(window.friends);
-console.log(window.unCheckedFriends);
-console.log(window.addedFriends);
-console.log(window.graph);
-console.log(window.currentNode);
 }
 
 
 function buildLinks(){
 
-  // if (window.unCheckedFriends) {
 
-  // };
-  // var i = 0;
-  // var j = 0;
-  var nodes = [];
-  // var links= [];
+  var nodes = window.friends;
 
-  //   while (window.friends_list[i] ){
-  //     while (window.friends_list[j]){
-  //         links.push( { "source" : window.friends_list[i] , "target" : window.friends_list[j] });        
-  //         j++;
-  //     }
-  //     nodes.push({"id": window.friends_list[i]  , "group": i})
-  //     i++; 
-  //     j = 0; 
-  // }
-
-nodes = window.friends;
 for (var i = nodes.length - 1; i >= 0; i--) {
   nodes[i] = {"id": nodes[i] , "group": i};
 };
