@@ -43,7 +43,7 @@ var so = setOps;
 window.friends = null;
 window.unCheckedFriends = null;
 window.addedFriends = null;
-window.graph = null;
+window.graph = {"nodes":[],"links":[]};
 window.currentNode = null;
 
 // window.urlParams = parseURLParams();
@@ -99,21 +99,38 @@ function api_FetchDetails(result) {
 }
 
 function api_FetchFriendList(result) {
-    document.getElementById("friendList").innerHTML = JSON.stringify(result);
+    //check to see if there are any friends
     if (!window.friends) { 
+      
       window.unCheckedFriends = result["response"];
-      window.friends = result["response"];
-      console.log(window.friends);
-    } else {
+      window.friends = result["response"].slice(0);
+      window.currentNode = window.unCheckedFriends.pop();
+      fetchFriendList(window.currentNode);
+    } 
+//if not, then take intersection of the response and the friends
+    else {
+    document.getElementById("friendList").innerHTML = (1 - window.unCheckedFriends.length / window.friends.length) * 100;
+
+      if (result["response"] && window.friends) {
       var newLinks = so.intersection(window.friends,result["response"]);
       for (var i = newLinks.length - 1; i >= 0; i--) {
-        make_link(newLinks[i],window.currentNode);
-      };
+          make_link(newLinks[i],window.currentNode);
+        };
+    };
+      
+//keep recursing until all the unchecked friends are finished
+      if (window.unCheckedFriends.length != 0) {
+        window.currentNode = window.unCheckedFriends.pop();
+        fetchFriendList(window.currentNode);  
+      } else {return};
     }
-  
-    if (window.currentNode){
-
-    }
+  //lanch when done
+    // launch_graph();
+console.log(window.friends);
+console.log(window.unCheckedFriends);
+console.log(window.addedFriends);
+console.log(window.graph);
+console.log(window.currentNode);
 }
 
 
@@ -125,7 +142,7 @@ function buildLinks(){
   // var i = 0;
   // var j = 0;
   var nodes = [];
-  var links= [];
+  // var links= [];
 
   //   while (window.friends_list[i] ){
   //     while (window.friends_list[j]){
@@ -137,8 +154,11 @@ function buildLinks(){
   //     j = 0; 
   // }
 
-nodes = window.friends
-window.graph = {"nodes":nodes,"links":links};
+nodes = window.friends;
+for (var i = nodes.length - 1; i >= 0; i--) {
+  nodes[i] = {"id": nodes[i] , "group": i};
+};
+window.graph.nodes = nodes;
 }
 
 
@@ -147,7 +167,6 @@ window.graph = {"nodes":nodes,"links":links};
 function launch_graph(){
 
  buildLinks();
- console.log(window.graph);
 
   //draw canvas
 var canvas = document.querySelector("canvas"),
