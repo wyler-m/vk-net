@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src="setOPs.js"></script>
- <head><link rel="stylesheet" href="style.css"></head>
- <meta charset="utf-8">
+ <head>
+     <link rel="stylesheet" href="style.css">
+     <meta charset="utf-8">
+     <script src="https://d3js.org/d3.v4.min.js"></script>
+     <script src="setOPs.js"></script>
+ </head>
+ 
  <div id="right" ></div>
  <div id="left"> 
   <body>
@@ -11,17 +14,16 @@
     <canvas width="800" height="400"></canvas>
     <h1>The VK visualizer</h1>
     <p>Enter An ID number</p>
-    <input id="vkId" value="218868103"></input>
+    <input id="vkId" value="218868103">
     <button type="button" onclick="fetchDetails()">Get Info</button>
     <button type="button" onclick="fetchFriendList()">Build Graph</button>
     <button type="button" onclick="set_nodes()">set nodes</button>
     <p>Who is this person?</p>
-    <img id="current_contact" src="">
+    <img id="current_contact" src="" alt='picture'>
     <p id="friendDetails">let's find out</p>
     <p>Who are the friends?</p>
     <p id="friendList"></p>
     <p id="testBox">Test</p>
-    
 
     </center>
   </body>
@@ -35,9 +37,9 @@
 //script.src = 'https://api.vk.com/method/users.get?uids=218868103&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 var so = setOps;
 window.friends_list = 0;
-window.temp_list = 0;
+window.graph = 0;
 
-
+ 
 function fetchDetails() {
     var x;
     x = document.getElementById("vkId").value;
@@ -128,18 +130,16 @@ function buildLinks(){
       i++; 
       j = 0; 
   }
-return {"nodes":nodes,"links":links};
+
+
+window.graph = {"nodes":nodes,"links":links};
 }
 
 function graph_friend_list(){
 
-  var graph = buildLinks();
-// if (new_friends){
-//   window.friends_list.(new_friends)
-// }
+ buildLinks();
 
   //draw canvas
-
 var canvas = document.querySelector("canvas"),
     context = canvas.getContext("2d"),
     width = canvas.width,
@@ -153,14 +153,15 @@ var simulation = d3.forceSimulation()
 d3.select()
 
 //build graph
-d3.json(graph, function(error, graph1) {
+d3.json(null, function(error, graph1) {
+console.log(window.graph);
 
   simulation
-      .nodes(graph.nodes)
+      .nodes(window.graph.nodes)
       .on("tick", ticked);
 
   simulation.force("link")
-      .links(graph.links);
+      .links(window.graph.links);
 
   d3.select(canvas)
       .call(d3.drag()
@@ -174,12 +175,12 @@ d3.json(graph, function(error, graph1) {
     context.clearRect(0, 0, width, height);
 
     context.beginPath();
-    graph.links.forEach(drawLink);
+    window.graph.links.forEach(drawLink);
     context.strokeStyle = "#aaa";
     context.stroke();
 
     context.beginPath();
-    graph.nodes.forEach(drawNode);
+    window.graph.nodes.forEach(drawNode);
     context.fill();
     context.strokeStyle = "#fff";
     context.stroke();
@@ -205,7 +206,6 @@ function dragended() {
   if (!d3.event.active) simulation.alphaTarget(0);
   d3.event.subject.fx = null;
   d3.event.subject.fy = null;
-  graph_friend_list(fetchFriend_of_friend_List(d3.event.subject.id));
 }
 
 function drawLink(d) {
