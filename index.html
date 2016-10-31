@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html>
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="setOPs.js"></script>
  <head><link rel="stylesheet" href="style.css"></head>
+ <meta charset="utf-8">
  <div id="right" ></div>
  <div id="left"> 
   <body>
     <center>
-    <canvas width="800" height="800"></canvas>
+    <canvas width="800" height="400"></canvas>
     <h1>The VK visualizer</h1>
     <p>Enter An ID number</p>
     <input id="vkId" value="218868103"></input>
+    <button type="button" onclick="fetchDetails()">Get Info</button>
+    <button type="button" onclick="fetchFriendList()">Build Graph</button>
     <button type="button" onclick="set_nodes()">set nodes</button>
-    <button type="button" onclick="fetchDetails()">go</button>
     <p>Who is this person?</p>
+    <img id="current_contact" src="">
     <p id="friendDetails">let's find out</p>
     <p>Who are the friends?</p>
-    <button type="button" onclick="fetchFriendList()">find out</button>
     <p id="friendList"></p>
     <p id="testBox">Test</p>
     
@@ -30,20 +33,17 @@
 //script.src = "https://api.vk.com/method/getProfiles?uid=218868103&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
 //script.src = 'https://api.vk.com/method/users.get?uids=218868103&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
-
+var so = setOps;
 window.friends_list = 0;
+window.temp_list = 0;
 
-function set_nodes(){
-
-}
 
 function fetchDetails() {
     var x;
     x = document.getElementById("vkId").value;
     var script = document.createElement('SCRIPT');
-    script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=api_FetchDetails');   
+    script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails');   
     document.getElementsByTagName("head")[0].appendChild(script);
-    fetchFriendList();
     }
 
 function fetchFriendList() {
@@ -57,6 +57,7 @@ function fetchFriendList() {
 function api_FetchDetails(result) {
     document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
     document.getElementById("testBox").innerHTML = result["response"][0]["first_name"];
+    document.getElementById("current_contact").src = result["response"][0]["photo_200"];
 }
 
 function api_FetchFriendList(result) {
@@ -65,13 +66,60 @@ function api_FetchFriendList(result) {
     graph_friend_list()
 }
 
-function graph_friend_list(){
+
+
+// Cross-Domain Requests
+// For API cross-domain requests you may use JSONP protocol. For this you need to connect a script with request src=url to the document by adding a callback parameter to the request with the name of the function which will be called when the result is received.  
+
+// Example
+// var script = document.createElement('SCRIPT'); 
+
+// script.src = "https://api.vk.com/method/getProfiles?uid=66748&access_token=533bacf...&callback=callbackFunc"; 
+
+// document.getElementsByTagName("head")[0].appendChild(script); 
+
+// function callbackFunc(result) { 
+//   alert(result); 
+// }
+
+
+
+function fetchFriend_of_friend_List(friend_id) {
+        var script = document.createElement('SCRIPT');
+        script.src = 'https://api.vk.com/method/friends.get?uid='.concat(friend_id,'&callback=api_fetchFriend_of_friend_List');
+        document.getElementsByTagName("head")[0].appendChild(script);
+    window.data = null
+    var intvl = setInterval(function() {
+        if (window.data) { 
+            clearInterval(intvl);
+            return window.data;
+          }}, 100);
+}
+
+function api_fetchFriend_of_friend_List(result) {
+       window.data = result;
+      }
+
+function set_nodes(){  
+    window.data = null
+    fetchFriend_of_friend_List( document.getElementById("vkId").value);
+        var intvl = setInterval(function() {
+         if (window.data) { 
+            clearInterval(intvl);
+            console.log(window.data);
+          }}, 100);
+            console.log("first");
+}
+
+function buildLinks(){
+
+  
   var i = 0;
   var j = 0;
   var nodes = []
   var links= [];
 
-    while ( window.friends_list[i] ){
+    while (window.friends_list[i] ){
       while (window.friends_list[j]){
           links.push( { "source" : window.friends_list[i] , "target" : window.friends_list[j] });        
           j++;
@@ -80,8 +128,15 @@ function graph_friend_list(){
       i++; 
       j = 0; 
   }
+return {"nodes":nodes,"links":links};
+}
 
-friends_list_something = {"nodes":nodes,"links":links}; 
+function graph_friend_list(){
+
+  var graph = buildLinks();
+// if (new_friends){
+//   window.friends_list.(new_friends)
+// }
 
   //draw canvas
 
@@ -94,26 +149,18 @@ var canvas = document.querySelector("canvas"),
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
     .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 3));
+    .force("center", d3.forceCenter(width / 2, height / 3 * 2));
 d3.select()
 
-
-console.log(friends_list_something);
-
-
-d3.json(friends_list_something, function(error, graph) {
-//   if (error) {
-// console.log("fuck");
-//     throw error};
-
-console.log(friends_list_something);
+//build graph
+d3.json(graph, function(error, graph1) {
 
   simulation
-      .nodes(friends_list_something.nodes)
+      .nodes(graph.nodes)
       .on("tick", ticked);
 
   simulation.force("link")
-      .links(friends_list_something.links);
+      .links(graph.links);
 
   d3.select(canvas)
       .call(d3.drag()
@@ -127,12 +174,12 @@ console.log(friends_list_something);
     context.clearRect(0, 0, width, height);
 
     context.beginPath();
-    friends_list_something.links.forEach(drawLink);
+    graph.links.forEach(drawLink);
     context.strokeStyle = "#aaa";
     context.stroke();
 
     context.beginPath();
-    friends_list_something.nodes.forEach(drawNode);
+    graph.nodes.forEach(drawNode);
     context.fill();
     context.strokeStyle = "#fff";
     context.stroke();
@@ -158,6 +205,7 @@ function dragended() {
   if (!d3.event.active) simulation.alphaTarget(0);
   d3.event.subject.fx = null;
   d3.event.subject.fy = null;
+  graph_friend_list(fetchFriend_of_friend_List(d3.event.subject.id));
 }
 
 function drawLink(d) {
@@ -220,7 +268,6 @@ function drawNode(d) {
 // d3.select()
 
 // d3.json("wylers copy.json", function(error, graph) {
-// // d3.json(friends_list_something, function(error, graph) {
 //   if (error) throw error;
 
 //   simulation
