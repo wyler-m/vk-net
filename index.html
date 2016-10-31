@@ -51,8 +51,6 @@ window.friends = null;
 window.unChecked = null;
 window.graph = null;
 
-window.urlParams = parseURLParams();
-console.log(parseURLParams();
 function parseURLParams() {
     var params = {};
     var param_array = window.location.href.split('#')[1].split('&');
@@ -62,6 +60,11 @@ function parseURLParams() {
     }
     return params;
 }
+
+window.urlParams = parseURLParams();
+
+console.log(parseURLParams();
+
 
 function set_nodes(){  
   var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').window.urlParams.access_token;
