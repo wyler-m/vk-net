@@ -54,6 +54,7 @@ window.graph = null;
 window.urlParams = parseURLParams();
 
 console.log(parseURLParams());
+console.log(window.urlParams);
 
 function parseURLParams() {
     var params = {};
@@ -66,16 +67,12 @@ function parseURLParams() {
 }
 
 
-
-
 function set_nodes(){  
   var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').window.urlParams.access_token;
   $.get(url, function(data, status){
             alert("Data: " + data + "\nStatus: " + status);
         });
 }
-// document.getElementById("urlBar").innerHTML = parseURLParams(location);
-console.log(parseURLParams());
  
 function fetchDetails() {
     var x;
