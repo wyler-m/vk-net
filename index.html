@@ -6,15 +6,6 @@
      <script src="https://d3js.org/d3.v4.min.js"></script>
      <script src="setOps.js"></script>
      <script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-     <script type="text/javascript">
-            VK.init({
-              apiId: 4966960
-            });
-
-            // https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.59
-</script>
-
  </head>
  
  <div id="right" ></div>
@@ -27,7 +18,8 @@
     <p id="urlBar">11</p>
     <input id="vkId" value="218868103">
     <button type="button" onclick="fetchDetails()">Get Info</button>
-    <button type="button" onclick="fetchFriendList()">Build Graph</button>
+    <button type="button" onclick="fetchFriendList()">get friends</button>
+    <button type="button" onclick="launch_graph()">Build Graph</button>
     <button type="button" onclick="set_nodes()">set nodes</button>
     <p>Who is this person?</p>
     <img id="current_contact" src="" alt='picture'>
@@ -49,13 +41,15 @@
 var so = setOps;
 
 window.friends = null;
-window.unChecked = null;
+window.unCheckedFriends = null;
+window.addedFriends = null;
 window.graph = null;
+window.currentNode = null;
 
-window.urlParams = parseURLParams();
+// window.urlParams = parseURLParams();
 
-console.log(parseURLParams());
-console.log(window.urlParams);
+// console.log(parseURLParams());
+// console.log(window.urlParams);
 
 function parseURLParams() {
     var params = {};
@@ -67,16 +61,15 @@ function parseURLParams() {
     return params;
 }
 
-var invocation = new XMLHttpRequest();
-var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
+// var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
 
 
 function set_nodes(){  
-   if(invocation) {    
-    invocation.open('GET', url, true);
-    invocation.onreadystatechange = handler;
-    invocation.send(); 
-  }
+
+}
+
+function make_link(source,target){
+  window.graph.links.push({"source":source,"target":target})
 }
  
 function fetchDetails() {
@@ -87,9 +80,13 @@ function fetchDetails() {
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-function fetchFriendList() {
-    var x;
-    x = document.getElementById("vkId").value;
+function fetchFriendList(id) {
+    if (!id) {
+      var x;
+      x = document.getElementById("vkId").value;
+      window.currentNode = document.getElementById("vkId").value;
+    } else {x = id; window.currentNode = id;};
+
     var script = document.createElement('SCRIPT');
     script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,'&callback=api_FetchFriendList');
     document.getElementsByTagName("head")[0].appendChild(script);
@@ -103,69 +100,54 @@ function api_FetchDetails(result) {
 
 function api_FetchFriendList(result) {
     document.getElementById("friendList").innerHTML = JSON.stringify(result);
-    window.friends_list =  result["response"];
-    graph_friend_list()
+    if (!window.friends) { 
+      window.unCheckedFriends = result["response"];
+      window.friends = result["response"];
+      console.log(window.friends);
+    } else {
+      var newLinks = so.intersection(window.friends,result["response"]);
+      for (var i = newLinks.length - 1; i >= 0; i--) {
+        make_link(newLinks[i],window.currentNode);
+      };
+    }
+  
+    if (window.currentNode){
+
+    }
 }
 
-
-
-// Cross-Domain Requests
-// For API cross-domain requests you may use JSONP protocol. For this you need to connect a script with request src=url to the document by adding a callback parameter to the request with the name of the function which will be called when the result is received.  
-
-// Example
-// var script = document.createElement('SCRIPT'); 
-
-// script.src = "https://api.vk.com/method/getProfiles?uid=66748&access_token=533bacf...&callback=callbackFunc"; 
-
-// document.getElementsByTagName("head")[0].appendChild(script); 
-
-// function callbackFunc(result) { 
-//   alert(result); 
-// }
-
-
-
-function fetchFriend_of_friend_List(friend_id) {
-        var script = document.createElement('SCRIPT');
-        script.src = 'https://api.vk.com/method/friends.get?uid='.concat(friend_id,'&callback=api_fetchFriend_of_friend_List');
-        document.getElementsByTagName("head")[0].appendChild(script);
-    window.data = null
-    var intvl = setInterval(function() {
-        if (window.data) { 
-            clearInterval(intvl);
-            return window.data;
-          }}, 100);
-}
-
-function api_fetchFriend_of_friend_List(result) {
-       window.data = result;
-      }
 
 function buildLinks(){
 
-  
-  var i = 0;
-  var j = 0;
-  var nodes = []
+  // if (window.unCheckedFriends) {
+
+  // };
+  // var i = 0;
+  // var j = 0;
+  var nodes = [];
   var links= [];
 
-    while (window.friends_list[i] ){
-      while (window.friends_list[j]){
-          links.push( { "source" : window.friends_list[i] , "target" : window.friends_list[j] });        
-          j++;
-      }
-      nodes.push({"id": window.friends_list[i]  , "group": i})
-      i++; 
-      j = 0; 
-  }
+  //   while (window.friends_list[i] ){
+  //     while (window.friends_list[j]){
+  //         links.push( { "source" : window.friends_list[i] , "target" : window.friends_list[j] });        
+  //         j++;
+  //     }
+  //     nodes.push({"id": window.friends_list[i]  , "group": i})
+  //     i++; 
+  //     j = 0; 
+  // }
 
-
+nodes = window.friends
 window.graph = {"nodes":nodes,"links":links};
 }
 
-function graph_friend_list(){
+
+
+
+function launch_graph(){
 
  buildLinks();
+ console.log(window.graph);
 
   //draw canvas
 var canvas = document.querySelector("canvas"),
@@ -246,119 +228,6 @@ function drawNode(d) {
   context.arc(d.x, d.y, 3, 0, 2 * Math.PI);
 }
 }
-
-
-
-
-// ------------------------------------------------------------
-
-// d3.select("div1").insert("p").text("hui");
-// var dataset = [1,2,3,4];
-// var dataset2 = [];
-// for (var i = 0; i < 25; i++) {           //Loop 25 times
-//     var newNumber = Math.random() * 30;  //New random number (0-30)
-//     dataset2.push(newNumber);             //Add new number to array
-// }
-// d3.select("div")
-//   .selectAll("p")
-//   .data(dataset).enter()
-//   .append("p").append("center")
-//   .text(function (c) {return c+" dogs"})
-//   .style("color",function(d) {
-//     if (d%2==0){
-//       return "red"
-//     } else {
-//       return "green"
-//     }
-//   });
-// d3.selectAll("div").attr("width",100)
-//   d3.select("div").selectAll("p").attr("class","test");
-//   d3.select("div").selectAll("div1").data(dataset2).enter().append("div1").attr("class","bar")
-//   .style("height", function(d){
-//     return d+"px";
-//   })
-//   .style("margin-right",5+"px")
-
-
-//draw canvas
-
-// var canvas = document.querySelector("canvas"),
-//     context = canvas.getContext("2d"),
-//     width = canvas.width,
-//     height = canvas.height;
-
-// //build simulation
-// var simulation = d3.forceSimulation()
-//     .force("link", d3.forceLink().id(function(d) { return d.id; }))
-//     .force("charge", d3.forceManyBody())
-//     .force("center", d3.forceCenter(width / 2, height / 3));
-
-// d3.select()
-
-// d3.json("wylers copy.json", function(error, graph) {
-//   if (error) throw error;
-
-//   simulation
-//       .nodes(graph.nodes)
-//       .on("tick", ticked);
-
-//   simulation.force("link")
-//       .links(graph.links);
-
-//   d3.select(canvas)
-//       .call(d3.drag()
-//           .container(canvas)
-//           .subject(dragsubject)
-//           .on("start", dragstarted)
-//           .on("drag", dragged)
-//           .on("end", dragended));
-
-//   function ticked() {
-//     context.clearRect(0, 0, width, height);
-
-//     context.beginPath();
-//     graph.links.forEach(drawLink);
-//     context.strokeStyle = "#aaa";
-//     context.stroke();
-
-//     context.beginPath();
-//     graph.nodes.forEach(drawNode);
-//     context.fill();
-//     context.strokeStyle = "#fff";
-//     context.stroke();
-//   }
-
-//   function dragsubject() {
-//     return simulation.find(d3.event.x, d3.event.y);
-//   }
-// });
-
-// function dragstarted() {
-//   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-//   d3.event.subject.fx = d3.event.subject.x;
-//   d3.event.subject.fy = d3.event.subject.y;
-// }
-
-// function dragged() {
-//   d3.event.subject.fx = d3.event.x;
-//   d3.event.subject.fy = d3.event.y;
-// }
-
-// function dragended() {
-//   if (!d3.event.active) simulation.alphaTarget(0);
-//   d3.event.subject.fx = null;
-//   d3.event.subject.fy = null;
-// }
-
-// function drawLink(d) {
-//   context.moveTo(d.source.x, d.source.y);
-//   context.lineTo(d.target.x, d.target.y);
-// }
-
-// function drawNode(d) {
-//   context.moveTo(d.x + 3, d.y);
-//   context.arc(d.x, d.y, 3, 0, 2 * Math.PI);
-// }
 
 
 
