@@ -53,9 +53,8 @@ var so = setOps;
 window.friends = null;
 window.nodes = {};
 window.unCheckedFriends = null;
-window.edges = [];
+window.edges = {};
 window.currentNode = null;
-window.link_dict = {};
 
 // window.urlParams = parseURLParams();
 
@@ -141,28 +140,8 @@ function api_FetchFriendList(result) {
 
 //mark edges, and make sure there arn't any repeats
 function make_link(source,target){
-
-  if (!already_link(source,target)){
-      window.edges.push({"from":source,"to":target});
-      window.link_dict[target] = {source:1};
-      window.link_dict[source] = {target:1};
+      window.edges[ source + target ] = {"from":source,"to":target};
 }
-      window.link_dict[target][source] = 1; 
-      window.link_dict[source][target] = 1; 
-  
-}
-
-  function already_link(source,target){
-    if ((source in window.link_dict) && (target in window.link_dict[source])){
-      return true;
-    }
-
-  if ((target in window.link_dict) && (source in window.link_dict[target])){
-      return true;
-    }
-
-    return false;
-  }
 
 
 //rebuild node dicitonary 
@@ -175,18 +154,24 @@ function clean_nodes()
    return nodes;
 }
 
+function clean_edges(){
+  var edges = [];
+  for (var id in window.edges){
+    edges.push(window.edges[id]);
+  }
+  return edges;
+}
 
 var network;
 
 //build graph
 function redrawAll() {
 
-console.log("link ditcitonary",window.link_dict);
     // create a network
     var container = document.getElementById('mynetwork');
     var data = {
       nodes: clean_nodes(),
-      edges: window.edges
+      edges: clean_edges()
     };
 
     var options = {
@@ -210,9 +195,10 @@ console.log("link ditcitonary",window.link_dict);
       },
       physics: {
         stabilization: false,
-        forceAtlas2Based: {
-          gravitationalConstant: -200,
-          springConstant: 0.001,
+        // forceAtlas2Based: {
+        barnesHut: {
+          gravitationalConstant: -8000,
+          springConstant: 0.0005,
           springLength: 200
         }
       },
