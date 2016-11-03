@@ -10,8 +10,8 @@
      <script type="text/javascript" src="jLouvain.js"></script>
      <style type="text/css">
             #mynetwork {
-              width: 800px;
-              height: 800px;
+              width: 100%;
+              height: 90%;
               border: 1px solid lightgray;
             }
   </style>
@@ -134,7 +134,9 @@ function api_FetchFriendList(result) {
       if (window.unCheckedFriends.length != 0) {
         window.currentNode = window.unCheckedFriends.pop();
         fetchFriendList(window.currentNode);  
-      } else {return};
+      } else {
+        redrawAll();
+        return};
     }
 }
 
@@ -195,13 +197,17 @@ function redrawAll() {
       },
       physics: {
         stabilization: false,
+        // adaptiveTimestep: true,
+        timestep: .9,
         // forceAtlas2Based: {
         barnesHut: {
+          // repulsion:{
           gravitationalConstant: -8000,
-          springConstant: 0.0005,
-          springLength: 200
+          springConstant: 0.00015,
+          springLength: 250
         }
       },
+
       interaction: {
         tooltipDelay: 100,
         hideEdgesOnDrag: true
