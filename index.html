@@ -21,7 +21,6 @@
  <div id="left"> 
   <body>
     <center>
-    <!-- <canvas width="1000" height="1000"></canvas> -->
     <div id="mynetwork"></div>
     <h1>The VK visualizer</h1>
     <p>Enter An ID number</p>
@@ -51,12 +50,12 @@
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
 var so = setOps;
-window.launch = false;
 window.friends = null;
 window.nodes = {};
 window.unCheckedFriends = null;
 window.edges = [];
 window.currentNode = null;
+window.link_dict = {};
 
 // window.urlParams = parseURLParams();
 
@@ -75,37 +74,26 @@ function parseURLParams() {
 
 // var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
 
+// 1216918
+// 16081499
+
 
 function test_button(){  
-  console.log(window.nodes);
 redrawAll();
 }
  
 function fetchDetails(id) {
-    if (!id) {
-      var x;
-      x = document.getElementById("vkId").value;
-      window.currentNode = document.getElementById("vkId").value;
-    } else {x = id; window.currentNode = id;};
-
+   
     var script = document.createElement('SCRIPT');
-    script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails');   
+    script.src = 'https://api.vk.com/method/users.get?uids='.concat(id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails');   
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-function api_FetchDetails(result) {
-    document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
-    document.getElementById("testBox").innerHTML = result["response"][0]["first_name"];
-    document.getElementById("current_contact").src = result["response"][0]["photo_200"];
-    var res = result["response"][0];
-    if (window.friends){
-      var next = window.friends.pop();
-      window.nodes[res.uid] = {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt='picture'>", "inbound":[]};
-      fetchDetails(next);
-//{"response":[{"uid":218868103,"first_name":"Uayler","last_name":"Metdzh","sex":2,"city":99,"country":1,"photo_200":"https://pp.vk.me/c403629/v403629103/a7bc/A5dTkKKLGDw.jpg","hidden":1}]}
-// label: 'Yuto Nagatomo', title: 'Country: ' + 'Japan' + '<br>' + 'Team: ' + 'Internazionale', value: 29, group: 27,
-    }
 
+function api_FetchDetails(result) {
+    var res = result["response"][0];
+    document.getElementById("testBox").innerHTML = res["first_name"] + " " + res["last_name"];
+    window.nodes[res.uid] = {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt='picture'>", "inbound":[]};
 }
 
 function fetchFriendList(id) {
@@ -126,10 +114,11 @@ function api_FetchFriendList(result) {
       window.unCheckedFriends = result["response"];
       window.friends = result["response"].slice(0);
       window.currentNode = window.unCheckedFriends.pop();
-      fetchFriendList(window.currentNode);
+      fetchFriendList(window.currentNode);  
     } 
 //if not, then take intersection of the response and the friends
     else {
+      fetchDetails(window.currentNode);
       document.getElementById("friendList").innerHTML = Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
 // are there new friends and have there been friends added
       if (result["response"] && window.friends) {
@@ -148,53 +137,46 @@ function api_FetchFriendList(result) {
         fetchFriendList(window.currentNode);  
       } else {return};
     }
-  //lanch when done
 }
 
-function check_if_linked(source,target){
-  if (!window.nodes[source].inbound.indexOf(target) == -1) {
-    return true;
-  }; 
-  false;
-}
-
+//mark edges, and make sure there arn't any repeats
 function make_link(source,target){
-  // if (check_if_linked(source,target)) {
-  window.edges.push({"from":source,"to":target})
-  // window.nodes[target].inbound.push(source)  
-  // };
+  
+  if (!(source in window.link_dict)){
+    window.link_dict[source] = {target:1};
+    window.edges.push({"from":source,"to":target});
+  } else {window.link_dict[source][target] = 1 };
+  
+  if (!(target in window.link_dict)){
+    window.link_dict[target] = {source:1};
+    window.edges.push({"from":source,"to":target});
+  } else {window.link_dict[target][source] = 1 };
+
 }
 
-function make_node_list(){
-
-  var nodes = window.friends;
-        console.log(nodes);
-
-  for (var i = nodes.length - 1; i >= 0; i--) {
-    nodes[i] = {"id": nodes[i] ,  "label": 'Yuto Nagatomo', "title": 'Country: ' + 'Japan' + '<br>' + 'Team: ' + 'Internazionale', "value": 29, "group": 27};
-  };
-  window.graph.nodes = nodes;
+//rebuild node dicitonary 
+function clean_nodes()
+{
+  var nodes = []
+  for (var id in window.nodes) {
+     nodes.push(window.nodes[id])
+   }; 
+   return nodes;
 }
+
 
 var network;
 
-
+//build graph
 function redrawAll() {
 
-    // remove positoins
-    // for (var i = 0; i < nodes.length; i++) {
-    //   delete nodes[i].x;
-    //   delete nodes[i].y;
-    // }
-
+console.log("link ditcitonary",window.link_dict);
     // create a network
     var container = document.getElementById('mynetwork');
     var data = {
-      nodes: window.nodes,
+      nodes: clean_nodes(),
       edges: window.edges
     };
-
-  console.log("data",data);
 
     var options = {
       nodes: {
@@ -217,106 +199,21 @@ function redrawAll() {
       },
       physics: {
         stabilization: false,
-        barnesHut: {
-          gravitationalConstant: -8000,
+        forceAtlas2Based: {
+          // gravitationalConstant: -8000,
           springConstant: 0.001,
-          springLength: 100
+          springLength: 200
         }
       },
       interaction: {
-        tooltipDelay: 200,
+        tooltipDelay: 100,
         hideEdgesOnDrag: true
       }
     };
 
     network = new vis.Network(container, data, options);
+    console.log(network);
   }
-
-
-// function launch_graph(){
-
-//  make_node_list();
-
-//   //draw canvas
-// var canvas = document.querySelector("canvas"),
-//     context = canvas.getContext("2d"),
-//     width = canvas.width,
-//     height = canvas.height;
-
-// //build simulation
-// var simulation = d3.forceSimulation()
-//     .force("link", d3.forceLink().id(function(d) { return d.id; }))
-//     .force("charge", d3.forceManyBody())
-//     .force("center", d3.forceCenter(width / 2, height / 3 * 2));
-// d3.select()
-
-// //build graph
-// d3.json(null, function(error, graph1) {
-// console.log(window.graph);
-
-//   simulation
-//       .nodes(window.graph.nodes)
-//       .on("tick", ticked);
-
-//   simulation.force("link")
-//       .links(window.edges);
-
-//   d3.select(canvas)
-//       .call(d3.drag()
-//           .container(canvas)
-//           .subject(dragsubject)
-//           .on("start", dragstarted)
-//           .on("drag", dragged)
-//           .on("end", dragended));
-
-//   function ticked() {
-//     context.clearRect(0, 0, width, height);
-
-//     context.beginPath();
-//     window.edges.forEach(drawLink);
-//     context.strokeStyle = "#aaa";
-//     context.stroke();
-
-//     context.beginPath();
-//     window.graph.nodes.forEach(drawNode);
-//     context.fill();
-//     context.strokeStyle = "#fff";
-//     context.stroke();
-//   }
-
-//   function dragsubject() {
-//     return simulation.find(d3.event.x, d3.event.y);
-//   }
-// });
-
-// function dragstarted() {
-//   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-//   d3.event.subject.fx = d3.event.subject.x;
-//   d3.event.subject.fy = d3.event.subject.y;
-// }
-
-// function dragged() {
-//   d3.event.subject.fx = d3.event.x;
-//   d3.event.subject.fy = d3.event.y;
-// }
-
-// function dragended() {
-//   if (!d3.event.active) simulation.alphaTarget(0);
-//   d3.event.subject.fx = null;
-//   d3.event.subject.fy = null;
-// }
-
-// function drawLink(d) {
-//   context.moveTo(d.source.x, d.source.y);
-//   context.lineTo(d.target.x, d.target.y);
-// }
-
-// function drawNode(d) {
-//   context.moveTo(d.x + 3, d.y);
-//   context.arc(d.x, d.y, 3, 0, 2 * Math.PI);
-// }
-// }
-
 
 
 </script>
