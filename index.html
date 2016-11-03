@@ -53,9 +53,9 @@
 var so = setOps;
 window.launch = false;
 window.friends = null;
+window.nodes = {};
 window.unCheckedFriends = null;
-window.addedFriends = null;
-window.graph = {"nodes":[],"links":[]};
+window.edges = [];
 window.currentNode = null;
 
 // window.urlParams = parseURLParams();
@@ -77,18 +77,36 @@ function parseURLParams() {
 
 
 function test_button(){  
-
-make_node_list();
+  console.log(window.nodes);
 redrawAll();
 }
  
-function fetchDetails() {
-    var x;
-    x = document.getElementById("vkId").value;
+function fetchDetails(id) {
+    if (!id) {
+      var x;
+      x = document.getElementById("vkId").value;
+      window.currentNode = document.getElementById("vkId").value;
+    } else {x = id; window.currentNode = id;};
+
     var script = document.createElement('SCRIPT');
     script.src = 'https://api.vk.com/method/users.get?uids='.concat(x,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails');   
     document.getElementsByTagName("head")[0].appendChild(script);
     }
+
+function api_FetchDetails(result) {
+    document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
+    document.getElementById("testBox").innerHTML = result["response"][0]["first_name"];
+    document.getElementById("current_contact").src = result["response"][0]["photo_200"];
+    var res = result["response"][0];
+    if (window.friends){
+      var next = window.friends.pop();
+      window.nodes[res.uid] = {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt='picture'>", "inbound":[]};
+      fetchDetails(next);
+//{"response":[{"uid":218868103,"first_name":"Uayler","last_name":"Metdzh","sex":2,"city":99,"country":1,"photo_200":"https://pp.vk.me/c403629/v403629103/a7bc/A5dTkKKLGDw.jpg","hidden":1}]}
+// label: 'Yuto Nagatomo', title: 'Country: ' + 'Japan' + '<br>' + 'Team: ' + 'Internazionale', value: 29, group: 27,
+    }
+
+}
 
 function fetchFriendList(id) {
     if (!id) {
@@ -102,16 +120,9 @@ function fetchFriendList(id) {
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-function api_FetchDetails(result) {
-    document.getElementById("friendDetails").innerHTML = JSON.stringify(result);
-    document.getElementById("testBox").innerHTML = result["response"][0]["first_name"];
-    document.getElementById("current_contact").src = result["response"][0]["photo_200"];
-}
-
 function api_FetchFriendList(result) {
     //check to see if there are any friends
     if (!window.friends) { 
-      
       window.unCheckedFriends = result["response"];
       window.friends = result["response"].slice(0);
       window.currentNode = window.unCheckedFriends.pop();
@@ -119,14 +130,17 @@ function api_FetchFriendList(result) {
     } 
 //if not, then take intersection of the response and the friends
     else {
-    document.getElementById("friendList").innerHTML = Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
-
+      document.getElementById("friendList").innerHTML = Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
+// are there new friends and have there been friends added
       if (result["response"] && window.friends) {
-      var newLinks = so.intersection(window.friends,result["response"]);
-      for (var i = newLinks.length - 1; i >= 0; i--) {
-          make_link(newLinks[i],window.currentNode);
+        var newLinks = so.intersection(window.friends,result["response"]);
+            console.log("current node",window.currentNode);
+            console.log("new links",newLinks);
+            console.log("unchecked friends",window.unCheckedFriends);
+        for (var i = newLinks.length - 1; i >= 0; i--) {
+            make_link(newLinks[i],window.currentNode);          
         };
-    };
+      };
       
 //keep recursing until all the unchecked friends are finished
       if (window.unCheckedFriends.length != 0) {
@@ -137,8 +151,18 @@ function api_FetchFriendList(result) {
   //lanch when done
 }
 
+function check_if_linked(source,target){
+  if (!window.nodes[source].inbound.indexOf(target) == -1) {
+    return true;
+  }; 
+  false;
+}
+
 function make_link(source,target){
-  window.graph.links.push({"from":source,"to":target})
+  // if (check_if_linked(source,target)) {
+  window.edges.push({"from":source,"to":target})
+  // window.nodes[target].inbound.push(source)  
+  // };
 }
 
 function make_node_list(){
@@ -166,18 +190,18 @@ function redrawAll() {
     // create a network
     var container = document.getElementById('mynetwork');
     var data = {
-      nodes: window.graph.nodes,
-      edges: window.graph.links
+      nodes: window.nodes,
+      edges: window.edges
     };
-  console.log(data);
-  console.log(window.graph.nodes);
+
+  console.log("data",data);
 
     var options = {
       nodes: {
         shape: 'dot',
         scaling: {
-          min: 10,
-          max: 30
+          min: 5,
+          max: 10
         },
         font: {
           size: 12,
@@ -194,9 +218,9 @@ function redrawAll() {
       physics: {
         stabilization: false,
         barnesHut: {
-          gravitationalConstant: -8,
+          gravitationalConstant: -8000,
           springConstant: 0.001,
-          springLength: 200
+          springLength: 100
         }
       },
       interaction: {
@@ -205,7 +229,6 @@ function redrawAll() {
       }
     };
 
-    // Note: data is coming from ./datasources/WorldCup2014.js
     network = new vis.Network(container, data, options);
   }
 
@@ -236,7 +259,7 @@ function redrawAll() {
 //       .on("tick", ticked);
 
 //   simulation.force("link")
-//       .links(window.graph.links);
+//       .links(window.edges);
 
 //   d3.select(canvas)
 //       .call(d3.drag()
@@ -250,7 +273,7 @@ function redrawAll() {
 //     context.clearRect(0, 0, width, height);
 
 //     context.beginPath();
-//     window.graph.links.forEach(drawLink);
+//     window.edges.forEach(drawLink);
 //     context.strokeStyle = "#aaa";
 //     context.stroke();
 
