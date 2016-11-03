@@ -1,26 +1,35 @@
 <!DOCTYPE html>
 <html>
  <head>
-     <link rel="stylesheet" href="style.css">
+     <link rel="stylesheet" href="vis.css">
      <meta charset="utf-8">
      <script src="https://d3js.org/d3.v4.min.js"></script>
      <script src="setOps.js"></script>
      <script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
+     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script>
      <script type="text/javascript" src="jLouvain.js"></script>
+     <style type="text/css">
+            #mynetwork {
+              width: 800px;
+              height: 800px;
+              border: 1px solid lightgray;
+            }
+  </style>
  </head>
  
  <div id="right" ></div>
  <div id="left"> 
   <body>
     <center>
-    <canvas width="1000" height="1000"></canvas>
+    <!-- <canvas width="1000" height="1000"></canvas> -->
+    <div id="mynetwork"></div>
     <h1>The VK visualizer</h1>
     <p>Enter An ID number</p>
     <input id="vkId" value="218868103">
     <button type="button" onclick="fetchDetails()">Get Info</button>
     <button type="button" onclick="fetchFriendList()">get friends</button>
     <button type="button" onclick="launch_graph()">Build Graph</button>
-    <button type="button" onclick="set_nodes()">set nodes</button>
+    <button type="button" onclick="test_button()">Launch!</button>
     <p>Who is this person?</p>
     <img id="current_contact" src="" alt='picture'>
     <p id="friendDetails">let's find out</p>
@@ -42,7 +51,7 @@
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
 var so = setOps;
-
+window.launch = false;
 window.friends = null;
 window.unCheckedFriends = null;
 window.addedFriends = null;
@@ -67,12 +76,10 @@ function parseURLParams() {
 // var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
 
 
-function set_nodes(){  
+function test_button(){  
 
-}
-
-function make_link(source,target){
-  window.graph.links.push({"source":source,"target":target})
+make_node_list();
+redrawAll();
 }
  
 function fetchDetails() {
@@ -130,103 +137,162 @@ function api_FetchFriendList(result) {
   //lanch when done
 }
 
+function make_link(source,target){
+  window.graph.links.push({"from":source,"to":target})
+}
 
-function buildLinks(){
+function make_node_list(){
 
   var nodes = window.friends;
+        console.log(nodes);
 
   for (var i = nodes.length - 1; i >= 0; i--) {
-    nodes[i] = {"id": nodes[i] , "group": i};
+    nodes[i] = {"id": nodes[i] ,  "label": 'Yuto Nagatomo', "title": 'Country: ' + 'Japan' + '<br>' + 'Team: ' + 'Internazionale', "value": 29, "group": 27};
   };
   window.graph.nodes = nodes;
 }
 
+var network;
 
 
+function redrawAll() {
 
-function launch_graph(){
+    // remove positoins
+    // for (var i = 0; i < nodes.length; i++) {
+    //   delete nodes[i].x;
+    //   delete nodes[i].y;
+    // }
 
- buildLinks();
+    // create a network
+    var container = document.getElementById('mynetwork');
+    var data = {
+      nodes: window.graph.nodes,
+      edges: window.graph.links
+    };
+  console.log(data);
+  console.log(window.graph.nodes);
 
-  //draw canvas
-var canvas = document.querySelector("canvas"),
-    context = canvas.getContext("2d"),
-    width = canvas.width,
-    height = canvas.height;
+    var options = {
+      nodes: {
+        shape: 'dot',
+        scaling: {
+          min: 10,
+          max: 30
+        },
+        font: {
+          size: 12,
+          face: 'Tahoma'
+        }
+      },
+      edges: {
+        width: 0.15,
+        color: {inherit: 'from'},
+        smooth: {
+          type: 'continuous'
+        }
+      },
+      physics: {
+        stabilization: false,
+        barnesHut: {
+          gravitationalConstant: -8,
+          springConstant: 0.001,
+          springLength: 200
+        }
+      },
+      interaction: {
+        tooltipDelay: 200,
+        hideEdgesOnDrag: true
+      }
+    };
 
-//build simulation
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 3 * 2));
-d3.select()
-
-//build graph
-d3.json(null, function(error, graph1) {
-console.log(window.graph);
-
-  simulation
-      .nodes(window.graph.nodes)
-      .on("tick", ticked);
-
-  simulation.force("link")
-      .links(window.graph.links);
-
-  d3.select(canvas)
-      .call(d3.drag()
-          .container(canvas)
-          .subject(dragsubject)
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
-
-  function ticked() {
-    context.clearRect(0, 0, width, height);
-
-    context.beginPath();
-    window.graph.links.forEach(drawLink);
-    context.strokeStyle = "#aaa";
-    context.stroke();
-
-    context.beginPath();
-    window.graph.nodes.forEach(drawNode);
-    context.fill();
-    context.strokeStyle = "#fff";
-    context.stroke();
+    // Note: data is coming from ./datasources/WorldCup2014.js
+    network = new vis.Network(container, data, options);
   }
 
-  function dragsubject() {
-    return simulation.find(d3.event.x, d3.event.y);
-  }
-});
 
-function dragstarted() {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-  d3.event.subject.fx = d3.event.subject.x;
-  d3.event.subject.fy = d3.event.subject.y;
-}
+// function launch_graph(){
 
-function dragged() {
-  d3.event.subject.fx = d3.event.x;
-  d3.event.subject.fy = d3.event.y;
-}
+//  make_node_list();
 
-function dragended() {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d3.event.subject.fx = null;
-  d3.event.subject.fy = null;
-}
+//   //draw canvas
+// var canvas = document.querySelector("canvas"),
+//     context = canvas.getContext("2d"),
+//     width = canvas.width,
+//     height = canvas.height;
 
-function drawLink(d) {
-  context.moveTo(d.source.x, d.source.y);
-  context.lineTo(d.target.x, d.target.y);
-}
+// //build simulation
+// var simulation = d3.forceSimulation()
+//     .force("link", d3.forceLink().id(function(d) { return d.id; }))
+//     .force("charge", d3.forceManyBody())
+//     .force("center", d3.forceCenter(width / 2, height / 3 * 2));
+// d3.select()
 
-function drawNode(d) {
-  context.moveTo(d.x + 3, d.y);
-  context.arc(d.x, d.y, 3, 0, 2 * Math.PI);
-}
-}
+// //build graph
+// d3.json(null, function(error, graph1) {
+// console.log(window.graph);
+
+//   simulation
+//       .nodes(window.graph.nodes)
+//       .on("tick", ticked);
+
+//   simulation.force("link")
+//       .links(window.graph.links);
+
+//   d3.select(canvas)
+//       .call(d3.drag()
+//           .container(canvas)
+//           .subject(dragsubject)
+//           .on("start", dragstarted)
+//           .on("drag", dragged)
+//           .on("end", dragended));
+
+//   function ticked() {
+//     context.clearRect(0, 0, width, height);
+
+//     context.beginPath();
+//     window.graph.links.forEach(drawLink);
+//     context.strokeStyle = "#aaa";
+//     context.stroke();
+
+//     context.beginPath();
+//     window.graph.nodes.forEach(drawNode);
+//     context.fill();
+//     context.strokeStyle = "#fff";
+//     context.stroke();
+//   }
+
+//   function dragsubject() {
+//     return simulation.find(d3.event.x, d3.event.y);
+//   }
+// });
+
+// function dragstarted() {
+//   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+//   d3.event.subject.fx = d3.event.subject.x;
+//   d3.event.subject.fy = d3.event.subject.y;
+// }
+
+// function dragged() {
+//   d3.event.subject.fx = d3.event.x;
+//   d3.event.subject.fy = d3.event.y;
+// }
+
+// function dragended() {
+//   if (!d3.event.active) simulation.alphaTarget(0);
+//   d3.event.subject.fx = null;
+//   d3.event.subject.fy = null;
+// }
+
+// function drawLink(d) {
+//   context.moveTo(d.source.x, d.source.y);
+//   context.lineTo(d.target.x, d.target.y);
+// }
+
+// function drawNode(d) {
+//   context.moveTo(d.x + 3, d.y);
+//   context.arc(d.x, d.y, 3, 0, 2 * Math.PI);
+// }
+// }
 
 
 
