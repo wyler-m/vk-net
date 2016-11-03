@@ -141,18 +141,29 @@ function api_FetchFriendList(result) {
 
 //mark edges, and make sure there arn't any repeats
 function make_link(source,target){
-  
-  if (!(source in window.link_dict)){
-    window.link_dict[source] = {target:1};
-    window.edges.push({"from":source,"to":target});
-  } else {window.link_dict[source][target] = 1 };
-  
-  if (!(target in window.link_dict)){
-    window.link_dict[target] = {source:1};
-    window.edges.push({"from":source,"to":target});
-  } else {window.link_dict[target][source] = 1 };
 
+  if (!already_link(source,target)){
+      window.edges.push({"from":source,"to":target});
+      window.link_dict[target] = {source:1};
+      window.link_dict[source] = {target:1};
 }
+      window.link_dict[target][source] = 1; 
+      window.link_dict[source][target] = 1; 
+  
+}
+
+  function already_link(source,target){
+    if ((source in window.link_dict) && (target in window.link_dict[source])){
+      return true;
+    }
+
+  if ((target in window.link_dict) && (source in window.link_dict[target])){
+      return true;
+    }
+
+    return false;
+  }
+
 
 //rebuild node dicitonary 
 function clean_nodes()
@@ -200,7 +211,7 @@ console.log("link ditcitonary",window.link_dict);
       physics: {
         stabilization: false,
         forceAtlas2Based: {
-          // gravitationalConstant: -8000,
+          gravitationalConstant: -200,
           springConstant: 0.001,
           springLength: 200
         }
