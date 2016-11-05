@@ -10,8 +10,8 @@
      <script type="text/javascript" src="jLouvain.js"></script>
      <style type="text/css">
             #mynetwork {
-              width: 100%;
-              height: 90%;
+              width: 1000px;
+              height: 1000px;
               border: 1px solid lightgray;
             }
   </style>
@@ -21,20 +21,19 @@
  <div id="left"> 
   <body>
     <center>
-    <div id="mynetwork"></div>
     <h1>The VK visualizer</h1>
     <p>Enter An ID number</p>
+    <p>And find out what your graph looks like</p>
+
     <input id="vkId" value="218868103">
     <button type="button" onclick="fetchDetails()">Get Info</button>
     <button type="button" onclick="fetchFriendList()">get friends</button>
-    <button type="button" onclick="launch_graph()">Build Graph</button>
-    <button type="button" onclick="test_button()">Launch!</button>
-    <p>Who is this person?</p>
+    <button type="button" onclick="test_button()">stop!</button>
     <img id="current_contact" src="" alt='picture'>
-    <p id="friendDetails">let's find out</p>
-    <p>Who are the friends?</p>
     <p id="friendList"></p>
-    <p id="testBox">Test</p>
+    <p id="testBox">Who?</p>
+    <p id="response">raw</p>
+    <div id="mynetwork"></div>
 
     </center>
   </body>
@@ -50,10 +49,12 @@
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
 var so = setOps;
+var network;
 window.friends = null;
-window.nodes = {};
+window.nodes = [];
+window.edges = [];
+window.checkedDictionary = {};
 window.unCheckedFriends = null;
-window.edges = {};
 window.currentNode = null;
 
 // window.urlParams = parseURLParams();
@@ -78,7 +79,7 @@ function parseURLParams() {
 
 
 function test_button(){  
-redrawAll();
+  network.stopSimulation();
 }
  
 function fetchDetails(id) {
@@ -88,11 +89,12 @@ function fetchDetails(id) {
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-
 function api_FetchDetails(result) {
     var res = result["response"][0];
     document.getElementById("testBox").innerHTML = res["first_name"] + " " + res["last_name"];
-    window.nodes[res.uid] = {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt='picture'>", "inbound":[]};
+    document.getElementById("response").innerHTML = res;
+
+    window.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + ">"} );
 }
 
 function fetchFriendList(id) {
@@ -118,12 +120,12 @@ function api_FetchFriendList(result) {
 //if not, then take intersection of the response and the friends
     else {
       fetchDetails(window.currentNode);
-      document.getElementById("friendList").innerHTML = Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
+      document.getElementById("friendList").innerHTML = "percent finished" +" "+ Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
 // are there new friends and have there been friends added
       if (result["response"] && window.friends) {
         var newLinks = so.intersection(window.friends,result["response"]);
             console.log("current node",window.currentNode);
-            console.log("new links",newLinks);
+            console.log("new links", newLinks);
             console.log("unchecked friends",window.unCheckedFriends);
         for (var i = newLinks.length - 1; i >= 0; i--) {
             make_link(newLinks[i],window.currentNode);          
@@ -134,37 +136,38 @@ function api_FetchFriendList(result) {
       if (window.unCheckedFriends.length != 0) {
         window.currentNode = window.unCheckedFriends.pop();
         fetchFriendList(window.currentNode);  
-      } else {
-        redrawAll();
-        return};
+      } else { redrawAll(); return};
     }
 }
 
 //mark edges, and make sure there arn't any repeats
 function make_link(source,target){
-      window.edges[ source + target ] = {"from":source,"to":target};
+  var sum = source + target;
+  if (sum in window.checkedDictionary){
+    return;
+  }
+  window.checkedDictionary[sum] = 1;
+  count_degree(source); 
+  count_degree(target);
+
+  window.edges.push({"from":source,"to":target});
 }
 
+function count_degree(id){
+  if (id in window.checkedDictionary) {
+    window.checkedDictionary[id] ++ ;
+  } else {window.checkedDictionary[id] = 1};
+}
 
-//rebuild node dicitonary 
+//rebuild node dicitonary as array
 function clean_nodes()
 {
-  var nodes = []
-  for (var id in window.nodes) {
-     nodes.push(window.nodes[id])
-   }; 
-   return nodes;
+  for (var i = window.nodes.length - 1; i >= 0; i--) {
+    var deg = window.checkedDictionary[window.nodes[i].id]
+    window.nodes[i]["value"] = deg ? deg : 0;
+  };
+  return window.nodes;
 }
-
-function clean_edges(){
-  var edges = [];
-  for (var id in window.edges){
-    edges.push(window.edges[id]);
-  }
-  return edges;
-}
-
-var network;
 
 //build graph
 function redrawAll() {
@@ -173,7 +176,7 @@ function redrawAll() {
     var container = document.getElementById('mynetwork');
     var data = {
       nodes: clean_nodes(),
-      edges: clean_edges()
+      edges: window.edges
     };
 
     var options = {
@@ -181,7 +184,7 @@ function redrawAll() {
         shape: 'dot',
         scaling: {
           min: 5,
-          max: 10
+          max: 20
         },
         font: {
           size: 12,
@@ -196,15 +199,16 @@ function redrawAll() {
         }
       },
       physics: {
-        stabilization: false,
-        // adaptiveTimestep: true,
+        stabilization: true,
+        adaptiveTimestep: true,
         timestep: .9,
-        // forceAtlas2Based: {
-        barnesHut: {
+        forceAtlas2Based: {
+        // barnesHut: {
           // repulsion:{
-          gravitationalConstant: -8000,
-          springConstant: 0.00015,
-          springLength: 250
+          gravitationalConstant: -800000000,
+          damping: 0.4,
+          springConstant: 250000000,
+          springLength: 25000000000000000,
         }
       },
 
@@ -215,7 +219,6 @@ function redrawAll() {
     };
 
     network = new vis.Network(container, data, options);
-    console.log(network);
   }
 
 
