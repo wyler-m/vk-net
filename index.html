@@ -26,13 +26,11 @@
     <p>And find out what your graph looks like</p>
 
     <input id="vkId" value="218868103">
-    <button type="button" onclick="fetchDetails()">Get Info</button>
-    <button type="button" onclick="fetchFriendList()">get friends</button>
-    <button type="button" onclick="test_button()">stop!</button>
-    <img id="current_contact" src="" alt='picture'>
+    <button type="button" onclick="fetchFriendList()">Build Graph!</button>
     <p id="friendList"></p>
-    <p id="testBox">Who?</p>
-    <p id="response">raw</p>
+    <p id="testBox"></p>
+    <p id="response">if your graph is won't stop bouncing around: 
+      <button type="button" onclick="test_button()">stop bouncing around!</button></p>
     <div id="mynetwork"></div>
 
     </center>
@@ -49,7 +47,7 @@
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
 var so = setOps;
-var network;
+var network = null;
 window.friends = null;
 window.nodes = [];
 window.edges = [];
@@ -61,7 +59,14 @@ window.currentNode = null;
 
 // console.log(parseURLParams());
 // console.log(window.urlParams);
-
+var params = parseURLParams();
+if (params) {
+  for (var id in params) {
+     if (id == "user_id") {
+    document.getElementById("vkId").value = params.user_id;
+  };
+   }; 
+};
 function parseURLParams() {
     var params = {};
     var param_array = window.location.href.split('#')[1].split('&');
@@ -92,7 +97,7 @@ function fetchDetails(id) {
 function api_FetchDetails(result) {
     var res = result["response"][0];
     document.getElementById("testBox").innerHTML = res["first_name"] + " " + res["last_name"];
-    document.getElementById("response").innerHTML = res;
+    // document.getElementById("response").innerHTML = res;
 
     window.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + ">"} );
 }
@@ -120,7 +125,8 @@ function api_FetchFriendList(result) {
 //if not, then take intersection of the response and the friends
     else {
       fetchDetails(window.currentNode);
-      document.getElementById("friendList").innerHTML = "percent finished" +" "+ Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
+      // document.getElementById("friendList").innerHTML = "percent finished" +" "+ Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
+      document.getElementById("friendList").innerHTML = "added "+ (window.friends.length - window.unCheckedFriends.length) +" of " + window.friends.length + " friends";
 // are there new friends and have there been friends added
       if (result["response"] && window.friends) {
         var newLinks = so.intersection(window.friends,result["response"]);
