@@ -120,7 +120,12 @@ function api_FetchFriendList(result) {
       window.unCheckedFriends = result["response"];
       window.friends = result["response"].slice(0);
       window.currentNode = window.unCheckedFriends.pop();
-      fetchFriendList(window.currentNode);  
+      fetchFriendList(window.currentNode);
+//google tracker to track 
+      ga( 'send', 'event', {
+          'eventCategory': 'graph build',
+          'eventAction': 'started graph build'
+        });  
     } 
 //if not, then take intersection of the response and the friends
     else {
@@ -142,7 +147,15 @@ function api_FetchFriendList(result) {
       if (window.unCheckedFriends.length != 0) {
         window.currentNode = window.unCheckedFriends.pop();
         fetchFriendList(window.currentNode);  
-      } else { redrawAll(); return};
+      } else { 
+        redrawAll(); 
+        //google tracking
+        ga( 'send', 'event', {
+            'eventCategory': 'graph build',
+             'eventAction': 'finished graph build'
+           });  
+         return
+      };
     }
 }
 
