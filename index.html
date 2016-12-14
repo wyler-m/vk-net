@@ -6,15 +6,15 @@ Add the following link into the code of your page:
 <p>
 After loading the page for application initialization, the following code can be used:
 <script type="text/javascript">
- window.onload = (function() {   // когда загрузится вся страница
-    VK.init(function() { 
-     // API initialization succeeded
-     vk.api("getProfiles", {uids:"218868103"}, function(data) { 
-    // Actions with obtained data 
-     console.log(data);
-		});
- 	});
- }); 
+	window.onload = (function() {   // когда загрузится вся страница
+		VK.init(function() { 
+	     // API initialization succeeded
+			vk.api("getProfiles", {uids:"218868103"}, function(data) { 
+	    // Actions with obtained data 
+			console.log(data);
+			});
+	 	});
+
     
      // Your code here
   });
