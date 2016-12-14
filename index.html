@@ -9,12 +9,12 @@ After loading the page for application initialization, the following code can be
  window.onload = (function() {   // когда загрузится вся страница
     VK.init(function() { 
      // API initialization succeeded
-     vk.api("getUserSettings", {uids:"218868103"}, function(data) { 
+     vk.api("getProfiles", {uids:"218868103"}, function(data) { 
     // Actions with obtained data 
      console.log(data);
 		});
  	});
- }; 
+ }); 
     
      // Your code here
   });
