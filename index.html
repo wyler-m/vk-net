@@ -6,7 +6,7 @@ Add the following link into the code of your page:
 <p>
 After loading the page for application initialization, the following code can be used:
 <script type="text/javascript">
-	window.onload = (function() {   // когда загрузится вся страница
+	// window.onload = (function() {   // когда загрузится вся страница
 		VK.init(function() { 
 		VK.loadParams(document.location.href);
     	var viewer_id = VK.params.viewer_id;
@@ -16,7 +16,7 @@ After loading the page for application initialization, the following code can be
 	    // Actions with obtained data 
 			console.log(data);
 			});
-	 	});
+	 	// });
 
     
      // Your code here
