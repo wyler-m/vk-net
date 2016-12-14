@@ -1,0 +1,29 @@
+
+<html>
+<head>
+
+<script src="http://vkontakte.ru/js/api/xd_connection.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	// window.onload = (function() {   // когда загрузится вся страница
+		VK.init(function() { 
+		VK.loadParams(document.location.href);
+    	var viewer_id = VK.params.viewer_id;
+    	alert(viewer_id);
+	     // API initialization succeeded
+			vk.api("getProfiles", {uids:"218868103"}, function(data) { 
+	    // Actions with obtained data 
+			console.log(data);
+			});
+	 	// });
+
+    
+     // Your code here
+  });
+</script>
+
+</head>
+<body>
+does it work?
+</body>
+</html>
