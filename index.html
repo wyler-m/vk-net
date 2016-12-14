@@ -8,6 +8,9 @@ After loading the page for application initialization, the following code can be
 <script type="text/javascript">
 	window.onload = (function() {   // когда загрузится вся страница
 		VK.init(function() { 
+		VK.loadParams(document.location.href);
+    	var viewer_id = VK.params.viewer_id;
+    	alert(viewer_id);
 	     // API initialization succeeded
 			vk.api("getProfiles", {uids:"218868103"}, function(data) { 
 	    // Actions with obtained data 
