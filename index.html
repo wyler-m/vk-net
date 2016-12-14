@@ -115,13 +115,13 @@ function fetchFriendList(id) {
     }
 
 function api_FetchFriendList(result) {
-    //check to see if there are any friends
+//check to see if there are any friends in friendlist
     if (!window.friends) { 
       window.unCheckedFriends = result["response"];
       window.friends = result["response"].slice(0);
       window.currentNode = window.unCheckedFriends.pop();
       fetchFriendList(window.currentNode);
-//google tracker to track 
+//google analytics to see if graph was started
       ga( 'send', 'event', {
           'eventCategory': 'graph build',
           'eventAction': 'started graph build'
@@ -149,7 +149,7 @@ function api_FetchFriendList(result) {
         fetchFriendList(window.currentNode);  
       } else { 
         redrawAll(); 
-        //google tracking
+//google analytics to see if anyone started using it
         ga( 'send', 'event', {
             'eventCategory': 'graph build',
              'eventAction': 'finished graph build'
