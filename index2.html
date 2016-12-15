@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+
+<script src="xd_connection.js" type="text/javascript"></script>
+
+<script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
+
+
+</head>
+
+<body>does it work?</body>
+
+<script type="text/javascript">
+  VK.init({
+    apiId: 5777716
+  });
+  console.log("testing")
+  VK.api('friends.get',{user_id:218868103},function(response){
+  	console.log(response)
+  })
+</script>
+</html>
