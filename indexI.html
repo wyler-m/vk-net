@@ -18,9 +18,9 @@
 	    <h1>The VK visualizer</h1>
 	    <p>Enter An ID number</p>
 	    <p>And find out what your graph looks like</p>
-	    <input id="vkId" value="16081499">
-	    <!-- <button type="button" onclick="fetchFriendList()">Build Graph!</button> -->
-	    <button type="button" onclick="redrawAll()">Build Graph!</button>
+	    <input id="vkId" value="218868103">
+	    <button type="button" onclick="fetchFriendList()">Build Graph!</button>
+	    <!-- <button type="button" onclick="redrawAll()">Build Graph!</button> -->
 	    <p id="friendList"></p>
 	    <p id="testBox"></p>
 	    <p id="response">if your graph is won't stop bouncing around: 
@@ -193,10 +193,10 @@ function redrawAll() {
     // create a network
     var container = document.getElementById('mynetwork');
     var data = {
-      // nodes: clean_nodes(),
-      nodes: test_data.nodes,
-      // edges: window.edges
-      edges: test_data.links
+      nodes: clean_nodes(),
+      // nodes: test_data.nodes,
+      edges: window.edges
+      // edges: test_data.links
     };
 
     var options = {
