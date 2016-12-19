@@ -1,3 +1,19 @@
+body, html {
+    height:  100%;
+    margin:  0px auto;
+    padding: 0px auto;
+}
+
+.wrapper {
+              width: 100vw;
+              /*height: 100%;*/
+              height:     100vh;
+              /*height:     auto;*/
+          /*min-height: 500px*/
+              border: 5px solid lightgray;
+            }
+
+
 .vis .overlay {
   position: absolute;
   top: 0;

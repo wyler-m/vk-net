@@ -1,4 +1,4 @@
-{
+var wylers_friends = {
 "nodes": [
 {"id":295852032, "name" : "Egor Poznanskiy" ,"group": 148},
 {"id":16311296, "name" : "Алексей Глухов" ,"group": 99},
@@ -4171,4 +4171,4 @@
 {"source":190165983,"target":263413897},
 {"source":11310688,"target":18446921}
   ]
-}
+};
