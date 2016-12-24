@@ -91,7 +91,7 @@ function test_button(){
 function fetchDetails(id) {
    
     var script = document.createElement('SCRIPT');
-    script.src = 'https://api.vk.com/method/users.get?uids='.concat(id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails');   
+    script.src = 'https://api.vk.com/method/users.get?uids='.concat(id,'&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails');   
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
@@ -100,7 +100,7 @@ function api_FetchDetails(result) {
     document.getElementById("testBox").innerHTML = res["first_name"] + " " + res["last_name"];
     // document.getElementById("response").innerHTML = res;
 
-    window.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + ">"} );
+   window.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res.uid  +"</p>"} );
 }
 
 function fetchFriendList(id) {
