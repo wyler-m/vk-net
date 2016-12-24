@@ -28,7 +28,7 @@
       <!-- <p id="response">if your graph is won't stop bouncing around: </p> -->
       <button type="button" onclick="test_button()">Freeze Graph</button><p>
       <button type="button" onclick="change_weights()">change weights</button><p>
-      
+      <a href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">login</a>
   </menu>
   <div id="mynetwork" class="wrapper"></div>
   
@@ -41,7 +41,7 @@
 // https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
 //script.src = "https://api.vk.com/method/getProfiles?uid=218868103&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
-//script.src = 'https://api.vk.com/method/users.get?uids=218868103&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
+//script.src = 'https://api.vk.com/method/users.get?uids=2131567&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
@@ -52,6 +52,8 @@
 // 1216918
 // 16081499
 // 218868103
+
+//https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60
 
 
 class graph {
@@ -151,14 +153,20 @@ class graph {
 
 var so = setOps;
 var network = null;
+var access_token = null;
+var access_token = "404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662";
 cur_graph = new graph;
+
 
 var params = parseURLParams();
 if (params) {
-  for (var id in params) {
-     if (id == "user_id") {
+  for (var param in params) {
+     if (param == "user_id") {
     document.getElementById("vkId").value = params.user_id;
       };
+      if (param == "access_token"){
+        access_token = params.access_token;
+      }
    }; 
 };
 
@@ -208,7 +216,10 @@ function fetchFriendList(id) {
     } else {x = id; cur_graph.currentNode = id;};
 
     var script = document.createElement('SCRIPT');
-    script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,'&callback=api_FetchFriendList');
+    script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,'&order=hints&callback=api_FetchFriendList');
+    if (access_token) {
+      script.src.concat("&access_token=",access_token);
+    };
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
