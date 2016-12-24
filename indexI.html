@@ -8,6 +8,7 @@
      <script src="test_data.js"></script>
      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script>
      <script type="text/javascript" src="jLouvain.js"></script>
+     <script type="text/javascript" src="jLouvain.js"></script>
 
  </head>
  
@@ -45,15 +46,13 @@
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
 
-var so = setOps;
-var network = null;
-// friends = null;
-// nodes = [];
-// edges = [];
-// checkedDictionary = {};
-// unCheckedFriends = null;
-// currentNode = null;
-// logged_in = false;
+// var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
+// https://api.vk.com/method/users.get?uids=1216918&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails
+
+// 1216918
+// 16081499
+// 218868103
+
 
 class graph {
   constructor(){
@@ -61,6 +60,7 @@ class graph {
     this.nodes = [];
     this.edges = [];
     this.checkedDictionary = {};
+    this.popularityDictionary = {};
     this.NodeToFriends = {};
     this.unCheckedFriends = null;
     this.currentNode = null;  
@@ -85,6 +85,7 @@ class graph {
   }
 
   add_new_friends(res){
+    this.NodeToFriends[this.currentNode] = res["response"];
     if (res["response"] && this.friends) {        
         var newLinks = so.intersection(this.friends,res["response"]);
         for (var i = newLinks.length - 1; i >= 0; i--) {
@@ -102,6 +103,7 @@ class graph {
     this.count_degree(source); 
     this.count_degree(target);
     this.edges.push({"from":source,"to":target});
+    this.run_pop_dict(source, target);
   }
 
   count_degree(id){
@@ -116,17 +118,41 @@ class graph {
       this.nodes[i]["value"] = deg ? deg : 0;
       };
     }
+    
+
+    run_pop_dict(source, target){
+      this.add_to_pop_dict(source, this.get_popularity(source, target));
+      this.add_to_pop_dict(target, this.get_popularity(target, source));
+    }
+
+    get_popularity(source, target){
+      if (target && this.NodeToFriends[target]) {
+        var location = this.NodeToFriends[target].indexOf(source); // find location of the node in queue
+        var len = this.NodeToFriends[target].length; 
+        return (1 - location/len);
+      };
+      return 0;
+    }
+
+    add_to_pop_dict(source,rank){
+    if (source in this.popularityDictionary) {
+      this.popularityDictionary[source] += rank ;
+    } else {this.popularityDictionary[source] = 0};
+  }
+
+  popularity_weights(){
+    for (var i = this.nodes.length - 1; i >= 0; i--) {
+      var deg = this.popularityDictionary[this.nodes[i].id]
+      this.nodes[i]["value"] = deg ? deg : 0;
+      };
+    }
+
 }
 
-
+var so = setOps;
+var network = null;
 cur_graph = new graph;
-// cur_graph.friends = 5;
-console.log(cur_graph.friends);
 
-// window.urlParams = parseURLParams();
-
-// console.log(parseURLParams());
-// console.log(window.urlParams);
 var params = parseURLParams();
 if (params) {
   for (var id in params) {
@@ -135,6 +161,9 @@ if (params) {
       };
    }; 
 };
+
+
+
 function parseURLParams() {
     var params = {};
     var args = window.location.href.split('#');
@@ -147,13 +176,6 @@ function parseURLParams() {
     };
     return params;
 }
-
-// var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
-// https://api.vk.com/method/users.get?uids=1216918&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails
-
-// 1216918
-// 16081499
-// 218868103
 
 function update_progress(friends, unCheckedFriends){
     document.getElementById("friendList").innerHTML = "added "+ (friends.length - unCheckedFriends.length) +" of " + friends.length + " friends";
@@ -209,27 +231,18 @@ function api_FetchFriendList(result) {
 // are there new friends and have there been friends added
 
       cur_graph.add_new_friends(result)
-      // if (result["response"] && friends) {        
-      //   var newLinks = so.intersection(friends,result["response"]);
-      //       console.log("current node",currentNode);
-      //       console.log("new links", newLinks);
-      //       console.log("unchecked friends",unCheckedFriends);
-      //   for (var i = newLinks.length - 1; i >= 0; i--) {
-      //       make_link(newLinks[i],currentNode);          
-      //   };
-      // };
       
 //keep recursing until all the unchecked friends are finished
       // if (cur_graph.unCheckedFriends.length != 0) {
       if (cur_graph.currentNode) {
-        // currentNode = unCheckedFriends.pop();
 
-        //cur_graph.gotoNextNode() //add this into the fetch frineds list
+var tempfriend = cur_graph.gotoNextNode() //add this into the fetch frineds list
 
-        fetchFriendList(cur_graph.gotoNextNode());  
+        // fetchFriendList(cur_graph.gotoNextNode());  
+        fetchFriendList(tempfriend);  
         // fetchFriendList(currentNode);  
       } else { 
-        cur_graph.weight_nodes();
+        cur_graph.popularity_weights();
         // weight_nodes()
         redrawAll(); 
 //google analytics to see if anyone started using it
@@ -242,46 +255,6 @@ function api_FetchFriendList(result) {
     }
 }
 
-//mark edges, and make sure there aren't any repeats
-// function make_link(source,target){
-//   var sum = source + target;
-//   if (sum in checkedDictionary){
-//     return;
-//   }
-//   checkedDictionary[sum] = 1;
-//   count_degree(source); 
-//   count_degree(target);
-
-//   edges.push({"from":source,"to":target});
-// }
-
-// function count_degree(id){
-//   if (id in checkedDictionary) {
-//     checkedDictionary[id] ++ ;
-//   } else {checkedDictionary[id] = 1};
-// }
-
-// //rebuild node dicitonary as array
-// function weight_nodes()
-// {
-//   for (var i = nodes.length - 1; i >= 0; i--) {
-//     var deg = checkedDictionary[nodes[i].id]
-//     nodes[i]["value"] = deg ? deg : 0;
-//   };
-//     return nodes;
-// }
-
-// function change_weights(){
-
-//   for (var i = nodes.length - 1; i >= 0; i--) {
-//     console.log(nodes[i].value);
-//     console.log(nodes[i].id);
-//     nodes[i].value = 10/(nodes[i].value+.1);
-//     if (!nodes[i].value) {nodes[i].value = 0};
-
-//   };
-// redrawAll();
-// }
 
 //build graph
 function redrawAll() {
