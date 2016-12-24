@@ -14,22 +14,29 @@
   <body>
     
 <div id="controls">
-		<center>
-	    <h1>The VK visualizer</h1>
-	    <p>Enter An ID number</p>
-	    <p>And find out what your graph looks like</p>
-	    <input id="vkId" value="218868103">
-	    <button type="button" onclick="fetchFriendList()">Build Graph!</button>
-	    <!-- <button type="button" onclick="redrawAll()">Build Graph!</button> -->
-	    <p id="friendList"></p>
-	    <p id="testBox"></p>
-	    <p id="response">if your graph is won't stop bouncing around: 
-	      <button type="button" onclick="test_button()">stop bouncing around!</button></p>
-    </center>
-	    </div>
+		
+	    <div class="column">
+        <h1>The VK visualizer</h1>
+	       
+      </div>
+	    <div class="column">
+        <input id="vkId" value="218868103">
+        <!-- <button type="button" onclick="fetchFriendList()">Build Graph!</button> -->
+	      <button type="button" onclick="redrawAll()">Build Graph!</button>
+        <!-- <p id="response">if your graph is won't stop bouncing around: <button type="button" onclick="test_button()">stop bouncing around!</button>
+        </p> -->
+        <button type="button" onclick="test_button()">Pause Rendering</button>
+      </div>
+	    <div class="column">
+        <p id="friendList">Friend List</p>
+        <p id="testBox">Test Box</p>
+      </div>
+
+    
+</div>
     
     <div id="mynetwork" class="wrapper">
-	    
+<center><p>Enter An ID number and find out what your graph looks like</p></center>
     </div>
 
 
@@ -193,10 +200,10 @@ function redrawAll() {
     // create a network
     var container = document.getElementById('mynetwork');
     var data = {
-      nodes: clean_nodes(),
-      // nodes: test_data.nodes,
-      edges: window.edges
-      // edges: test_data.links
+      // nodes: clean_nodes(),
+      nodes: test_data.nodes,
+      // edges: window.edges
+      edges: test_data.links
     };
 
     var options = {
