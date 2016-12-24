@@ -47,13 +47,13 @@
 
 var so = setOps;
 var network = null;
-friends = null;
-nodes = [];
-edges = [];
-checkedDictionary = {};
-unCheckedFriends = null;
-currentNode = null;
-logged_in = false;
+// friends = null;
+// nodes = [];
+// edges = [];
+// checkedDictionary = {};
+// unCheckedFriends = null;
+// currentNode = null;
+// logged_in = false;
 
 class graph {
   constructor(){
@@ -61,11 +61,12 @@ class graph {
     this.nodes = [];
     this.edges = [];
     this.checkedDictionary = {};
+    this.NodeToFriends = {};
     this.unCheckedFriends = null;
     this.currentNode = null;  
   }
 
-  add_node(res){
+  add_details(res){
     this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res.uid  +"</p>"} );
   }
 
@@ -76,8 +77,11 @@ class graph {
   }
 
   gotoNextNode(){
-    this.currentNode = this.unCheckedFriends.pop();
-    return this.currentNode;
+    if (this.unCheckedFriends) {
+      this.currentNode = this.unCheckedFriends.pop();
+      return this.currentNode;
+    };
+    this.currentNode = null;
   }
 
   add_new_friends(res){
@@ -101,23 +105,22 @@ class graph {
   }
 
   count_degree(id){
-    if (id in checkedDictionary) {
-      checkedDictionary[id] ++ ;
-    } else {checkedDictionary[id] = 1};
+    if (id in this.checkedDictionary) {
+      this.checkedDictionary[id] ++ ;
+    } else {this.checkedDictionary[id] = 1};
   }
 
   weight_nodes(){
     for (var i = this.nodes.length - 1; i >= 0; i--) {
-      var deg = checkedDictionary[this.nodes[i].id]
+      var deg = this.checkedDictionary[this.nodes[i].id]
       this.nodes[i]["value"] = deg ? deg : 0;
       };
     }
-
 }
 
 
 cur_graph = new graph;
-cur_graph.friends = 5;
+// cur_graph.friends = 5;
 console.log(cur_graph.friends);
 
 // window.urlParams = parseURLParams();
@@ -152,12 +155,11 @@ function parseURLParams() {
 // 16081499
 // 218868103
 
-function update_progress(){
+function update_progress(friends, unCheckedFriends){
     document.getElementById("friendList").innerHTML = "added "+ (friends.length - unCheckedFriends.length) +" of " + friends.length + " friends";
     document.getElementById("progbar").max = friends.length;
     document.getElementById("progbar").value = (friends.length - unCheckedFriends.length);
 }
-
 
 function test_button(){  
   if (network) {network.stopSimulation();};
@@ -173,10 +175,7 @@ function fetchDetails(id) {
 function api_FetchDetails(result) {
     var res = result["response"][0];
     document.getElementById("testBox").innerHTML = res["first_name"] + " " + res["last_name"];
-
-    cur_graph.add_node(res);
-
-    nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res.uid  +"</p>"} );
+    cur_graph.add_details(res);
 }
 
 function fetchFriendList(id) {
@@ -184,7 +183,7 @@ function fetchFriendList(id) {
       var x;
       x = document.getElementById("vkId").value;
       currentNode = document.getElementById("vkId").value;
-    } else {x = id; currentNode = id;};
+    } else {x = id; cur_graph.currentNode = id;};
 
     var script = document.createElement('SCRIPT');
     script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,'&callback=api_FetchFriendList');
@@ -193,14 +192,9 @@ function fetchFriendList(id) {
 
 function api_FetchFriendList(result) {
 //check to see if there are any friends in friendlist
-    if (!friends) { 
-      cur_graph.init_friends(result);
-
-      unCheckedFriends = result["response"];
-      friends = result["response"].slice(0);
-      currentNode = unCheckedFriends.pop();
-      
-      fetchFriendList(currentNode);
+    if (!cur_graph.friends) { 
+      cur_graph.init_friends(result);      
+      fetchFriendList(cur_graph.currentNode);
 //google analytics to see if graph was started
       ga( 'send', 'event', {
           'eventCategory': 'graph build',
@@ -209,26 +203,34 @@ function api_FetchFriendList(result) {
     } 
 //if not, then take intersection of the response and the friends
     else {
-      fetchDetails(currentNode);
-      update_progress();
+      fetchDetails(cur_graph.currentNode);
+      update_progress(cur_graph.friends,cur_graph.unCheckedFriends);
       
 // are there new friends and have there been friends added
-      if (result["response"] && friends) {        
-        var newLinks = so.intersection(friends,result["response"]);
-            console.log("current node",currentNode);
-            console.log("new links", newLinks);
-            console.log("unchecked friends",unCheckedFriends);
-        for (var i = newLinks.length - 1; i >= 0; i--) {
-            make_link(newLinks[i],currentNode);          
-        };
-      };
+
+      cur_graph.add_new_friends(result)
+      // if (result["response"] && friends) {        
+      //   var newLinks = so.intersection(friends,result["response"]);
+      //       console.log("current node",currentNode);
+      //       console.log("new links", newLinks);
+      //       console.log("unchecked friends",unCheckedFriends);
+      //   for (var i = newLinks.length - 1; i >= 0; i--) {
+      //       make_link(newLinks[i],currentNode);          
+      //   };
+      // };
       
 //keep recursing until all the unchecked friends are finished
-      if (unCheckedFriends.length != 0) {
-        currentNode = unCheckedFriends.pop();
-        fetchFriendList(currentNode);  
+      // if (cur_graph.unCheckedFriends.length != 0) {
+      if (cur_graph.currentNode) {
+        // currentNode = unCheckedFriends.pop();
+
+        //cur_graph.gotoNextNode() //add this into the fetch frineds list
+
+        fetchFriendList(cur_graph.gotoNextNode());  
+        // fetchFriendList(currentNode);  
       } else { 
-        weight_nodes()
+        cur_graph.weight_nodes();
+        // weight_nodes()
         redrawAll(); 
 //google analytics to see if anyone started using it
         ga( 'send', 'event', {
@@ -241,45 +243,45 @@ function api_FetchFriendList(result) {
 }
 
 //mark edges, and make sure there aren't any repeats
-function make_link(source,target){
-  var sum = source + target;
-  if (sum in checkedDictionary){
-    return;
-  }
-  checkedDictionary[sum] = 1;
-  count_degree(source); 
-  count_degree(target);
+// function make_link(source,target){
+//   var sum = source + target;
+//   if (sum in checkedDictionary){
+//     return;
+//   }
+//   checkedDictionary[sum] = 1;
+//   count_degree(source); 
+//   count_degree(target);
 
-  edges.push({"from":source,"to":target});
-}
+//   edges.push({"from":source,"to":target});
+// }
 
-function count_degree(id){
-  if (id in checkedDictionary) {
-    checkedDictionary[id] ++ ;
-  } else {checkedDictionary[id] = 1};
-}
+// function count_degree(id){
+//   if (id in checkedDictionary) {
+//     checkedDictionary[id] ++ ;
+//   } else {checkedDictionary[id] = 1};
+// }
 
-//rebuild node dicitonary as array
-function weight_nodes()
-{
-  for (var i = nodes.length - 1; i >= 0; i--) {
-    var deg = checkedDictionary[nodes[i].id]
-    nodes[i]["value"] = deg ? deg : 0;
-  };
-    return nodes;
-}
+// //rebuild node dicitonary as array
+// function weight_nodes()
+// {
+//   for (var i = nodes.length - 1; i >= 0; i--) {
+//     var deg = checkedDictionary[nodes[i].id]
+//     nodes[i]["value"] = deg ? deg : 0;
+//   };
+//     return nodes;
+// }
 
-function change_weights(){
+// function change_weights(){
 
-  for (var i = nodes.length - 1; i >= 0; i--) {
-    console.log(nodes[i].value);
-    console.log(nodes[i].id);
-    nodes[i].value = 10/(nodes[i].value+.1);
-    if (!nodes[i].value) {nodes[i].value = 0};
+//   for (var i = nodes.length - 1; i >= 0; i--) {
+//     console.log(nodes[i].value);
+//     console.log(nodes[i].id);
+//     nodes[i].value = 10/(nodes[i].value+.1);
+//     if (!nodes[i].value) {nodes[i].value = 0};
 
-  };
-redrawAll();
-}
+//   };
+// redrawAll();
+// }
 
 //build graph
 function redrawAll() {
@@ -287,9 +289,9 @@ function redrawAll() {
     // create a network
     var container = document.getElementById('mynetwork');
     var data = {
-      nodes: nodes,
+      nodes: cur_graph.nodes,
       // nodes: test_data.nodes,
-      edges: edges
+      edges: cur_graph.edges
       // edges: test_data.links
     };
 
