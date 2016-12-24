@@ -3,27 +3,28 @@ body, html {
     margin:  0px auto;
     padding: 0px auto;
 }
-.column{
-      float: left;
-       /*width: 33%;*/
+
+#container
+{
+  width: 100vw;
+  height:     100vh;
+  border: 5px solid lightgray;
+}
+#mynetwork
+{
+  height: 100%;
+  width: 100%;
+  
+}
+#controls
+{
+  margin-top: 0;
+  position: absolute;
+  width: 20%;
+  z-index: 1;
+  border: 5px solid lightgray;
 
 }
-.wrapper {
-              width: 100vw;
-              /*height: 100%;*/
-              height:     90vh;
-              /*height:     auto;*/
-          /*min-height: 500px*/
-              border: 5px solid lightgray;
-            }
-#controls {
-              width: 100vw;
-              /*height: 100%;*/
-              height:     13vh;
-              /*height:     auto;*/
-          /*min-height: 500px*/
-              border: 5px solid lightgray;
-            }
 
 
 .vis .overlay {

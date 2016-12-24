@@ -11,40 +11,25 @@
 
  </head>
  
-  <body>
+<body>
     
-<div id="controls">
-		
-	    <div class="column">
+	   
+<div id="container">
+    <menu id="controls">
+        <div class="column">
         <h1>The VK visualizer</h1>
-	       
-      </div>
-	    <div class="column">
-        <!-- <input id="vkId" value="218868103"> -->
-        <!-- <button type="button" onclick="fetchFriendList()">Build Graph!</button> -->
-	      <!-- <button type="button" onclick="redrawAll()">Build Graph!</button> -->
-        <!-- <p id="response">if your graph is won't stop bouncing around: </p> -->
-        <!-- <button type="button" onclick="test_button()">Freeze Rendering</button> -->
-      </div>
-	    <div class="column">
-        
-        <!-- <p id="testBox"></p> -->
-      </div>
-
-    
-</div>
-    
-  <div id="mynetwork" class="wrapper">
-<p>Enter An ID number and find out what your graph looks like</p>
-<center>
-
-<p id="response">if your graph is won't stop bouncing around: </p>
-<input id="vkId" value="218868103">
-<button type="button" onclick="fetchFriendList()">Build Graph!</button>
-<p id="testBox"></p>
-<p id="friendList">Friend List</p>
-</center>
-</div>
+     <p>Enter An ID number and find out what your graph looks like</p>
+      
+      <input id="vkId" value="218868101">
+      <button type="button" onclick="fetchFriendList()">Build Graph!</button>
+      <p id="testBox"></p>
+      <p id="friendList">Friend List</p>
+      <p id="response">if your graph is won't stop bouncing around: </p>
+      <button type="button" onclick="test_button()">Freeze Rendering</button>
+  
+  </menu>
+  <div id="mynetwork" class="wrapper"></div>
+  
 
 
   </body>
@@ -76,16 +61,19 @@ if (params) {
   for (var id in params) {
      if (id == "user_id") {
     document.getElementById("vkId").value = params.user_id;
-  };
+      };
    }; 
 };
 function parseURLParams() {
     var params = {};
-    var param_array = window.location.href.split('#')[1].split('&');
-    for(var i in param_array){
-        x = param_array[i].split('=');
-        params[x[0]] = x[1];
-    }
+    var args = window.location.href.split('#');
+    if (args[1]) {
+      var param_array = args[1].split('&');
+      for(var i in param_array){
+          x = param_array[i].split('=');
+          params[x[0]] = x[1];
+      }
+    };
     return params;
 }
 
@@ -97,7 +85,8 @@ function parseURLParams() {
 
 
 function test_button(){  
-  network.stopSimulation();
+  if (network) {network.stopSimulation();};
+  
 }
  
 function fetchDetails(id) {
@@ -202,13 +191,13 @@ function clean_nodes()
   return window.nodes;
 }
 
+
 //build graph
 function redrawAll() {
 
     // create a network
     var container = document.getElementById('mynetwork');
     var data = {
-      // nodes: clean_nodes(),
       nodes: window.nodes,
       // nodes: test_data.nodes,
       edges: window.edges
