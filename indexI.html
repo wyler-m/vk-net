@@ -17,16 +17,17 @@
 <div id="container">
     <menu id="controls">
         <div class="column">
-        <h1>The VK visualizer</h1>
+        <h1><img src= "file:////Users/rmetge/pypro/javascript projects/vk-net/vk.svg"> visualizer</h1>
      <p>Enter An ID number and find out what your graph looks like</p>
-      
       <input id="vkId" value="218868101">
       <button type="button" onclick="fetchFriendList()">Build Graph!</button>
       <p id="testBox"></p>
+      <progress id= "progbar" max="100" value="0"></progress>
       <p id="friendList">Friend List</p>
-      <p id="response">if your graph is won't stop bouncing around: </p>
-      <button type="button" onclick="test_button()">Freeze Rendering</button>
-  
+      <!-- <p id="response">if your graph is won't stop bouncing around: </p> -->
+      <button type="button" onclick="test_button()">Freeze Graph</button><p>
+      <button type="button" onclick="change_weights()">change weights</button><p>
+      
   </menu>
   <div id="mynetwork" class="wrapper"></div>
   
@@ -43,14 +44,21 @@
 
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
+
 var so = setOps;
 var network = null;
-window.friends = null;
-window.nodes = [];
-window.edges = [];
-window.checkedDictionary = {};
-window.unCheckedFriends = null;
-window.currentNode = null;
+friends = null;
+nodes = [];
+edges = [];
+checkedDictionary = {};
+unCheckedFriends = null;
+currentNode = null;
+logged_in = false;
+
+// class graph {
+//   friends
+
+// }
 
 // window.urlParams = parseURLParams();
 
@@ -101,15 +109,15 @@ function api_FetchDetails(result) {
     document.getElementById("testBox").innerHTML = res["first_name"] + " " + res["last_name"];
     // document.getElementById("response").innerHTML = res;
 
-    window.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res.uid  +"</p>"} );
+    nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res.uid  +"</p>"} );
 }
 
 function fetchFriendList(id) {
     if (!id) {
       var x;
       x = document.getElementById("vkId").value;
-      window.currentNode = document.getElementById("vkId").value;
-    } else {x = id; window.currentNode = id;};
+      currentNode = document.getElementById("vkId").value;
+    } else {x = id; currentNode = id;};
 
     var script = document.createElement('SCRIPT');
     script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,'&callback=api_FetchFriendList');
@@ -118,11 +126,11 @@ function fetchFriendList(id) {
 
 function api_FetchFriendList(result) {
 //check to see if there are any friends in friendlist
-    if (!window.friends) { 
-      window.unCheckedFriends = result["response"];
-      window.friends = result["response"].slice(0);
-      window.currentNode = window.unCheckedFriends.pop();
-      fetchFriendList(window.currentNode);
+    if (!friends) { 
+      unCheckedFriends = result["response"];
+      friends = result["response"].slice(0);
+      currentNode = unCheckedFriends.pop();
+      fetchFriendList(currentNode);
 //google analytics to see if graph was started
       ga( 'send', 'event', {
           'eventCategory': 'graph build',
@@ -131,26 +139,28 @@ function api_FetchFriendList(result) {
     } 
 //if not, then take intersection of the response and the friends
     else {
-      fetchDetails(window.currentNode);
-      // document.getElementById("friendList").innerHTML = "percent finished" +" "+ Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
-      document.getElementById("friendList").innerHTML = "added "+ (window.friends.length - window.unCheckedFriends.length) +" of " + window.friends.length + " friends";
+      fetchDetails(currentNode);
+      // document.getElementById("friendList").innerHTML = "percent finished" +" "+ Math.floor((1 - unCheckedFriends.length / friends.length) * 100);
+      document.getElementById("friendList").innerHTML = "added "+ (friends.length - unCheckedFriends.length) +" of " + friends.length + " friends";
+      document.getElementById("progbar").max = friends.length;
+      document.getElementById("progbar").value = (friends.length - unCheckedFriends.length);
 // are there new friends and have there been friends added
-      if (result["response"] && window.friends) {
-        var newLinks = so.intersection(window.friends,result["response"]);
-            console.log("current node",window.currentNode);
+      if (result["response"] && friends) {        
+        var newLinks = so.intersection(friends,result["response"]);
+            console.log("current node",currentNode);
             console.log("new links", newLinks);
-            console.log("unchecked friends",window.unCheckedFriends);
+            console.log("unchecked friends",unCheckedFriends);
         for (var i = newLinks.length - 1; i >= 0; i--) {
-            make_link(newLinks[i],window.currentNode);          
+            make_link(newLinks[i],currentNode);          
         };
       };
       
 //keep recursing until all the unchecked friends are finished
-      if (window.unCheckedFriends.length != 0) {
-        window.currentNode = window.unCheckedFriends.pop();
-        fetchFriendList(window.currentNode);  
+      if (unCheckedFriends.length != 0) {
+        currentNode = unCheckedFriends.pop();
+        fetchFriendList(currentNode);  
       } else { 
-        clean_nodes()
+        weight_nodes()
         redrawAll(); 
 //google analytics to see if anyone started using it
         ga( 'send', 'event', {
@@ -165,32 +175,43 @@ function api_FetchFriendList(result) {
 //mark edges, and make sure there aren't any repeats
 function make_link(source,target){
   var sum = source + target;
-  if (sum in window.checkedDictionary){
+  if (sum in checkedDictionary){
     return;
   }
-  window.checkedDictionary[sum] = 1;
+  checkedDictionary[sum] = 1;
   count_degree(source); 
   count_degree(target);
 
-  window.edges.push({"from":source,"to":target});
+  edges.push({"from":source,"to":target});
 }
 
 function count_degree(id){
-  if (id in window.checkedDictionary) {
-    window.checkedDictionary[id] ++ ;
-  } else {window.checkedDictionary[id] = 1};
+  if (id in checkedDictionary) {
+    checkedDictionary[id] ++ ;
+  } else {checkedDictionary[id] = 1};
 }
 
 //rebuild node dicitonary as array
-function clean_nodes()
+function weight_nodes()
 {
-  for (var i = window.nodes.length - 1; i >= 0; i--) {
-    var deg = window.checkedDictionary[window.nodes[i].id]
-    window.nodes[i]["value"] = deg ? deg : 0;
+  for (var i = nodes.length - 1; i >= 0; i--) {
+    var deg = checkedDictionary[nodes[i].id]
+    nodes[i]["value"] = deg ? deg : 0;
   };
-  return window.nodes;
+  return nodes;
 }
 
+function change_weights(){
+
+  for (var i = nodes.length - 1; i >= 0; i--) {
+    console.log(nodes[i].value);
+    console.log(nodes[i].id);
+    nodes[i].value = 10/(nodes[i].value+.1);
+    if (!nodes[i].value) {nodes[i].value = 0};
+
+  };
+redrawAll();
+}
 
 //build graph
 function redrawAll() {
@@ -198,9 +219,9 @@ function redrawAll() {
     // create a network
     var container = document.getElementById('mynetwork');
     var data = {
-      nodes: window.nodes,
+      nodes: nodes,
       // nodes: test_data.nodes,
-      edges: window.edges
+      edges: edges
       // edges: test_data.links
     };
 
