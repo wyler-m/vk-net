@@ -70,7 +70,7 @@ document.getElementById("controlDiv").style.display = "none";
   } else {document.getElementById("selectedDegree").innerHTML = "no connections";};
   
   document.getElementById("selectedProfile").href = "https://www.vk.com/id"+nodeInfo.id;
-if (nodeInfo.id){
+if (nodeInfo.id && (nodeInfo.big_pic!="https://vk.com/images/deactivated_100.png")){
   document.getElementById("buildSelected").href = "https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id;
   document.getElementById("buildSelected").style.display = "block";
 } else {document.getElementById("buildSelected").style.display = "none";};
@@ -290,15 +290,6 @@ function fetchFriendList(id) {
     }
 
 function api_FetchFriendList(result) {
-  //error
-  if ("error" in result){
-    document.getElementById("vkId").value = "This user has been deactivated";
-    document.getElementById("controlDiv").style.display = "none";
-    var paragraph = document.createElement('div');
-    paragraph.innerHTML = "sorry, this user is deactivated </p>";
-    document.getElementById("controls").appendChild(paragraph);
-    return;
-  };
 //check to see if there are any friends in friendlist
     if (!cur_graph.friends) { 
       cur_graph.init_friends(result);      
