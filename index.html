@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
  <head>
+     <title>VK Visualizer</title>
      <link rel="stylesheet" href="vis.css">
      <meta charset="utf-8">
      <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -179,7 +180,7 @@ class graph {
       // if (degree!=0) {popularity_measure = popularity_measure/degree};
       // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
       // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size) : 0;
+      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
