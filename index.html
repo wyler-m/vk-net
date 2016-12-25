@@ -180,16 +180,16 @@ class graph {
       // if (degree!=0) {popularity_measure = popularity_measure/degree};
       // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
       // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
+      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure/degree*1000) : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
       };
     }
     
-    run_pop_dict(source, target){
-      this.add_to_pop_dict(source, this.get_popularity(source, target));
-      this.add_to_pop_dict(target, this.get_popularity(target, source));
+    run_pop_dict(nodeA, nodeB){
+      this.add_to_pop_dict(nodeB, this.get_popularity(nodeA, nodeB));
+      this.add_to_pop_dict(nodeA, this.get_popularity(nodeB, nodeA));
     }
 
     get_popularity(source, target){
@@ -201,7 +201,7 @@ class graph {
           // return (1 - location/len);
           // return (len-location);
           // return 1/Math.pow((1 + location/len),10);
-          return (1/(1 + location)*len);
+          return (1/(1 + location));
         };
       };
       return 0;
