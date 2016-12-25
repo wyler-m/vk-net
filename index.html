@@ -7,7 +7,7 @@
 
 var params = parseURLParams();
 var access_token ;
-var user_id = 1216918;
+var user_id = 350154;
 
 if (params) {
   for (var param in params) {
@@ -49,6 +49,7 @@ function fetchFriendList(id) {
         console.log(test);
     script.src = 'https://api.vk.com/method/friends.get?uid='.concat(id,'&order=hints&callback=api_FetchFriendList');
     // script.src = 'https://api.vk.com/method/friends.get?uid=350154&callback=api_FetchFriendList';
+                    // https://api.vk.com/method/friends.get?uid=1216918&order=hints&callback=api_FetchFriendList
     
     document.getElementsByTagName("head")[0].appendChild(script);
     }
