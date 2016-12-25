@@ -20,7 +20,7 @@
         <div class="column">
         <h1><img src= "file:////Users/rmetge/pypro/javascript projects/vk-net/vk.svg"> visualizer</h1>
      <p>Enter An ID number and find out what your graph looks like</p>
-      <input id="vkId" value="218868101">
+      <input id="vkId" value="16081499">
       <button type="button" onclick="fetchFriendList()">Build Graph!</button>
       <p id="testBox"></p>
       <progress id= "progbar" max="100" value="0"></progress>
@@ -129,9 +129,12 @@ class graph {
     }
 
     get_popularity(source, target){
-      if (target && this.NodeToFriends[target]) {
-        var location = this.NodeToFriends[target].indexOf(source); // find location of the node in queue
-        var len = this.NodeToFriends[target].length; 
+
+      if (target && this.NodeToFriends[source]) {
+      console.log(source,target);
+        var location = this.NodeToFriends[source].indexOf(target); // find location of the node in queue
+        var len = this.NodeToFriends[source].length; 
+        console.log(location,len);
         return (1 - location/len);
       };
       return 0;
@@ -212,7 +215,7 @@ function fetchFriendList(id) {
     if (!id) {
       var x;
       x = document.getElementById("vkId").value;
-      currentNode = document.getElementById("vkId").value;
+      // currentNode = document.getElementById("vkId").value;
     } else {x = id; cur_graph.currentNode = id;};
 
     var script = document.createElement('SCRIPT');
@@ -255,8 +258,8 @@ var tempfriend = cur_graph.gotoNextNode() //add this into the fetch frineds list
         fetchFriendList(tempfriend);  
         // fetchFriendList(currentNode);  
       } else { 
-        // cur_graph.popularity_weights();
-        cur_graph.weight_nodes()
+        cur_graph.popularity_weights();
+        // cur_graph.weight_nodes()
         redrawAll(); 
 //google analytics to see if anyone started using it
         ga( 'send', 'event', {
