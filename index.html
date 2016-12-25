@@ -179,7 +179,7 @@ class graph {
       // if (degree!=0) {popularity_measure = popularity_measure/degree};
       // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
       // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
+      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size) : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
