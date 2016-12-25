@@ -20,7 +20,7 @@
         
         <h1><img src= "vk.svg"> visualizer</h1>
      <div id = "controlDiv">
-     <p>Enter An ID number and find out what your graph looks like:</p>
+     <p id="welcome">Enter An ID number and find out what your graph looks like:</p>
      <a id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">If you don't know your number, then login to VK.com</a> </p>
       <input id="vkId" value="16081499"></p>
       <button type="button" onclick="fetchFriendList()">Build Graph!</button>
@@ -179,7 +179,7 @@ class graph {
       // if (degree!=0) {popularity_measure = popularity_measure/degree};
       // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
       // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;
+      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
@@ -217,6 +217,7 @@ class graph {
 var so = setOps;
 var network = null;
 var access_token = null;
+var first_pass = true;
 cur_graph = new graph;
 
 
@@ -270,13 +271,19 @@ function fetchDetails(id) {
 
 function api_FetchDetails(result) {
     var res = result["response"][0];
-    cur_graph.add_details(res);
+    if (!first_pass) {cur_graph.add_details(res);
+    } else {
+      first_pass = false;
+    document.getElementById("welcome").innerHTML = res.first_name +" "+res.last_name;
+  };
+    
 }
 
 function fetchFriendList(id) {
     if (!id) {
       var x;
       x = document.getElementById("vkId").value;
+      fetchDetails(x);
     } else {x = id; cur_graph.currentNode = id;};
 
     var script = document.createElement('SCRIPT');
