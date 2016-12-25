@@ -39,7 +39,7 @@
 
   <script>
 
-  //https://api.vk.com/method/friends.get?uid=63204589&callback=callbackFunc
+  //https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
 // https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
 //script.src = "https://api.vk.com/method/getProfiles?uid=218868103&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
@@ -256,8 +256,8 @@ var tempfriend = cur_graph.gotoNextNode() //add this into the fetch frineds list
         fetchFriendList(tempfriend);  
         // fetchFriendList(currentNode);  
       } else { 
-        cur_graph.popularity_weights();
-        // weight_nodes()
+        // cur_graph.popularity_weights();
+        cur_graph.weight_nodes()
         redrawAll(); 
 //google analytics to see if anyone started using it
         ga( 'send', 'event', {
