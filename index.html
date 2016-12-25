@@ -193,15 +193,15 @@ class graph {
     }
 
     get_popularity(source, target){
-
-      if (target && this.nodeToFriends[source]) {
-        var location = this.nodeToFriends[source].indexOf(target); // find location of the node in queue
-        var len = this.nodeToFriends[source].length; 
+      var source_friends = this.nodeToFriends[source];
+      if (target && source_friends) {
+        var location = source_friends.indexOf(target); // find location of the node in queue
+        var len = source_friends.length; 
         if ((location!=-1) && (len!=0)) {
           // return (1 - location/len);
           // return (len-location);
           // return 1/Math.pow((1 + location/len),10);
-          return 1/(1 + location);
+          return (1/(1 + location)*len);
         };
       };
       return 0;
