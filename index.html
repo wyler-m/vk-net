@@ -227,10 +227,11 @@ if (params) {
   for (var param in params) {
      if (param == "user_id") {
     document.getElementById("vkId").value = params.user_id;
+        document.getElementById("loginP").style.display = "none";
+    
       };
       if (param == "access_token"){
         access_token = params.access_token;
-        document.getElementById("loginP").style.display = "none";
       }
    }; 
 };
