@@ -114,7 +114,7 @@ class graph {
 
   add_details(res){
     if (res.photo_200 == undefined) {res.photo_200 = "http://vk.com/images/camera_200.png"};
-    this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res["status"]  + "</p>" , big_pic:res.photo_100, group:res.city } );
+    this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res["status"]  + "</p>", big_pic:res.photo_100, group:res.city } );
   }
 
   init_friends(res){
