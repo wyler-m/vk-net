@@ -40,7 +40,6 @@
         <p id="selectedDegree">0</p>
         <a id="selectedProfile" target="_blank" href="https">Visit Profile</a></p>
         <a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
-        <p id="selectedWarning"></p>
 
       </div><p>
   </menu>
@@ -72,17 +71,13 @@ function insertNodeInfo (argument) {
   } else {document.getElementById("selectedDegree").innerHTML = "no connections";};
   
   document.getElementById("selectedProfile").href = "https://www.vk.com/id"+nodeInfo.id;
-if (nodeInfo.id && (nodeInfo.big_pic!="https://vk.com/images/deactivated_100.png")){
-  document.getElementById("buildSelected").href = "https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id;
-  document.getElementById("buildSelected").innerHTML = "Build Graph ("+ total_friends + " friends)"; 
-  document.getElementById("buildSelected").style.display = "block";
-} else {document.getElementById("buildSelected").style.display = "none";};
-  
-  
-  if (total_friends>400){
-  document.getElementById("selectedWarning").innerHTML = "That might take a while! " + total_friends + "is a lot of friends"
-  document.getElementById("selectedWarning").style.display = "block";
-  } else {document.getElementById("selectedWarning").style.display = "none"};
+
+  if (nodeInfo.id && (nodeInfo.big_pic!="https://vk.com/images/deactivated_100.png")){
+    document.getElementById("buildSelected").href = "https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id;
+    document.getElementById("buildSelected").innerHTML = "Build Graph ("+ total_friends + " friends)"; 
+    document.getElementById("buildSelected").style.display = "block";
+  } else {document.getElementById("buildSelected").style.display = "none";};
+    
 };
 
   //https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
@@ -178,12 +173,14 @@ class graph {
     // once popularity for each node has been written, iterate through nodes, also build node => nodeinfo dictionary
     var size = this.nodes.length;
     for (var i = this.nodes.length - 1; i >= 0; i--) {
-      var popularity_measure = this.popularityDictionary[this.nodes[i].id]
-      var degree = this.degreeDictionary[this.nodes[i].id]
+      var popularity_measure = this.popularityDictionary[this.nodes[i].id];
+      var degree = this.degreeDictionary[this.nodes[i].id];
       // finds average popularity of node by dividing by degree
       // if (degree!=0) {popularity_measure = popularity_measure/degree};
       // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
+      // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
+      this.nodes[i]["value"] = popularity_measure ? popularity_measure : 0;
+
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
       };
@@ -202,7 +199,8 @@ class graph {
         if ((location!=-1) && (len!=0)) {
           // return (1 - location/len);
           // return (len-location);
-          return 1/Math.pow((1 + location/len),10);
+          // return 1/Math.pow((1 + location/len),10);
+          return 1/(1 + location);
         };
       };
       return 0;
@@ -226,9 +224,9 @@ var params = parseURLParams();
 if (params) {
   for (var param in params) {
      if (param == "user_id") {
-    document.getElementById("vkId").value = params.user_id;
+        document.getElementById("vkId").value = params.user_id;
         document.getElementById("loginP").style.display = "none";
-    
+
       };
       if (param == "access_token"){
         access_token = params.access_token;
@@ -374,10 +372,10 @@ function redrawAll() {
         forceAtlas2Based: {
         // barnesHut: {
           // repulsion:{
-          gravitationalConstant: -80,
+          gravitationalConstant: -8,
           damping: 0.4,
           springConstant: 250,
-          springLength: 25,
+          springLength: 2500,
         }
       },
 
