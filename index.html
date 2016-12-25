@@ -21,6 +21,7 @@
         <h1><img src= "vk.svg"> visualizer</h1>
      <div id = "controlDiv">
      <p>Enter An ID number and find out what your graph looks like:</p>
+     <a id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">If you don't know your number, then login to VK.com</a> </p>
       <input id="vkId" value="16081499"></p>
       <button type="button" onclick="fetchFriendList()">Build Graph!</button>
       <button type="button" onclick="test_button()">Freeze Graph</button>
@@ -49,10 +50,10 @@
 
   <script>
 document.getElementById("nodeInfo").style.display = "none";
+document.getElementById("buildSelected").style.display = "none";
+document.getElementById("loginP").style.display = "block";
 
 function insertNodeInfo (argument) {
-  console.log(argument);
-  console.log(cur_graph.nodeToInfo[argument.nodes[0]]);
   var nodeInfo = cur_graph.nodeToInfo[argument.nodes[0]];
   if (cur_graph.nodeToFriends[argument.nodes[0]]) {
     var total_friends = cur_graph.nodeToFriends[argument.nodes[0]].length;
@@ -60,10 +61,11 @@ function insertNodeInfo (argument) {
   };
   
   document.getElementById("nodeInfo").style.display = "block";
-document.getElementById("controlDiv").style.display = "none";
+  document.getElementById("controlDiv").style.display = "block";
+
 
   document.getElementById("selectedPic").src = nodeInfo.big_pic;
-  document.getElementById("selectedImportance").innerHTML = "'Activity': " + nodeInfo.value;
+  document.getElementById("selectedImportance").innerHTML = "Activity: " + nodeInfo.value;
   document.getElementById("selectedName").innerHTML = nodeInfo.label;
   if (nodeInfo.id in cur_graph.degreeDictionary) {
     document.getElementById("selectedDegree").innerHTML = "Connections: " + cur_graph.degreeDictionary[nodeInfo.id];
@@ -72,12 +74,13 @@ document.getElementById("controlDiv").style.display = "none";
   document.getElementById("selectedProfile").href = "https://www.vk.com/id"+nodeInfo.id;
 if (nodeInfo.id && (nodeInfo.big_pic!="https://vk.com/images/deactivated_100.png")){
   document.getElementById("buildSelected").href = "https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id;
+  document.getElementById("buildSelected").innerHTML = "Build Graph ("+ total_friends + " friends)"; 
   document.getElementById("buildSelected").style.display = "block";
 } else {document.getElementById("buildSelected").style.display = "none";};
   
   
   if (total_friends>400){
-  document.getElementById("selectedWarning").innerHTML = "this might take a while, they have " + total_friends + " friends"
+  document.getElementById("selectedWarning").innerHTML = "That might take a while! " + total_friends + "is a lot of friends"
   document.getElementById("selectedWarning").style.display = "block";
   } else {document.getElementById("selectedWarning").style.display = "none"};
 };
@@ -99,9 +102,7 @@ if (nodeInfo.id && (nodeInfo.big_pic!="https://vk.com/images/deactivated_100.png
 // 218868103
 
 //https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60
-function buildNewGraph(){
-  alert(arg);
-}
+
 
 class graph {
   constructor(){
@@ -154,7 +155,6 @@ class graph {
     this.count_degree(source); 
     this.count_degree(target);
     this.edges.push({"from":source,"to":target});
-    // this.run_pop_dict(source, target);
   }
 
   count_degree(id){
@@ -176,13 +176,14 @@ class graph {
       this.run_pop_dict(this.edges[i].to, this.edges[i].from);
     };
     // once popularity for each node has been written, iterate through nodes, also build node => nodeinfo dictionary
-    var size = this.degreeDictionary.length;
+    var size = this.nodes.length;
     for (var i = this.nodes.length - 1; i >= 0; i--) {
       var popularity_measure = this.popularityDictionary[this.nodes[i].id]
       var degree = this.degreeDictionary[this.nodes[i].id]
       // finds average popularity of node by dividing by degree
       // if (degree!=0) {popularity_measure = popularity_measure/degree};
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100) : 0;
+      // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
+      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
       };
@@ -200,8 +201,8 @@ class graph {
         var len = this.nodeToFriends[source].length; 
         if ((location!=-1) && (len!=0)) {
           // return (1 - location/len);
-          return 1/Math.pow((1 + location/len),10);
           // return (len-location);
+          return 1/Math.pow((1 + location/len),10);
         };
       };
       return 0;
@@ -212,10 +213,8 @@ class graph {
       this.popularityDictionary[source] += rank ;
     } else {this.popularityDictionary[source] = 0};
   }
-
-
-
 }
+
 
 var so = setOps;
 var network = null;
@@ -231,9 +230,12 @@ if (params) {
       };
       if (param == "access_token"){
         access_token = params.access_token;
+        document.getElementById("loginP").style.display = "none";
       }
    }; 
 };
+
+
 
 
 
@@ -391,11 +393,8 @@ function redrawAll() {
     });
 
     network.on("deselectNode", function (params) {
-        console.log('select Event:', params)
-        // document.getElementById("nodeInfo").style.visibility = "hidden";
         document.getElementById("nodeInfo").style.display = "none";
         document.getElementById("controlDiv").style.display = "block";
-        console.log(cur_graph.nodeToInfo[params.nodes[0]]);
     });
   }
 
