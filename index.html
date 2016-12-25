@@ -13,7 +13,6 @@ if (params) {
   for (var param in params) {
      if (param == "user_id") {
     // user_id = params.user_id;
-    // user_id = params.user_id;
       };
       if (param == "access_token"){
         access_token = params.access_token;
@@ -47,7 +46,7 @@ function fetchFriendList(id) {
     };
     // script.src = 'https://api.vk.com/method/friends.get?uid='.concat(id,y,'&order=hints&callback=api_FetchFriendList&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200');
     // script.src = 'https://api.vk.com/method/friends.get?uid='.concat(id,y,'&order=hints&callback=api_FetchFriendList');
-    script.src = 'https://api.vk.com/method/friends.get?uid=350154&callback=api_FetchFriendList');
+    script.src = 'https://api.vk.com/method/friends.get?uid=350154&callback=api_FetchFriendList';
     
     document.getElementsByTagName("head")[0].appendChild(script);
     }
