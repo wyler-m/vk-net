@@ -1,255 +1,67 @@
-<!DOCTYPE html>
 <html>
- <head>
-     <link rel="stylesheet" href="vis.css">
-     <meta charset="utf-8">
-     <script src="https://d3js.org/d3.v4.min.js"></script>
-     <script src="setOps.js"></script>
-     <script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script>
-     <script type="text/javascript" src="jLouvain.js"></script>
-     <style type="text/css">
-            #mynetwork {
-              width: 1000px;
-              height: 1000px;
-              border: 1px solid lightgray;
-            }
-  </style>
- </head>
- 
- <div id="right" ></div>
- <div id="left"> 
-  <body>
-    <center>
-    <h1>The VK visualizer</h1>
-    <p>Enter An ID number</p>
-    <p>And find out what your graph looks like</p>
+<head>
+<!-- подключаем xd_connection.js -->
+<script src="http://vkontakte.ru/js/api/xd_connection.js?2" type="text/javascript"></script>
 
-    <input id="vkId" value="16081499">
-    <button type="button" onclick="fetchFriendList()">Build Graph!</button>
-    <p id="friendList"></p>
-    <p id="testBox"></p>
-    <p id="response">if your graph is won't stop bouncing around: 
-      <button type="button" onclick="test_button()">stop bouncing around!</button></p>
-    <div id="mynetwork"></div>
+<script type="text/javascript">
 
-    </center>
-  </body>
-  </div>
-  
-
-  <script>
-// https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
-//script.src = "https://api.vk.com/method/getProfiles?uid=218868103&callback=callbackFunc";
-//script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
-//script.src = 'https://api.vk.com/method/users.get?uids=218868103&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
-
-// http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
-// http://www.almende.com/contact
-var so = setOps;
-var network = null;
-window.friends = null;
-window.nodes = [];
-window.edges = [];
-window.checkedDictionary = {};
-window.unCheckedFriends = null;
-window.currentNode = null;
-
-// window.urlParams = parseURLParams();
-
-// console.log(parseURLParams());
-// console.log(window.urlParams);
 var params = parseURLParams();
+var access_token ;
+var user_id;
+
 if (params) {
-  for (var id in params) {
-     if (id == "user_id") {
+  for (var param in params) {
+     if (param == "user_id") {
     document.getElementById("vkId").value = params.user_id;
-  };
+      };
+      if (param == "access_token"){
+        access_token = params.access_token;
+      }
    }; 
 };
+
+console.log(access_token);
+
+fetchFriendList(user_id);
+
 function parseURLParams() {
     var params = {};
-    var param_array = window.location.href.split('#')[1].split('&');
-    for(var i in param_array){
-        x = param_array[i].split('=');
-        params[x[0]] = x[1];
-    }
+    var args = window.location.href.split('#');
+    if (args[1]) {
+      var param_array = args[1].split('&');
+      for(var i in param_array){
+          x = param_array[i].split('=');
+          params[x[0]] = x[1];
+      }
+    };
     return params;
 }
 
-// var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
-
-// 1216918
-// 16081499
-// 218868103
-
-
-function test_button(){  
-  network.stopSimulation();
-}
- 
-function fetchDetails(id) {
-   
-    var script = document.createElement('SCRIPT');
-    script.src = 'https://api.vk.com/method/users.get?uids='.concat(id,'&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails');   
-    document.getElementsByTagName("head")[0].appendChild(script);
-    }
-
-function api_FetchDetails(result) {
-    var res = result["response"][0];
-    document.getElementById("testBox").innerHTML = res["first_name"] + " " + res["last_name"];
-    // document.getElementById("response").innerHTML = res;
-
-   window.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res.uid  +"</p>"} );
-}
-
 function fetchFriendList(id) {
-    if (!id) {
-      var x;
-      x = document.getElementById("vkId").value;
-      window.currentNode = document.getElementById("vkId").value;
-    } else {x = id; window.currentNode = id;};
-
+    
     var script = document.createElement('SCRIPT');
-    script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,'&callback=api_FetchFriendList');
+    var y = '';
+    if (access_token) {
+      y = "&access_token="+access_token;
+    };
+    script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,y,'&order=hints&callback=api_FetchFriendList');
+    
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
 function api_FetchFriendList(result) {
-//check to see if there are any friends in friendlist
-    if (!window.friends) { 
-      window.unCheckedFriends = result["response"];
-      window.friends = result["response"].slice(0);
-      window.currentNode = window.unCheckedFriends.pop();
-      fetchFriendList(window.currentNode);
-//google analytics to see if graph was started
-      ga( 'send', 'event', {
-          'eventCategory': 'graph build',
-          'eventAction': 'started graph build'
-        });  
-    } 
-//if not, then take intersection of the response and the friends
-    else {
-      fetchDetails(window.currentNode);
-      // document.getElementById("friendList").innerHTML = "percent finished" +" "+ Math.floor((1 - window.unCheckedFriends.length / window.friends.length) * 100);
-      document.getElementById("friendList").innerHTML = "added "+ (window.friends.length - window.unCheckedFriends.length) +" of " + window.friends.length + " friends";
-// are there new friends and have there been friends added
-      if (result["response"] && window.friends) {
-        var newLinks = so.intersection(window.friends,result["response"]);
-            console.log("current node",window.currentNode);
-            console.log("new links", newLinks);
-            console.log("unchecked friends",window.unCheckedFriends);
-        for (var i = newLinks.length - 1; i >= 0; i--) {
-            make_link(newLinks[i],window.currentNode);          
-        };
-      };
-      
-//keep recursing until all the unchecked friends are finished
-      if (window.unCheckedFriends.length != 0) {
-        window.currentNode = window.unCheckedFriends.pop();
-        fetchFriendList(window.currentNode);  
-      } else { 
-        redrawAll(); 
-//google analytics to see if anyone started using it
-        ga( 'send', 'event', {
-            'eventCategory': 'graph build',
-             'eventAction': 'finished graph build'
-           });  
-         return
-      };
-    }
-}
 
-//mark edges, and make sure there arn't any repeats
-function make_link(source,target){
-  var sum = source + target;
-  if (sum in window.checkedDictionary){
-    return;
-  }
-  window.checkedDictionary[sum] = 1;
-  count_degree(source); 
-  count_degree(target);
+console.log(result);
+};
 
-  window.edges.push({"from":source,"to":target});
-}
-
-function count_degree(id){
-  if (id in window.checkedDictionary) {
-    window.checkedDictionary[id] ++ ;
-  } else {window.checkedDictionary[id] = 1};
-}
-
-//rebuild node dicitonary as array
-function clean_nodes()
-{
-  for (var i = window.nodes.length - 1; i >= 0; i--) {
-    var deg = window.checkedDictionary[window.nodes[i].id]
-    window.nodes[i]["value"] = deg ? deg : 0;
-  };
-  return window.nodes;
-}
-
-//build graph
-function redrawAll() {
-
-    // create a network
-    var container = document.getElementById('mynetwork');
-    var data = {
-      nodes: clean_nodes(),
-      edges: window.edges
-    };
-
-    var options = {
-      nodes: {
-        shape: 'dot',
-        scaling: {
-          min: 5,
-          max: 20
-        },
-        font: {
-          size: 12,
-          face: 'Tahoma'
-        }
-      },
-      edges: {
-        width: 0.15,
-        color: {inherit: 'from'},
-        smooth: {
-          type: 'continuous'
-        }
-      },
-      physics: {
-        stabilization: true,
-        adaptiveTimestep: true,
-        timestep: .9,
-        forceAtlas2Based: {
-        // barnesHut: {
-          // repulsion:{
-          gravitationalConstant: -80,
-          damping: 0.4,
-          springConstant: 250,
-          springLength: 250,
-        }
-      },
-
-      interaction: {
-        tooltipDelay: 10,
-        hideEdgesOnDrag: true
-      }
-    };
-
-    network = new vis.Network(container, data, options);
-  }
 
 </script>
+</head>
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-86997959-1', 'auto');
-  ga('send', 'pageview');
-</script>
 
-</html> 
+<body>
+<a href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">login</a>
+
+
+</body>
+</html>
