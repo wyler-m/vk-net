@@ -63,7 +63,7 @@ function insertNodeInfo (argument) {
 document.getElementById("controlDiv").style.display = "none";
 
   document.getElementById("selectedPic").src = nodeInfo.big_pic;
-  document.getElementById("selectedImportance").innerHTML = "'Importance': " + nodeInfo.value;
+  document.getElementById("selectedImportance").innerHTML = "'Activity': " + nodeInfo.value;
   document.getElementById("selectedName").innerHTML = nodeInfo.label;
   if (nodeInfo.id in cur_graph.degreeDictionary) {
     document.getElementById("selectedDegree").innerHTML = "Connections: " + cur_graph.degreeDictionary[nodeInfo.id];
