@@ -73,9 +73,9 @@ function insertNodeInfo (argument) {
   document.getElementById("selectedProfile").href = "https://www.vk.com/id"+nodeInfo.id;
 
   if (nodeInfo.id && (nodeInfo.big_pic!="https://vk.com/images/deactivated_100.png")){
-    document.getElementById("buildSelected").innerHTML = "Build Graph ("+ total_friends + " friends)"; 
-    document.getElementById("buildSelected").style.display = "block";
+    // document.getElementById("buildSelected").innerHTML = "Build Graph ("+ total_friends + " friends)"; 
     document.getElementById("buildSelected").href = "https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id;
+    document.getElementById("buildSelected").style.display = "block";
   } else {document.getElementById("buildSelected").style.display = "none";};
     
 };
