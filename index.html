@@ -27,8 +27,6 @@
       <p id="testBox"></p>
       <progress id= "progbar" max="100" value="0"></progress>
       <p id="friendList"></p>
-
-
     </div>
       <!-- <p id="response">if your graph is won't stop bouncing around: </p> -->
       
@@ -40,7 +38,7 @@
         <p id="selectedImportance">importance</p>
         <p id="selectedDegree">0</p>
         <a id="selectedProfile" target="_blank" href="https">Visit Profile</a></p>
-        <button id="buildSelected" type="button" onclick="buildNewGraph()">BuildGraph</button><p>
+        <a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
         <p id="selectedWarning"></p>
 
       </div><p>
@@ -72,8 +70,11 @@ document.getElementById("controlDiv").style.display = "none";
   } else {document.getElementById("selectedDegree").innerHTML = "no connections";};
   
   document.getElementById("selectedProfile").href = "https://www.vk.com/id"+nodeInfo.id;
-  document.getElementById("selectedProfile").href = "https://wyler-m.github.io/vk-net#autobuild=true&user_id="+nodeInfo.id;
-  document.getElementById("buildSelected").onclick = "buildNewGraph()" 
+if (nodeInfo.id){
+  document.getElementById("buildSelected").href = "https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id;
+  document.getElementById("buildSelected").style.display = "block";
+} else {document.getElementById("buildSelected").style.display = "none";};
+  
   
   if (total_friends>400){
   document.getElementById("selectedWarning").innerHTML = "this might take a while, they have " + total_friends + " friends"
@@ -83,7 +84,7 @@ document.getElementById("controlDiv").style.display = "none";
 
   //https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
 // https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
-//script.src = "https://api.vk.com/method/getProfiles?uid=218868103&callback=callbackFunc";
+//script.src = "https://api.vk.com/method/getProfiles?uid=176205957&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&callback=callbackFunc';
 //script.src = 'https://api.vk.com/method/users.get?uids=2131567&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
@@ -116,6 +117,7 @@ class graph {
   }
 
   add_details(res){
+    if (res.photo_200 == undefined) {res.photo_200 = "http://vk.com/images/camera_200.png"};
     this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" +  res.uid  +"</p>", big_pic: res.photo_100} );
   }
 
@@ -218,7 +220,6 @@ class graph {
 var so = setOps;
 var network = null;
 var access_token = null;
-var autobuild = false;
 cur_graph = new graph;
 
 
@@ -230,9 +231,6 @@ if (params) {
       };
       if (param == "access_token"){
         access_token = params.access_token;
-      }
-      if (param == "autobuild"){
-        // fetchFriendList();
       }
    }; 
 };
@@ -292,6 +290,15 @@ function fetchFriendList(id) {
     }
 
 function api_FetchFriendList(result) {
+  //error
+  if ("error" in result){
+    document.getElementById("vkId").value = "This user has been deactivated";
+    document.getElementById("controlDiv").style.display = "none";
+    var paragraph = document.createElement('div');
+    paragraph.innerHTML = "sorry, this user is deactivated </p>";
+    document.getElementById("controls").appendChild(paragraph);
+    return;
+  };
 //check to see if there are any friends in friendlist
     if (!cur_graph.friends) { 
       cur_graph.init_friends(result);      
