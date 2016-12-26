@@ -110,7 +110,8 @@ class graph {
     this.nodeToFriends = {};
     this.unCheckedFriends = null;
     this.currentNode = null;
-    this.nodeToInfo = {};  
+    this.nodeToInfo = {};
+    this.overheat = false;  
   }
 
   add_details(res){
@@ -309,9 +310,11 @@ function api_FetchFriendList(result) {
     if ("error" in result) { 
       console.log(result["error"]);
         if ((result["error"]["error_code"]==6) && (cur_graph.currentNode != undefined)){
+          cur_graph.overheat = true
           cur_graph.unCheckedFriends.push(cur_graph.currentNode);
         }
       };
+
     if (!cur_graph.friends) { 
       cur_graph.init_friends(result);      
       fetchFriendList(cur_graph.currentNode);
@@ -340,7 +343,12 @@ function api_FetchFriendList(result) {
       var tempfriend = cur_graph.gotoNextNode() //add this into the fetch frineds list
 
         // fetchFriendList(cur_graph.gotoNextNode());  
-        fetchFriendList(tempfriend);  
+        if (cur_graph.overheat) {
+            cur_graph.overheat = false;
+            setTimeout(function(){
+              fetchFriendList(tempfriend);  
+                }, 1000);
+        };
         // fetchFriendList(currentNode);  
       } else { 
         cur_graph.weight_nodes_popularity();
