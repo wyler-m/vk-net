@@ -65,7 +65,7 @@ function insertNodeInfo (argument) {
 
 
   document.getElementById("selectedPic").src = nodeInfo.big_pic;
-  document.getElementById("selectedImportance").innerHTML = "Average Rank: " + Math.round(1000/(nodeInfo.value+.001) - 1);
+  document.getElementById("selectedImportance").innerHTML = "Average Rank: " + Math.round(1000/(nodeInfo.value));
   document.getElementById("selectedName").innerHTML = nodeInfo.label;
   if (nodeInfo.id in cur_graph.degreeDictionary) {
     document.getElementById("selectedDegree").innerHTML = "Connections: " + cur_graph.degreeDictionary[nodeInfo.id];
@@ -187,7 +187,7 @@ class graph {
       // if (degree!=0) {popularity_measure = popularity_measure/degree};
       // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
       // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure/degree*1000) : 0;
+      this.nodes[i]["value"] = popularity_measure ? Math.round(1000/popularity_measure/degree) : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
@@ -208,10 +208,11 @@ class graph {
           // return (1 - location/len);
           // return (len-location);
           // return 1/Math.pow((1 + location/len),10);
-          return (1/(1 + location));
+          // return (1/(1 + location));
+          return location;
         };
       };
-      return 0;
+      return 1000;
     }
 
     add_to_pop_dict(source,rank){
