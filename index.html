@@ -192,7 +192,6 @@ $("#loginP").show();
   });
 
 function ga_onclick(element,action){
-  console.log($(element).attr("href"),action);
       ga( 'send', 'event', {
           'eventCategory': 'link out',
           'eventAction': action,
@@ -278,8 +277,6 @@ function freeze_graph(){
   if (network) {
     network.stopSimulation();
     var graph_density = cur_graph.edges.length / cur_graph.nodes.length / (cur_graph.nodes.length - 1) * 2;
-        console.log(graph_density);
-
           ga( 'send', 'event', {
           'eventCategory': 'graph interaction',
           'eventAction': 'freeze graph',
@@ -369,7 +366,6 @@ function api_FetchFriendList(result) {
         redrawAll(); 
 //google analytics to see if anyone started using it
         var graph_density = cur_graph.edges.length / cur_graph.nodes.length / (cur_graph.nodes.length - 1) * 2;
-        console.log(graph_density);
         ga( 'send', 'event', {
             'eventCategory': 'graph interaction',
              'eventAction': 'finished graph build',
