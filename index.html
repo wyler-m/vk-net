@@ -8,6 +8,7 @@
      <script src="setOps.js"></script>
      <script src="test_data.js"></script>
      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
      <script type="text/javascript" src="jLouvain.js"></script>
      <script type="text/javascript" src="jLouvain.js"></script>
 
@@ -16,88 +17,38 @@
 <body>
     
 	   
-<div id="container">
-    <menu id="controls">
-        
-        <h1><img src= "vk.svg"> visualizer</h1>
-     <div id = "controlDiv">
-     <p id="welcome">Enter An ID number and find out what your graph looks like:</p>
-     <a id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">If you don't know your number, then login to VK.com</a> </p>
-      <input id="vkId" value="56843436"></p>
-      <button type="button" onclick="fetchFriendList()">Build Graph!</button>
-      <button type="button" onclick="freeze_graph()">Freeze Graph</button>
-      <p id="testBox"></p>
-      <progress id= "progbar" max="100" value="0"></progress>
-      <p id="friendList"></p>
-    </div>
-      <!-- <p id="response">if your graph is won't stop bouncing around: </p> -->
-      
-      <!-- <button type="button" onclick="change_weights()">change weights</button><p> -->
-      <!-- <a href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">login</a> -->
-      <div id="nodeInfo" >
-        <p id="selectedName">name</p>
-        <img id="selectedPic" src = ''>
-        <p id="selectedImportance">importance</p>
-        <p id="selectedDegree">0</p>
-        <a id="selectedProfile" target="_blank" href="https">Visit Profile</a></p>
-        <a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
+<div id="container" >
+<menu id="controls">
 
-      </div><p>
+<h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+<div id = "controlDiv" >
+  <p id="welcome">Enter An ID number and find out what your graph looks like:</p>
+  <a id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">If you don't know your number, then login to VK.com</a> </p>
+  <input id="vkId" value="218868101"></p>
+  <button type="button" onclick="fetchFriendList()">Build Graph!</button>
+  <button type="button" onclick="freeze_graph()">Freeze Graph</button>
+  <p id="testBox"></p>
+<progress id= "progbar" max="100" value="0"></progress>
+<p id="friendList"></p>
+</div>
+
+
+<div id="nodeInfo" >
+  <p id="selectedName">name</p>
+  <img id="selectedPic" src = ''>
+<p id="selectedImportance">importance</p>
+<p id="selectedDegree">0</p>
+<a id="selectedProfile" target="_blank" href="https">Visit Profile</a></p>
+<a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
+</div><p>
   </menu>
   <div id="mynetwork" class="wrapper"></div>
-  
+  </div>
   </body>
 
   <script>
-document.getElementById("nodeInfo").style.display = "none";
-document.getElementById("buildSelected").style.display = "none";
-document.getElementById("loginP").style.display = "block";
-
-function insertNodeInfo (argument) {
-  var nodeInfo = cur_graph.nodeToInfo[argument.nodes[0]];
-  if (cur_graph.nodeToFriends[argument.nodes[0]]) {
-    var total_friends = cur_graph.nodeToFriends[argument.nodes[0]].length;
-  }else {var total_friends = 0
-  };
-  
-  document.getElementById("nodeInfo").style.display = "block";
-  document.getElementById("controlDiv").style.display = "none";
 
 
-  document.getElementById("selectedPic").src = nodeInfo.big_pic;
-  document.getElementById("selectedImportance").innerHTML = "Average Rank: " + Math.round(1000/(nodeInfo.value+.01));
-  document.getElementById("selectedName").innerHTML = nodeInfo.label;
-  if (nodeInfo.id in cur_graph.degreeDictionary) {
-    document.getElementById("selectedDegree").innerHTML = "Connections: " + cur_graph.degreeDictionary[nodeInfo.id];
-  } else {document.getElementById("selectedDegree").innerHTML = "no connections";};
-  
-  document.getElementById("selectedProfile").href = "https://www.vk.com/id"+nodeInfo.id;
-
-  if (nodeInfo.id && (nodeInfo.big_pic!="https://vk.com/images/deactivated_100.png")){
-    document.getElementById("buildSelected").innerHTML = "Build Graph ("+ total_friends + " friends)"; 
-    document.getElementById("buildSelected").href = "https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id;
-    document.getElementById("buildSelected").style.display = "block";
-  } else {document.getElementById("buildSelected").style.display = "none";};
-    
-};
-
-  //https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
-// https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
-//script.src = "https://api.vk.com/method/getProfiles?uid=355065657&callback=callbackFunc";
-//script.src = 'https://api.vk.com/method/friends.get?uid=206373419&callback=callbackFunc';
-//script.src = 'https://api.vk.com/method/users.get?uids=2131567&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
-
-// http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
-// http://www.almende.com/contact
-
-// var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
-// https://api.vk.com/method/users.get?uids=1216918&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails
-
-// 1216918
-// 16081499
-// 218868103
-
-//https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60
 
 
 class graph {
@@ -111,17 +62,19 @@ class graph {
     this.unCheckedFriends = null;
     this.currentNode = null;
     this.nodeToInfo = {};  
+    this.graphSource = null;
+  }
+
+  init_friends(res,node){
+    this.unCheckedFriends = res["response"];
+    this.friends = res["response"].slice(0);
+    this.gotoNextNode();
+    this.graphSource = document.getElementById("vkId").value;
   }
 
   add_details(res){
     if (res.photo_200 == undefined) {res.photo_200 = "http://vk.com/images/camera_200.png"};
     this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>"+res.city, big_pic:res.photo_100, group:res.city } );
-  }
-
-  init_friends(res){
-    this.unCheckedFriends = res["response"];
-    this.friends = res["response"].slice(0);
-    this.gotoNextNode();
   }
 
   gotoNextNode(){
@@ -169,6 +122,7 @@ class graph {
     for (var i = this.nodes.length - 1; i >= 0; i--) {
       var deg = this.degreeDictionary[this.nodes[i].id]
       this.nodes[i]["value"] = deg ? deg : 0;
+      this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
       };
     }
 
@@ -183,11 +137,9 @@ class graph {
       var popularity_measure = this.popularityDictionary[this.nodes[i].id];
       var degree = this.degreeDictionary[this.nodes[i].id];
       // finds average popularity of node by dividing by degree
-      // if (degree!=0) {popularity_measure = popularity_measure/degree};
-      // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/degree) : 0;
-      // console.log(popularity_measure,this.nodes[i]);
       // this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(degree+1)) : 0;
+      // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/degree) : 0;
+      this.nodes[i]["value"] = popularity_measure ? popularity_measure : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
@@ -206,14 +158,9 @@ class graph {
         var location = source_friends.indexOf(target); // find location of the node in queue
         var len = source_friends.length; 
         if ((location!=-1) && (len!=0)) {
-          // return (1 - location/len);
-          // return (len-location);
-          // return 1/Math.pow((1 + location/len),10);
           return (1/(1 + location));
-          // return (location);
         };
       };
-      console.log(target,source_friends);
       return 0;
     }
 
@@ -231,22 +178,80 @@ var access_token = null;
 var first_pass = true;
 cur_graph = new graph;
 
+$("#nodeInfo").hide();
+$("#buildSelected").hide();
+$("#loginP").show();
+
+
+  $("#selectedProfile").click(function(){
+    ga_onclick("#selectedProfile","Check Profile");
+  });
+
+  $("#buildSelected").click(function(){
+    ga_onclick("#selectedProfile","Build Graph");
+  });
+
+function ga_onclick(element,action){
+  console.log($(element).attr("href"),action);
+      ga( 'send', 'event', {
+          'eventCategory': 'link out',
+          'eventAction': action,
+          'eventLabel': $(element).attr("href")
+        }); 
+  }
+
+function insertNodeInfo (argument) {
+  var nodeInfo = cur_graph.nodeToInfo[argument.nodes[0]];
+  if (cur_graph.nodeToFriends[argument.nodes[0]]) {
+    var total_friends = cur_graph.nodeToFriends[argument.nodes[0]].length;
+  }else {var total_friends = 0
+  };
+  
+  $("#nodeInfo").toggle();
+  $("#controlDiv").toggle();
+
+  $("#selectedName").text(nodeInfo.label);
+  $("#selectedPic").attr("src",nodeInfo.big_pic);
+
+  $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
+  // $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
+
+  if (nodeInfo.id in cur_graph.degreeDictionary) {
+    $("#selectedDegree").text("Connections: " + cur_graph.degreeDictionary[nodeInfo.id]);
+  } else {$("#selectedDegree").text("no connections")};
+  
+  $("#selectedProfile").attr("href","https://www.vk.com/id"+nodeInfo.id);
+
+
+  if (nodeInfo.id && (nodeInfo.big_pic!="https://vk.com/images/deactivated_100.png")){
+    $("#buildSelected").text("Build Graph ("+ total_friends + " friends)");
+    $("#buildSelected").attr("href","https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id);
+    $("#buildSelected").show();
+
+  } else {$("#buildSelected").hide();};
+    
+// google analytics
+      ga( 'send', 'event', {
+          'eventCategory': 'graph interaction',
+          'eventAction': 'select node',
+          'eventLabel': nodeInfo.id
+        }); 
+
+};
+
 
 var params = parseURLParams();
 if (params) {
   for (var param in params) {
      if (param == "user_id") {
         document.getElementById("vkId").value = params.user_id;
-        document.getElementById("loginP").style.display = "none";
-
+        $("#loginP").hide();        
       };
       if (param == "access_token"){
         access_token = params.access_token;
       }
    }; 
 };
-
-
 
 
 
@@ -270,7 +275,18 @@ function update_progress(friends, unCheckedFriends){
 }
 
 function freeze_graph(){  
-  if (network) {network.stopSimulation();};
+  if (network) {
+    network.stopSimulation();
+    var graph_density = cur_graph.edges.length / cur_graph.nodes.length / (cur_graph.nodes.length - 1) * 2;
+        console.log(graph_density);
+
+          ga( 'send', 'event', {
+          'eventCategory': 'graph interaction',
+          'eventAction': 'freeze graph',
+          'eventLabel': cur_graph.graphSource,
+          'eventValue': graph_density
+        }); 
+  };
 }
  
 function fetchDetails(id) {
@@ -281,11 +297,12 @@ function fetchDetails(id) {
     }
 
 function api_FetchDetails(result) {
+    if ('error' in result) {console.log(result)};
     var res = result["response"][0];
     if (!first_pass) {cur_graph.add_details(res);
     } else {
       first_pass = false;
-    document.getElementById("welcome").innerHTML = res.first_name +" "+res.last_name;
+      document.getElementById("welcome").innerHTML = res.first_name +" "+res.last_name;
   };
     
 }
@@ -308,20 +325,20 @@ function fetchFriendList(id) {
     }
 
 function api_FetchFriendList(result) {
-//check to see if there are any friends in friendlist
+
 //if error
     if ("error" in result) { 
-      console.log(result["error"]);
         if ((result["error"]["error_code"]==6) && (cur_graph.currentNode != undefined)){
           cur_graph.unCheckedFriends.push(cur_graph.currentNode);
         }
       };
+//check to see if there are any friends in friendlist
     if (!cur_graph.friends) { 
       cur_graph.init_friends(result);      
       fetchFriendList(cur_graph.currentNode);
 //google analytics to see if graph was started
       ga( 'send', 'event', {
-          'eventCategory': 'graph build',
+          'eventCategory': 'graph interaction',
           'eventAction': 'started graph build'
         });  
     } 
@@ -340,8 +357,8 @@ function api_FetchFriendList(result) {
 //keep recursing until all the unchecked friends are finished
       // if (cur_graph.unCheckedFriends.length != 0) {
       if (cur_graph.currentNode) {
-
-      var tempfriend = cur_graph.gotoNextNode() //add this into the fetch frineds list
+//add this into the fetch frineds list
+      var tempfriend = cur_graph.gotoNextNode() 
 
         // fetchFriendList(cur_graph.gotoNextNode());  
         fetchFriendList(tempfriend);  
@@ -351,14 +368,18 @@ function api_FetchFriendList(result) {
         // cur_graph.weight_nodes_degree()
         redrawAll(); 
 //google analytics to see if anyone started using it
+        var graph_density = cur_graph.edges.length / cur_graph.nodes.length / (cur_graph.nodes.length - 1) * 2;
+        console.log(graph_density);
         ga( 'send', 'event', {
-            'eventCategory': 'graph build',
-             'eventAction': 'finished graph build'
+            'eventCategory': 'graph interaction',
+             'eventAction': 'finished graph build',
+             'eventLabel': document.getElementById("welcome").innerHTML,
+             'eventValue': graph_density
            });  
          return
+        };
       };
     };
-};
 
 
 //build graph
@@ -419,10 +440,32 @@ function redrawAll() {
     });
 
     network.on("deselectNode", function (params) {
-        document.getElementById("nodeInfo").style.display = "none";
-        document.getElementById("controlDiv").style.display = "block";
+        $("#nodeInfo").hide();
+        $("#controlDiv").show();
     });
   }
+
+
+//https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
+// https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
+//script.src = "https://api.vk.com/method/getProfiles?uid=355065657&callback=callbackFunc";
+//script.src = 'https://api.vk.com/method/friends.get?uid=218868103&order=hints&callback=callbackFunc';
+//script.src = 'https://api.vk.com/method/users.get?uids=2131567&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
+
+
+// http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
+// http://www.almende.com/contact
+
+// var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
+// https://api.vk.com/method/users.get?uids=1216918&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails
+
+// 1216918
+// 16081499
+// 218868103
+
+//https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60
+
+// https://api.vk.com/method/friends.get?uid=218868103&v=58&order=hints&lang=ru&fields=first_name,last_name,city,domain,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=callbackFunc
 
 </script>
 
@@ -436,3 +479,6 @@ function redrawAll() {
 </script>
 
 </html> 
+
+
+
