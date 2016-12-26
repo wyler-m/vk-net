@@ -137,9 +137,9 @@ class graph {
       var popularity_measure = this.popularityDictionary[this.nodes[i].id];
       var degree = this.degreeDictionary[this.nodes[i].id];
       // finds average popularity of node by dividing by degree
-      // this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(degree+1)) : 0;
+      this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(degree+1)) : 0;
       // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/degree) : 0;
-      this.nodes[i]["value"] = popularity_measure ? popularity_measure : 0;
+      // this.nodes[i]["value"] = popularity_measure ? popularity_measure : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
@@ -205,15 +205,14 @@ function insertNodeInfo (argument) {
     var total_friends = cur_graph.nodeToFriends[argument.nodes[0]].length;
   }else {var total_friends = 0
   };
-  
   $("#nodeInfo").toggle();
   $("#controlDiv").toggle();
 
   $("#selectedName").text(nodeInfo.label);
   $("#selectedPic").attr("src",nodeInfo.big_pic);
 
-  $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
-  // $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
+  // $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
+  $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
 
   if (nodeInfo.id in cur_graph.degreeDictionary) {
     $("#selectedDegree").text("Connections: " + cur_graph.degreeDictionary[nodeInfo.id]);
@@ -294,13 +293,19 @@ function fetchDetails(id) {
     }
 
 function api_FetchDetails(result) {
-    if ('error' in result) {console.log(result)};
-    var res = result["response"][0];
-    if (!first_pass) {cur_graph.add_details(res);
-    } else {
-      first_pass = false;
-      document.getElementById("welcome").innerHTML = res.first_name +" "+res.last_name;
-  };
+    if ('error' in result) {
+      console.log(result)
+    } 
+    else {
+      var res = result["response"][0];
+      if (!first_pass) {
+        cur_graph.add_details(res);
+      } 
+      else {
+        first_pass = false;
+        document.getElementById("welcome").innerHTML = res.first_name +" "+res.last_name;
+      };
+    };
     
 }
 
