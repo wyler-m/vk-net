@@ -140,6 +140,12 @@ class graph {
             this.make_link(newLinks[i],this.currentNode);          
         };
       };
+  };
+
+  update_progress(){
+    document.getElementById("friendList").innerHTML = "added "+ (this.friends.length - this.unCheckedFriends.length) +" of " + this.friends.length + " friends";
+    document.getElementById("progbar").max = this.friends.length;
+    document.getElementById("progbar").value = (this.friends.length - this.unCheckedFriends.length);
   }
 
   make_link(source,target){
@@ -299,6 +305,13 @@ function fetchFriendList(id) {
 
 function api_FetchFriendList(result) {
 //check to see if there are any friends in friendlist
+//if error
+    if ("error" in result) { 
+      console.log(result["error"]);
+        if ((result["error"]["error_code"]==6) && (cur_graph.currentNode != undefined)){
+          cur_graph.unCheckedFriends.push(cur_graph.currentNode);
+        }
+      };
     if (!cur_graph.friends) { 
       cur_graph.init_friends(result);      
       fetchFriendList(cur_graph.currentNode);
@@ -310,7 +323,8 @@ function api_FetchFriendList(result) {
     } 
 //if not, then take intersection of the response and the friends
     else {
-      update_progress(cur_graph.friends,cur_graph.unCheckedFriends);
+      // update_progress(cur_graph.friends,cur_graph.unCheckedFriends);
+      cur_graph.update_progress();
       
 // are there new friends and have there been friends added
       
