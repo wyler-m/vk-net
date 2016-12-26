@@ -65,7 +65,7 @@ function insertNodeInfo (argument) {
 
 
   document.getElementById("selectedPic").src = nodeInfo.big_pic;
-  document.getElementById("selectedImportance").innerHTML = "Average Rank: " + Math.round(1000/(nodeInfo.value));
+  document.getElementById("selectedImportance").innerHTML = "Average Rank: " + Math.round(1000/(nodeInfo.value+.01));
   document.getElementById("selectedName").innerHTML = nodeInfo.label;
   if (nodeInfo.id in cur_graph.degreeDictionary) {
     document.getElementById("selectedDegree").innerHTML = "Connections: " + cur_graph.degreeDictionary[nodeInfo.id];
@@ -110,8 +110,7 @@ class graph {
     this.nodeToFriends = {};
     this.unCheckedFriends = null;
     this.currentNode = null;
-    this.nodeToInfo = {};
-    this.overheat = false;  
+    this.nodeToInfo = {};  
   }
 
   add_details(res){
@@ -186,8 +185,9 @@ class graph {
       // finds average popularity of node by dividing by degree
       // if (degree!=0) {popularity_measure = popularity_measure/degree};
       // if (degree!=0) {this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*100/degree) : 0;};
-      // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*size/degree) : 0;
-      this.nodes[i]["value"] = popularity_measure ? Math.round(1000/popularity_measure/degree) : 0;
+      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/degree) : 0;
+      // console.log(popularity_measure,this.nodes[i]);
+      // this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(degree+1)) : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
 
@@ -200,7 +200,8 @@ class graph {
     }
 
     get_popularity(source, target){
-      var source_friends = this.nodeToFriends[source];
+      var source_friends = (this.nodeToFriends[source] != undefined)  ? this.nodeToFriends[source]: [] ;
+
       if (target && source_friends) {
         var location = source_friends.indexOf(target); // find location of the node in queue
         var len = source_friends.length; 
@@ -208,11 +209,12 @@ class graph {
           // return (1 - location/len);
           // return (len-location);
           // return 1/Math.pow((1 + location/len),10);
-          // return (1/(1 + location));
-          return location;
+          return (1/(1 + location));
+          // return (location);
         };
       };
-      return 1000;
+      console.log(target,source_friends);
+      return 0;
     }
 
     add_to_pop_dict(source,rank){
@@ -311,11 +313,9 @@ function api_FetchFriendList(result) {
     if ("error" in result) { 
       console.log(result["error"]);
         if ((result["error"]["error_code"]==6) && (cur_graph.currentNode != undefined)){
-          cur_graph.overheat = true
           cur_graph.unCheckedFriends.push(cur_graph.currentNode);
         }
       };
-
     if (!cur_graph.friends) { 
       cur_graph.init_friends(result);      
       fetchFriendList(cur_graph.currentNode);
@@ -344,12 +344,7 @@ function api_FetchFriendList(result) {
       var tempfriend = cur_graph.gotoNextNode() //add this into the fetch frineds list
 
         // fetchFriendList(cur_graph.gotoNextNode());  
-        if (cur_graph.overheat) {
-            cur_graph.overheat = false;
-            setTimeout(function(){
-              fetchFriendList(tempfriend);  
-                }, 1000);
-        };
+        fetchFriendList(tempfriend);  
         // fetchFriendList(currentNode);  
       } else { 
         cur_graph.weight_nodes_popularity();
