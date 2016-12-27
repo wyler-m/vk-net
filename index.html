@@ -26,10 +26,14 @@
   <a id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">If you don't know your number, then login to VK.com</a> </p>
   <input id="vkId" value="218868101"></p>
   <button type="button" onclick="fetchFriendList()">Build Graph!</button>
+  <!-- <button type="button" onclick="redrawAll()">Build Graph!</button> -->
   <button type="button" onclick="freeze_graph()">Freeze Graph</button>
   <p id="testBox"></p>
 <progress id= "progbar" max="100" value="0"></progress>
 <p id="friendList"></p>
+<!-- <input type="radio" name="group1" value="Milk" checked> degree <br>
+<input type="radio" name="group1" value="Butter"> popularity <br>
+<input type="radio" name="group1" value="Cheese"> averaged popularity<br> -->
 </div>
 
 
@@ -38,7 +42,7 @@
   <img id="selectedPic" src = ''>
 <p id="selectedImportance">importance</p>
 <p id="selectedDegree">0</p>
-<a id="selectedProfile" target="_blank" href="https">Visit Profile</a></p>
+<a id="selectedProfile" target="_blank" class="mylink" href="https">Visit Profile</a></p>
 <a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
 </div><p>
   </menu>
@@ -56,20 +60,27 @@ class graph {
     this.friends = null;
     this.nodes = [];
     this.edges = [];
-    this.degreeDictionary = {};
-    this.popularityDictionary = {};
+    // this.weightsDictionary = {};
+    // this.weightsDictionary.popularity = {};
+    this.weightsDictionary = {
+                    "degree":{},
+                    "popularity":{}
+                  };
     this.nodeToFriends = {};
     this.unCheckedFriends = null;
     this.currentNode = null;
     this.nodeToInfo = {};  
-    this.graphSource = null;
+    this.ownerInfo = {};
+  }
+
+  init_owner(res){
+    this.ownerInfo = res
   }
 
   init_friends(res){
     this.unCheckedFriends = res["response"];
     this.friends = res["response"].slice(0);
     this.gotoNextNode();
-    this.graphSource = document.getElementById("vkId").value;
   }
 
   add_details(res){
@@ -103,27 +114,23 @@ class graph {
 
   make_link(source,target){
     var sum = source + target;
-    if (sum in this.degreeDictionary){
+    if (sum in this.weightsDictionary.degree){
       return;
     }
-    this.degreeDictionary[sum] = 1;
+    this.weightsDictionary.degree[sum] = 1;
     this.count_degree(source); 
     this.count_degree(target);
     this.edges.push({"from":source,"to":target});
   }
 
   count_degree(id){
-    if (id in this.degreeDictionary) {
-      this.degreeDictionary[id] ++ ;
-    } else {this.degreeDictionary[id] = 1};
+    if (id in this.weightsDictionary.degree) {
+      this.weightsDictionary.degree[id] ++ ;
+    } else {this.weightsDictionary.degree[id] = 1};
   }
 
-  weight_nodes_degree(){
-    for (var i = this.nodes.length - 1; i >= 0; i--) {
-      var deg = this.degreeDictionary[this.nodes[i].id]
-      this.nodes[i]["value"] = deg ? deg : 0;
-      this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
-      };
+  get_density(){
+        return this.edges.length / this.nodes.length / (this.nodes.length - 1) * 2;
     }
 
   weight_nodes_popularity(){
@@ -131,21 +138,8 @@ class graph {
     for (var i = 0; i < this.edges.length; i++) {
       this.run_pop_dict(this.edges[i].to, this.edges[i].from);
     };
-    // once popularity for each node has been written, iterate through nodes, also build node => nodeinfo dictionary
-    var size = this.nodes.length;
-    for (var i = this.nodes.length - 1; i >= 0; i--) {
-      var popularity_measure = this.popularityDictionary[this.nodes[i].id];
-      var degree = this.degreeDictionary[this.nodes[i].id];
-      //inverts the popularity measure
-      // this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(degree+1)) : 0; 
-      // finds average popularity of node by dividing by degree - average
-      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/degree) : 0;
-      // this.nodes[i]["value"] = popularity_measure ? popularity_measure : 0;
 
-      this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
-
-      };
-    }
+  }
     
     run_pop_dict(nodeA, nodeB){
       this.add_to_pop_dict(nodeB, this.get_popularity(nodeA, nodeB));
@@ -159,17 +153,67 @@ class graph {
         var location = source_friends.indexOf(target); // find location of the node in queue
         var len = source_friends.length; 
         if ((location!=-1) && (len!=0)) {
-          return (1/(1 + location));
+          return (1000/(1 + location));
         };
       };
       return 0;
     }
 
     add_to_pop_dict(source,rank){
-    if (source in this.popularityDictionary) {
-      this.popularityDictionary[source] += rank ;
-    } else {this.popularityDictionary[source] = 0};
-  }
+      if (source in this.weightsDictionary.popularity) {
+        this.weightsDictionary.popularity[source] += rank ;
+      } else {
+        this.weightsDictionary.popularity[source] = 0
+      };
+    }
+
+//generate popularity averaged over degree
+    weight_nodes_popularity_deg(){
+      this.weightsDictionary["popularityDeg"] = {};
+      var nodes = Object.keys(this.weightsDictionary.degree);
+      for (var i = 0; i < nodes.length; i++) {
+        var deg = this.weightsDictionary.degree[nodes[i]];
+        this.weightsDictionary.popularityDeg[nodes[i]] = Math.round(this.weightsDictionary.popularity[nodes[i]]/deg);
+      };
+    }
+    
+
+    set_weights(weight_type){
+      var size = this.nodes.length;
+
+      for (var i = this.nodes.length - 1; i >= 0; i--) {
+       /// for degree
+        // var deg = Math.pow(this.weightsDictionary[weight_type][this.nodes[i].id],2);
+        var deg = this.weightsDictionary[weight_type][this.nodes[i].id];
+        this.nodes[i]["value"] = deg ? deg : 0;
+        this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
+      
+      /// for popularity
+
+        // var popularity_measure = this.weightsDictionary.popularity[this.nodes[i].id];
+      //inverts the popularity measure
+      // this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(deg+1)) : 0; 
+      // finds average popularity of node by dividing by deg - average
+      // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/deg) : 0;
+          // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000) : 0;
+      // this.nodes[i]["value"] = popularity_measure ? popularity_measure : 0;
+
+          // once popularity for each node has been written, iterate through nodes, also build node => nodeinfo dictionary
+    // var size = this.nodes.length;
+    // for (var i = this.nodes.length - 1; i >= 0; i--) {
+    //   var popularity_measure = this.weightsDictionary.popularity[this.nodes[i].id];
+    //   var degree = this.weightsDictionary.degree[this.nodes[i].id];
+    //   //inverts the popularity measure
+    //   // this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(degree+1)) : 0; 
+    //   // finds average popularity of node by dividing by degree - average
+    //   // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/degree) : 0;
+    //   this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000) : 0;
+    //   // this.nodes[i]["value"] = popularity_measure ? popularity_measure : 0;
+
+    //   };
+
+      }
+    }
 }
 
 
@@ -212,11 +256,11 @@ function insertNodeInfo (argument) {
   $("#selectedName").text(nodeInfo.label);
   $("#selectedPic").attr("src",nodeInfo.big_pic);
 
-  // $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
-  $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
+  $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
+  // $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
 
-  if (nodeInfo.id in cur_graph.degreeDictionary) {
-    $("#selectedDegree").text("Connections: " + cur_graph.degreeDictionary[nodeInfo.id]);
+  if (nodeInfo.id in cur_graph.weightsDictionary.degree) {
+    $("#selectedDegree").text("Connections: " + cur_graph.weightsDictionary.degree[nodeInfo.id]);
   } else {$("#selectedDegree").text("no connections")};
   
   $("#selectedProfile").attr("href","https://www.vk.com/id"+nodeInfo.id);
@@ -268,6 +312,7 @@ function parseURLParams() {
 }
 
 function update_progress(friends, unCheckedFriends){
+
     document.getElementById("friendList").innerHTML = "added "+ (friends.length - unCheckedFriends.length) +" of " + friends.length + " friends";
     document.getElementById("progbar").max = friends.length;
     document.getElementById("progbar").value = (friends.length - unCheckedFriends.length);
@@ -276,12 +321,11 @@ function update_progress(friends, unCheckedFriends){
 function freeze_graph(){  
   if (network) {
     network.stopSimulation();
-    var graph_density = cur_graph.edges.length / cur_graph.nodes.length / (cur_graph.nodes.length - 1) * 2;
           ga( 'send', 'event', {
           'eventCategory': 'graph interaction',
           'eventAction': 'freeze graph',
-          'eventLabel': cur_graph.graphSource,
-          'eventValue': graph_density
+          'eventLabel': cur_graph.ownerInfo["id"],
+          'eventValue': cur_graph.get_density()
         }); 
   };
 }
@@ -304,6 +348,7 @@ function api_FetchDetails(result) {
       } 
       else {
         first_pass = false;
+        cur_graph.init_owner(res);
         document.getElementById("welcome").innerHTML = res.first_name +" "+res.last_name;
       };
     };
@@ -342,7 +387,9 @@ function api_FetchFriendList(result) {
 //google analytics to see if graph was started
       ga( 'send', 'event', {
           'eventCategory': 'graph interaction',
-          'eventAction': 'started graph build'
+          'eventAction': 'started graph build',
+          'eventLabel': cur_graph.ownerInfo["id"],
+          'eventValue': cur_graph.unCheckedFriends.length
         });  
     } 
 //if not, then take intersection of the response and the friends
@@ -368,15 +415,16 @@ function api_FetchFriendList(result) {
         // fetchFriendList(currentNode);  
       } else { 
         cur_graph.weight_nodes_popularity();
+        cur_graph.weight_nodes_popularity_deg();
         // cur_graph.weight_nodes_degree()
+        cur_graph.set_weights("degree");
         redrawAll(); 
 //google analytics to see if anyone started using it
-        var graph_density = cur_graph.edges.length / cur_graph.nodes.length / (cur_graph.nodes.length - 1) * 2;
         ga( 'send', 'event', {
             'eventCategory': 'graph interaction',
              'eventAction': 'finished graph build',
-             'eventLabel': document.getElementById("welcome").innerHTML,
-             'eventValue': graph_density
+             'eventLabel': cur_graph.ownerInfo["id"],
+             'eventValue': cur_graph.get_density()
            });  
          return
         };
@@ -422,9 +470,9 @@ function redrawAll() {
         forceAtlas2Based: {
         // barnesHut: {
           // repulsion:{
-          gravitationalConstant: -8,
+          gravitationalConstant: -80,
           damping: 0.4,
-          springConstant: 250,
+          springConstant: 2,
           springLength: 2500,
         }
       },
