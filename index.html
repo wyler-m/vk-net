@@ -65,7 +65,7 @@ class graph {
     this.graphSource = null;
   }
 
-  init_friends(res,node){
+  init_friends(res){
     this.unCheckedFriends = res["response"];
     this.friends = res["response"].slice(0);
     this.gotoNextNode();
@@ -136,9 +136,10 @@ class graph {
     for (var i = this.nodes.length - 1; i >= 0; i--) {
       var popularity_measure = this.popularityDictionary[this.nodes[i].id];
       var degree = this.degreeDictionary[this.nodes[i].id];
-      // finds average popularity of node by dividing by degree
-      this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(degree+1)) : 0;
-      // this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/degree) : 0;
+      //inverts the popularity measure
+      // this.nodes[i]["value"] = popularity_measure ? Math.round(1000/(popularity_measure+1)/(degree+1)) : 0; 
+      // finds average popularity of node by dividing by degree - average
+      this.nodes[i]["value"] = popularity_measure ? Math.round(popularity_measure*1000/degree) : 0;
       // this.nodes[i]["value"] = popularity_measure ? popularity_measure : 0;
 
       this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
