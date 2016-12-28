@@ -455,18 +455,30 @@ function api_FetchFriendList(result) {
 
 function change_weights_d(){
   cur_graph.set_weights("degree");
+  ga( 'send', 'event', {
+          'eventCategory': 'change weight',
+          'eventAction': "degree"
+        }); 
   redrawAll();
   network.stopSimulation();
 }
 
 function change_weights_p(){
   cur_graph.set_weights("popularity");
+    ga( 'send', 'event', {
+          'eventCategory': 'change weight',
+          'eventAction': "popularity"
+        }); 
   redrawAll();
   network.stopSimulation();
 }
 
 function change_weights_ap(){
   cur_graph.set_weights("popularityDeg");
+      ga( 'send', 'event', {
+          'eventCategory': 'change weight',
+          'eventAction': "average popularity"
+        }); 
   redrawAll();
   network.stopSimulation();
   
