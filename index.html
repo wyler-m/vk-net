@@ -7,10 +7,10 @@
      <script src="https://d3js.org/d3.v4.min.js"></script>
      <script src="setOps.js"></script>
      <script src="test_data.js"></script>
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script>
+     <!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
+     <script type="text/javascript" src="vis.js"></script>
      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-     <script type="text/javascript" src="jLouvain.js"></script>
-     <script type="text/javascript" src="jLouvain.js"></script>
+     <!-- // <script type="text/javascript" src="jLouvain.js"></script> -->
 
  </head>
  
@@ -31,6 +31,8 @@
   <button type="button" onclick="change_weights_d()">Node Size: Connections</button>
   <button type="button" onclick="change_weights_p()">Node Size: "linear popularity"</button>
   <button type="button" onclick="change_weights_ap()">Node Size: "relative popularity"</button>
+  <button type="button" onclick="test_build()">test build</button>
+  <button type="button" onclick="canvas_image()">get image</button>
   <p id="testBox"></p>
 <progress id= "progbar" max="100" value="0"></progress>
 <p id="friendList"></p>
@@ -48,6 +50,9 @@
 </div><p>
   </menu>
   <div id="mynetwork" class="wrapper"></div>
+  <img id="data" class="wrapper">
+<a href="" id="download" target="_blank" download="graph.html">Save Image</a>
+  </div>
   </div>
   </body>
 
@@ -467,7 +472,7 @@ function change_weights_d(){
   cur_graph.set_weights("quad degree");
   ga( 'send', 'event', {
           'eventCategory': 'change weight',
-          'eventAction': "degree"
+          'eventAction': 'degree'
         }); 
   redrawAll();
 }
@@ -477,7 +482,7 @@ function change_weights_p(){
   cur_graph.set_weights("linear popularity");
     ga( 'send', 'event', {
           'eventCategory': 'change weight',
-          'eventAction': "popularity"
+          'eventAction': 'popularity'
         }); 
   redrawAll();
 }
@@ -486,11 +491,39 @@ function change_weights_ap(){
   cur_graph.set_weights("popularityDeg");
       ga( 'send', 'event', {
           'eventCategory': 'change weight',
-          'eventAction': "average popularity"
+          'eventAction': 'average popularity'
         }); 
   redrawAll();
   
 }
+
+function test_build(){
+cur_graph.currentNode = test_data.currentNode  
+cur_graph.edges = test_data.edges   
+cur_graph.first_pass = test_data.first_pass   
+cur_graph.friends = test_data.friends   
+cur_graph.nodeToFriends = test_data.nodeToFriends  
+cur_graph.nodeToInfo = test_data.nodeToInfo   
+cur_graph.nodes = test_data.nodes   
+cur_graph.nodesRetrieved = test_data.nodesRetrieved   
+cur_graph.ownerInfo = test_data.ownerInfo   
+cur_graph.unCheckedFriends = test_data.unCheckedFriends   
+cur_graph.weightsDictionary = test_data.weightsDictionary  
+redrawAll()
+
+}
+
+function canvas_image(){
+  var canvas = document.getElementsByTagName("canvas");
+  console.log(canvas);
+  var img    = canvas[0].toDataURL("image/png");
+  var img2    = canvas[0].toDataURL("data:application/octet-stream");
+  var apple = document.getElementById("download");
+  apple.href = img2;
+  
+}
+
+
 
 //build graph
 function redrawAll() {
@@ -546,6 +579,7 @@ function redrawAll() {
     };
 
     network = new vis.Network(container, data, options);
+
 
     network.on("selectNode", function (params) {        
         insertNodeInfo(params);
