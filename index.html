@@ -47,7 +47,7 @@
 </menu>
 
 <div id="nodeInfo" >
-  <div padding="20px">
+  <center >
   <p id="selectedName">name</p>
   <img id="selectedPic" src = ''>
 <p id="selectedImportance">importance</p>
@@ -55,7 +55,7 @@
 <p id="idNumber">0</p>
 <a id="selectedProfile" target="_blank" class="mylink" href="https">Visit Profile</a></p>
 <a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
-</div>
+</center>
 </div><p>
 
 
@@ -114,9 +114,9 @@ options = {
         },
         adaptiveTimestep: true,
         timestep: .5,
-        forceAtlas2Based: {
+        // forceAtlas2Based: {
         // barnesHut: {
-          // repulsion:{
+          repulsion:{
           gravitationalConstant: -80000,
           damping: 0.4,
           springConstant: 2,
@@ -352,8 +352,8 @@ if(this.checked) {options.nodes.font.size = 14;}
  };
 
 function change_weights_d(){
-  cur_graph.normalize_weights("quad","degree");
-  cur_graph.set_weights("quad degree",data_set);
+  cur_graph.normalize_weights("log","degree");
+  cur_graph.set_weights("log degree",data_set);
   network.redraw();
 
   network.stopSimulation()
@@ -382,7 +382,9 @@ function change_weights_p(){
 }
 
 function change_weights_ap(){
-  cur_graph.set_weights("popularityDeg",data_set);
+  cur_graph.normalize_weights("log","popularityDeg");
+
+  cur_graph.set_weights("log popularityDeg",data_set);
   network.redraw();
   network.stopSimulation()
 
@@ -482,10 +484,8 @@ function redrawAll() {
         network.stopSimulation()
     });
 
-    network.on("dragEnd", function (params) {console.log(params);
+    network.on("dragEnd", function (params) {console.log(params,"dragEnd");
       network.stopSimulation()});
-
-network.on("stabilized", function (params) {console.log(params)});
 
     network.on("deselectNode", function (params) {
         $("#nodeInfo").hide();
