@@ -33,6 +33,8 @@
   <button type="button" onclick="change_weights_ap()">Node Size: "relative popularity"</button>
   <button type="button" onclick="test_build()">test build</button>
   <button type="button" onclick="canvas_image()">get image</button>
+  <button type="button" onclick="save_build()" >save build</button>
+
   <p id="testBox"></p>
 <progress id= "progbar" max="100" value="0"></progress>
 <p id="friendList"></p>
@@ -45,12 +47,13 @@
   <img id="selectedPic" src = ''>
 <p id="selectedImportance">importance</p>
 <p id="selectedDegree">0</p>
+<p id="idNumber">0</p>
 <a id="selectedProfile" target="_blank" class="mylink" href="https">Visit Profile</a></p>
 <a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
 </div><p>
   </menu>
   <div id="mynetwork" class="wrapper"></div>
-  <img id="data" class="wrapper">
+  <div id="data" class="wrapper">
 <a href="" id="download" target="_blank" download="graph.html">Save Image</a>
   </div>
   </div>
@@ -206,8 +209,6 @@ class graph {
     }
 
 
-
-
     weight_nodes_popularity_deg_rank(scale_type,weight_type){
       var dict_name = scale_type+" "+weight_type
       var scaling_function = {"linear":function(rank) {return (rank)},
@@ -281,6 +282,7 @@ function insertNodeInfo (argument) {
   $("#selectedPic").attr("src",nodeInfo.small_pic);
 
   $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
+  $("#idNumber").text("ID: " + nodeInfo.id);
   // $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
 
   if (nodeInfo.id in cur_graph.weightsDictionary.degree) {
@@ -512,6 +514,25 @@ cur_graph.weightsDictionary = test_data.weightsDictionary
 redrawAll()
 
 }
+
+function save_build(){
+    test_data = {
+"currentNode" : cur_graph.currentNode,  
+"edges" : cur_graph.edges,   
+"first_pass" : cur_graph.first_pass,   
+"friends" : cur_graph.friends,   
+"nodeToFriends" : cur_graph.nodeToFriends,  
+"nodeToInfo" : cur_graph.nodeToInfo,   
+"nodes" : cur_graph.nodes,   
+"nodesRetrieved" : cur_graph.nodesRetrieved,   
+"ownerInfo" : cur_graph.ownerInfo,   
+"unCheckedFriends" : cur_graph.unCheckedFriends,   
+"weightsDictionary" : cur_graph.weightsDictionary 
+}
+document.getElementById("data").innerHTML = JSON.stringify(test_data);
+
+}
+
 
 function canvas_image(){
   var canvas = document.getElementsByTagName("canvas");
