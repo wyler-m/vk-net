@@ -6,7 +6,7 @@
      <meta charset="utf-8">
      <!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
      <script src="setOps.js"></script>
-    <script src="test_wyler.js"></script>
+     <script src="test_wyler.js"></script>
      <!-- // <script src="test_data.js"></script> -->
      <!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
      <script type="text/javascript" src="vis.js"></script>
@@ -38,13 +38,15 @@
   <input type="checkbox" id="showNodesCB">labels</input>
 
   <p id="testBox"></p>
-<progress id= "progbar" max="100" value="0"></progress>
-<p id="friendList"></p>
+  <progress id= "progbar" max="100" value="0"></progress>
+  <p id="friendList"></p>
 
 </div>
 
+</menu>
 
 <div id="nodeInfo" >
+  <div padding="20px">
   <p id="selectedName">name</p>
   <img id="selectedPic" src = ''>
 <p id="selectedImportance">importance</p>
@@ -52,8 +54,10 @@
 <p id="idNumber">0</p>
 <a id="selectedProfile" target="_blank" class="mylink" href="https">Visit Profile</a></p>
 <a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
+</div>
 </div><p>
-  </menu>
+
+
   <div id="mynetwork" class="wrapper"></div>
   <div id="data" class="wrapper">
 <a href="" id="download" target="_blank" download="graph.html">Save Image</a>
@@ -235,37 +239,95 @@ class graph {
           deg = this.weightsDictionary[weight_type][this.nodes[i]["id"]];
           deg = deg ? deg : 0
         }
-        // this.nodes[i]["value"] = deg ? deg : 0;
-
-        if (network_data_set) {
-          network_data_set.update({"id":this.nodes[i].id,"value":deg});          
-        }
-          // this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
-
-        
-
+          this.nodes[i].value = deg
+          this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
       }
+
+      if (network_data_set) {
+          network_data_set.update(this.nodes);          
+        }
     }
 }
 
 
-var so = setOps;
-var network = null;
-var access_token = null;
+so = setOps;
+network = null;
+access_token = null;
+
+params = parseURLParams();
+
+if (params) {
+  for (var param in params) {
+     if (param == "user_id") {
+        document.getElementById("vkId").value = params.user_id;
+        $("#loginP").hide();        
+      };
+      if (param == "access_token"){
+        access_token = params.access_token;
+      }
+   }; 
+};
+
+
+options = {
+      nodes: {
+        shape: 'dot',
+        scaling: {
+          min: 3,
+          max: 30
+        },
+        font: {
+          size: 0,
+          face: 'Tahoma'
+        }
+      },
+      edges: {
+        width: 0.15,
+        color: {inherit: 'from'},
+        smooth: {
+          type: 'continuous'
+        }
+      },
+      physics: {
+        stabilization: {
+          iterations:100
+        },
+        adaptiveTimestep: true,
+        timestep: .5,
+        forceAtlas2Based: {
+        // barnesHut: {
+          // repulsion:{
+          gravitationalConstant: -80000,
+          damping: 0.4,
+          springConstant: 2,
+          springLength: 10,
+        }
+      },
+
+      interaction: {
+        tooltipDelay: 10,
+        hideEdgesOnDrag: true
+      }
+    };
+
 cur_graph = new graph;
+data_set = new vis.DataSet(options);
+
+
+
 
 $("#nodeInfo").hide();
 $("#buildSelected").hide();
 $("#loginP").show();
 
 
-  $("#selectedProfile").click(function(){
+$("#selectedProfile").click(function(){
     ga_onclick("#selectedProfile","Check Profile");
-  });
+});
 
-  $("#buildSelected").click(function(){
+$("#buildSelected").click(function(){
     ga_onclick("#selectedProfile","Build Graph");
-  });
+});
 
 function ga_onclick(element,action){
       ga( 'send', 'event', {
@@ -282,7 +344,7 @@ function insertNodeInfo (argument) {
   }else {var total_friends = 0
   };
   $("#nodeInfo").toggle();
-  $("#controlDiv").toggle();
+  // $("#controlDiv").toggle();
 
   $("#selectedName").text(nodeInfo.label);
   $("#selectedPic").attr("src",nodeInfo.small_pic);
@@ -313,21 +375,6 @@ function insertNodeInfo (argument) {
         }); 
 
 };
-
-
-var params = parseURLParams();
-if (params) {
-  for (var param in params) {
-     if (param == "user_id") {
-        document.getElementById("vkId").value = params.user_id;
-        $("#loginP").hide();        
-      };
-      if (param == "access_token"){
-        access_token = params.access_token;
-      }
-   }; 
-};
-
 
 function parseURLParams() {
     var params = {};
@@ -475,6 +522,16 @@ function api_FetchFriendList(result) {
       };
     };
 
+var cb = document.getElementById('showNodesCB');
+cb.onchange = function (){
+if(this.checked) {options.nodes.font.size = 14;} 
+  else {options.nodes.font.size = 0;}
+       
+       network.setOptions(options);
+       network.redraw();
+       network.stopSimulation();
+ };
+
 function change_weights_d(){
   cur_graph.normalize_weights("quad","degree");
   cur_graph.set_weights("quad degree",data_set);
@@ -552,6 +609,13 @@ document.getElementById("data").innerHTML = JSON.stringify(test_data);
 
 }
 
+function hide_unhide_selected(selected,hide){
+
+  var nodes_to_hide = selected.map(function(x){
+   return {"id":x,"hidden":hide}})
+  data_set.update(nodes_to_hide)
+}
+
 
 function canvas_image(){
   var canvas = document.getElementsByTagName("canvas");
@@ -562,59 +626,6 @@ function canvas_image(){
   
 }
 
-
-var cb = document.getElementById('showNodesCB');
-cb.onchange = function (){
-if(this.checked) {options.nodes.font.size = 14;} 
-  else {options.nodes.font.size = 0;}
-       
-       network.setOptions(options);
-       network.redraw();
-       network.stopSimulation();
- };
-
-    var options = {
-      nodes: {
-        shape: 'dot',
-        scaling: {
-          min: 3,
-          max: 30
-        },
-        font: {
-          size: 0,
-          face: 'Tahoma'
-        }
-      },
-      edges: {
-        width: 0.15,
-        color: {inherit: 'from'},
-        smooth: {
-          type: 'continuous'
-        }
-      },
-      physics: {
-        stabilization: {
-          iterations:10
-        },
-        adaptiveTimestep: true,
-        timestep: .5,
-        forceAtlas2Based: {
-        // barnesHut: {
-          // repulsion:{
-          gravitationalConstant: -80000,
-          damping: 0.4,
-          springConstant: 2,
-          springLength: 10,
-        }
-      },
-
-      interaction: {
-        tooltipDelay: 10,
-        hideEdgesOnDrag: true
-      }
-    };
-
-var data_set = new vis.DataSet(options);
 
 //build graph
 function redrawAll() {
@@ -644,11 +655,28 @@ function redrawAll() {
 
     network.on("selectNode", function (params) {        
         insertNodeInfo(params);
+        var parent = params.nodes[0];
+        var selected = network.getConnectedNodes(parent);
+        selected.push(parent)
+        console.log(selected)
+        hide_unhide_selected(so.complement(data_set.getIds(), selected),true)
+        network.stopSimulation()
     });
+
+    network.on("dragEnd", function (params) {console.log(params);
+      network.stopSimulation()});
+
+network.on("stabilized", function (params) {console.log(params)});
 
     network.on("deselectNode", function (params) {
         $("#nodeInfo").hide();
         $("#controlDiv").show();
+        var parent = params.nodes[0];
+        var selected = network.getConnectedNodes(parent);
+        selected.push(parent)
+        hide_unhide_selected(data_set.getIds(),false)
+        network.stopSimulation()
+
     });
   }
 

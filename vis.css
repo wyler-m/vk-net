@@ -16,14 +16,21 @@ body, html {
   width: 100%;
   
 }
-#controls
-{
+#controls{
   margin-top: 0;
   position: absolute;
   width: 20%;
   z-index: 1;
   border: 5px solid lightgray;
 
+}
+
+#nodeInfo {
+  right: 0;
+  position: absolute;
+  width: 20%;
+  z-index: 1;
+  border: 5px solid lightgray;
 }
 
 
