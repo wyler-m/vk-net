@@ -148,6 +148,7 @@ class graph {
         return this.edges.length / this.nodes.length / (this.nodes.length - 1) * 2;
     }
 
+//generate nodes popularity 
   weight_nodes_popularity(){
     //iterate through edges, to get the "popularity" for each node
     for (var i = 0; i < this.edges.length; i++) {
@@ -192,7 +193,6 @@ class graph {
     }
 
 
-
     rank_weights(weight_type){
       var ranked_weights = [];
       var nodes = Object.keys(this.weightsDictionary.degree);
@@ -207,7 +207,7 @@ class graph {
     }
 
 
-    weight_nodes_popularity_deg_rank(scale_type,weight_type){
+    normalize_weights(scale_type,weight_type){
       var dict_name = scale_type+" "+weight_type
       var scaling_function = {"linear":function(rank) {return (rank)},
                               "quad":function(rank) {return Math.pow(rank,2)},
@@ -219,6 +219,7 @@ class graph {
         this.weightsDictionary[dict_name] = {}
         var nodes = Object.keys(this.weightsDictionary.degree);
         for (var i = 0; i < nodes.length; i++) {
+
           var weight = this.weightsDictionary[weight_type][nodes[i]];
           var node_rank = ranked_weights.indexOf(weight);
           this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](node_rank);
@@ -227,15 +228,22 @@ class graph {
     }
     
 
-    set_weights(weight_type){
-      var size = this.nodes.length;
+    set_weights(weight_type,network_data_set){
       for (var i = this.nodes.length - 1; i >= 0; i--) {
         var deg = 0    
         if (!(this.nodes[i].small_pic=="https://vk.com/images/deactivated_100.png")){
           deg = this.weightsDictionary[weight_type][this.nodes[i]["id"]];
+          deg = deg ? deg : 0
         }
-      this.nodes[i]["value"] = deg ? deg : 0;
-      this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
+        // this.nodes[i]["value"] = deg ? deg : 0;
+
+        if (network_data_set) {
+          network_data_set.update({"id":this.nodes[i].id,"value":deg});          
+        }
+          // this.nodeToInfo[this.nodes[i].id] = this.nodes[i];
+
+        
+
       }
     }
 }
@@ -321,7 +329,6 @@ if (params) {
 };
 
 
-
 function parseURLParams() {
     var params = {};
     var args = window.location.href.split('#');
@@ -335,12 +342,13 @@ function parseURLParams() {
     return params;
 }
 
-function update_progress(friends, unCheckedFriends){
+function update_progress(current_val, total_val){
 
-    document.getElementById("friendList").innerHTML = "added "+ (friends.length - unCheckedFriends.length) +" of " + friends.length + " friends";
-    document.getElementById("progbar").max = friends.length;
-    document.getElementById("progbar").value = (friends.length - unCheckedFriends.length);
+    document.getElementById("friendList").innerHTML = "added "+ (current_val - total_val) +" of " + current_val + " friends";
+    document.getElementById("progbar").max = current_val;
+    document.getElementById("progbar").value = (current_val - total_val);
 }
+
 
 function freeze_graph(){  
   if (network) {
@@ -430,7 +438,7 @@ function api_FetchFriendList(result) {
           fetchDetails(node.join());  
         }
       };
-      update_progress(cur_graph.friends,cur_graph.unCheckedFriends);
+      update_progress(cur_graph.friends.length,cur_graph.unCheckedFriends.length);
       // cur_graph.update_progress();
       
 // are there new friends and have there been friends added
@@ -468,23 +476,28 @@ function api_FetchFriendList(result) {
     };
 
 function change_weights_d(){
-  cur_graph.weight_nodes_popularity_deg_rank("log","degree");
-  cur_graph.set_weights("log degree");
-  
+  cur_graph.normalize_weights("quad","degree");
+  cur_graph.set_weights("quad degree",data_set);
+  network.redraw();
+
+  network.stopSimulation()
   ga( 'send', 'event', {
           'eventCategory': 'change weight',
           'eventAction': 'degree'
         }); 
-  redrawAll()
+  // redrawAll()
 }
 
 function change_weights_p(){
-  cur_graph.weight_nodes_popularity_deg_rank("linear","popularity");
-  cur_graph.set_weights("linear popularity");
+  cur_graph.normalize_weights("linear","popularity");
+  cur_graph.set_weights("linear popularity",data_set);
+  network.redraw();
+  network.stopSimulation()
 
-  for (var i = cur_graph.nodes.length - 1; i >= 0; i--) {
-    data_set.update(cur_graph.nodes[i])
-  }
+  // for (var i = cur_graph.nodes.length - 1; i >= 0; i--) {
+  //   update_progress(i,cur_graph.nodes.length)
+  //   data_set.update(cur_graph.nodes[i])
+  // }
     ga( 'send', 'event', {
           'eventCategory': 'change weight',
           'eventAction': 'popularity'
@@ -493,12 +506,15 @@ function change_weights_p(){
 }
 
 function change_weights_ap(){
-  cur_graph.set_weights("popularityDeg");
+  cur_graph.set_weights("popularityDeg",data_set);
+  network.redraw();
+  network.stopSimulation()
+
       ga( 'send', 'event', {
           'eventCategory': 'change weight',
           'eventAction': 'average popularity'
         }); 
-  redrawAll();
+  // redrawAll();
   
 }
 
@@ -547,24 +563,21 @@ function canvas_image(){
 }
 
 
-
-//build graph
-function redrawAll() {
-
-    // create a network
-    var container = document.getElementById('mynetwork');
-    var data = {
-      nodes: cur_graph.nodes,
-      // nodes: test_data.nodes,
-      edges: cur_graph.edges
-      // edges: test_data.links
-    };
+var cb = document.getElementById('showNodesCB');
+cb.onchange = function (){
+if(this.checked) {options.nodes.font.size = 14;} 
+  else {options.nodes.font.size = 0;}
+       
+       network.setOptions(options);
+       network.redraw();
+       network.stopSimulation();
+ };
 
     var options = {
       nodes: {
         shape: 'dot',
         scaling: {
-          min: 5,
+          min: 3,
           max: 30
         },
         font: {
@@ -584,14 +597,14 @@ function redrawAll() {
           iterations:10
         },
         adaptiveTimestep: true,
-        timestep: .9,
+        timestep: .5,
         forceAtlas2Based: {
         // barnesHut: {
           // repulsion:{
-          gravitationalConstant: -80,
+          gravitationalConstant: -80000,
           damping: 0.4,
-          springConstant: 25,
-          springLength: 2500,
+          springConstant: 2,
+          springLength: 10,
         }
       },
 
@@ -601,7 +614,32 @@ function redrawAll() {
       }
     };
 
+var data_set = new vis.DataSet(options);
+
+//build graph
+function redrawAll() {
+
+
+    // create a network
+    var container = document.getElementById('mynetwork');
+
+
+    
+    data_set.add(cur_graph.nodes);
+
+    // data_set.add(cur_graph.edges);
+    
+    var data = {
+      nodes: data_set,
+      // nodes: cur_graph.nodes,
+      // nodes: test_data.nodes,
+      // edges: data_set
+      edges: cur_graph.edges
+      // edges: test_data.links
+    };
+
     network = new vis.Network(container, data, options);
+ 
 
 
     network.on("selectNode", function (params) {        
