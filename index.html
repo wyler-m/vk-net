@@ -34,7 +34,8 @@
   <button type="button" onclick="change_weights_ap()">Node Size: "relative popularity"</button>
   <button type="button" onclick="test_build()">test build</button>
   <button type="button" onclick="canvas_image()">get image</button>
-  <button type="button" onclick="save_build()" >save build</button>
+  <button type="button" onclick="save_build()" >save build</button></br>
+  <input type="checkbox" id="showNodesCB">labels</input>
 
   <p id="testBox"></p>
 <progress id= "progbar" max="100" value="0"></progress>
@@ -124,11 +125,7 @@ class graph {
       };
   };
 
-  update_progress(){
-    document.getElementById("friendList").innerHTML = "added "+ (this.friends.length - this.unCheckedFriends.length) +" of " + this.friends.length + " friends";
-    document.getElementById("progbar").max = this.friends.length;
-    document.getElementById("progbar").value = (this.friends.length - this.unCheckedFriends.length);
-  }
+
 
   make_link(source,target){
     var sum = source + target;
@@ -196,17 +193,17 @@ class graph {
 
 
 
-    normalize_weights(weight_type){
-      var normalized_weights = [];
+    rank_weights(weight_type){
+      var ranked_weights = [];
       var nodes = Object.keys(this.weightsDictionary.degree);
       for (var node in this.nodes){
         var uid = this.nodes[node].id
         var weight = this.weightsDictionary[weight_type][uid];
-        if (normalized_weights.indexOf(weight) < 0){
-          normalized_weights.push(weight);
+        if (ranked_weights.indexOf(weight) < 0){
+          ranked_weights.push(weight);
         }
       }
-      return normalized_weights.sort(function(a, b){return a-b});
+      return ranked_weights.sort(function(a, b){return a-b});
     }
 
 
@@ -214,16 +211,16 @@ class graph {
       var dict_name = scale_type+" "+weight_type
       var scaling_function = {"linear":function(rank) {return (rank)},
                               "quad":function(rank) {return Math.pow(rank,2)},
-                              "log":function(rank) {return Math.log(rank+1)}  
+                              "log":function(rank) {return Math.round(Math.log(rank+1)*100)}  
                               }
 
-      var normalized_weights = this.normalize_weights(weight_type);
+      var ranked_weights = this.rank_weights(weight_type);
       if (!(dict_name in this.weightsDictionary)) {
         this.weightsDictionary[dict_name] = {}
         var nodes = Object.keys(this.weightsDictionary.degree);
         for (var i = 0; i < nodes.length; i++) {
           var weight = this.weightsDictionary[weight_type][nodes[i]];
-          var node_rank = normalized_weights.indexOf(weight);
+          var node_rank = ranked_weights.indexOf(weight);
           this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](node_rank);
         };
       };
@@ -433,8 +430,8 @@ function api_FetchFriendList(result) {
           fetchDetails(node.join());  
         }
       };
-      // update_progress(cur_graph.friends,cur_graph.unCheckedFriends);
-      cur_graph.update_progress();
+      update_progress(cur_graph.friends,cur_graph.unCheckedFriends);
+      // cur_graph.update_progress();
       
 // are there new friends and have there been friends added
       
@@ -471,23 +468,28 @@ function api_FetchFriendList(result) {
     };
 
 function change_weights_d(){
-  cur_graph.weight_nodes_popularity_deg_rank("quad","degree");
-  cur_graph.set_weights("quad degree");
+  cur_graph.weight_nodes_popularity_deg_rank("log","degree");
+  cur_graph.set_weights("log degree");
+  
   ga( 'send', 'event', {
           'eventCategory': 'change weight',
           'eventAction': 'degree'
         }); 
-  redrawAll();
+  redrawAll()
 }
 
 function change_weights_p(){
   cur_graph.weight_nodes_popularity_deg_rank("linear","popularity");
   cur_graph.set_weights("linear popularity");
+
+  for (var i = cur_graph.nodes.length - 1; i >= 0; i--) {
+    data_set.update(cur_graph.nodes[i])
+  }
     ga( 'send', 'event', {
           'eventCategory': 'change weight',
           'eventAction': 'popularity'
         }); 
-  redrawAll();
+  // redrawAll();
 }
 
 function change_weights_ap(){
@@ -537,7 +539,6 @@ document.getElementById("data").innerHTML = JSON.stringify(test_data);
 
 function canvas_image(){
   var canvas = document.getElementsByTagName("canvas");
-  console.log(canvas);
   var img    = canvas[0].toDataURL("image/png");
   var img2    = canvas[0].toDataURL("data:application/octet-stream");
   var apple = document.getElementById("download");
