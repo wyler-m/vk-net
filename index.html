@@ -49,8 +49,8 @@
   <center >
   <!-- <a id="selectedName"class="w3-btn-block w3-bottombar w3-border-blue">name</a> -->
   <img id="selectedPic" class="w3-btn-block" src = ''>
-<a id="selectedImportance"class="w3-btn-block w3-bottombar w3-border-blue">importance</p>
-<a id="selectedDegree"class="w3-btn-block w3-bottombar w3-border-blue">0</a>
+<a id="selectedImportance"class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
+<a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
 <!-- <a id="idNumber" class="w3-btn-block w3-bottombar w3-border-blue">0</p> -->
 <!-- <a id="selectedProfile" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue" target="_blank" class="mylink" href="https">Visit Profile</a> -->
 <!-- <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue"target="_blank" href="https">Build Graph</a> -->
@@ -67,17 +67,17 @@
 
  <div class="w3-card-4 w3-display-middle" style="display:none;" id="graphingCard">
 
-          <header class="w3-container w3-blue">
+          <header class="w3-container w3-white w3-border w3-border-blue">
             <h1 id="welcome"></h1>
           </header>
-          <div class="w3-container w3-black w3-border-black w3-bottombar w3-topbar">
-            <div class="w3-progress-container w3-round w3-large w3-blue">
-              <div class="w3-progressbar w3-round w3-black" id="progbar" style="width:0%"></div>
+          <div class="w3-container w3-white w3-border-black w3-bottombar w3-topbar">
+            <div class="w3-progress-container w3-round w3-large w3-white">
+              <div class="w3-progressbar w3-round w3-blue" id="progbar" style="width:0%"></div>
             </div>
 
           </div>
 
-          <footer class="w3-container w3-blue">
+          <footer class="w3-container w3-white w3-border w3-border-blue">
             <h5 id="friendList"></h5>
         </footer>
   </div>
@@ -121,6 +121,7 @@ if (params) {
 
 function build_graph(test){
   $("#mynetwork").hide();
+  $("#nodeInfo").hide();
   $("#graphingCard").show();
 
   cur_graph = new graph;
