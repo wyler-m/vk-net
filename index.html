@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
- <head>
-     <title>VK Visualizer</title>
-     <link rel="stylesheet" href="vis.css">
-     <meta name="viewport" content="width=device-width, initial-scale=1">
-     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
-     <meta charset="utf-8">
-     <!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
-     <script src="setOps.js"></script>
-     <script src="graphClass.js"></script>
-     <script src="test_wyler.js"></script>
-     <!-- // <script src="test_data.js"></script> -->
-     <!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
-     <script type="text/javascript" src="vis.js"></script>
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-     <!-- // <script type="text/javascript" src="jLouvain.js"></script> -->
+	<head>
+		<title>VK Visualizer</title>
+		<link rel="stylesheet" href="vis.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+		<meta charset="utf-8">
+		<!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
+		<script src="setOps.js"></script>
+		<script src="graphClass.js"></script>
+		<script src="test_wyler.js"></script>
+		<!-- // <script src="test_data.js"></script> -->
+		<!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
+		<script type="text/javascript" src="vis.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<!-- // <script type="text/javascript" src="jLouvain.js"></script> -->
 
- </head>
+	</head>
  
 <body>
     
@@ -27,22 +27,19 @@
 <div id = "controlDiv" >
   <!-- <nav class="w3-sidenav w3-collapse w3-white" style="width:200px" id="mySidenav"> -->
   <!-- <a href="#" onclick="w3_close()" class="w3-closenav w3-hide-large">Close &times;</a>  -->
-<h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+	<h1 id="logo"><img src= "vk.svg"> visualizer</h1>
 
-  <p id="welcome">Enter An ID number and find out what your graph looks like:</p>
-  <a id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">If you don't know your number, then login to VK.com</a> </p>
-  <input id="vkId" class="w3-input w3-border w3-hover-blue" value="16081499"></p>
-  <button class="w3-btn-block" onclick="build_graph()">Build Graph</button>
-  <button class="w3-btn-block" onclick="freeze_graph()">Freeze Graph</button></br>
-  <button class="w3-btn-block" onclick="change_weights_d()">Node Size: Friends</button></br>
-  <button class="w3-btn-block" onclick="change_weights_p()">Node Size: Friends^2</button></br>
-  <button class="w3-btn-block" onclick="change_weights_ap()">Node Size: "popularity"</button></br>
+  <!-- <p id="welcome">Enter An ID number and find out what your graph looks like:</p> -->
+	
+	<a id="selectedName" class="w3-btn-block w3-border w3-border-blue w3-white" target="_blank" href="#">name</a>
+	<input id="vkId" class="w3-input w3-border w3-hover-blue" value="86299933"></p>
+	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Build Graph</button>
+	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_d()">Node Size: Friends</button></br>
+	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_p()">Node Size: Friends^2</button></br>
+	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_ap()">Node Size: "popularity"</button></br>
+	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodesCB()" id="toggleLabels">Show Labels</button>
+	<a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">Войти на VK.com</a>
 
-  <input type="checkbox" id="showNodesCB">labels</input>
-
-  <p id="testBox"></p>
-  <progress id= "progbar" max="100" value="0"></progress>
-  <p id="friendList"></p>
 <!-- </nav>   -->   
 </div>
 
@@ -50,23 +47,43 @@
 
 <div id="nodeInfo" >
   <center >
-  <p id="selectedName">name</p>
-  <img id="selectedPic" src = ''>
-<p id="selectedImportance">importance</p>
-<p id="selectedDegree">0</p>
-<p id="idNumber">0</p>
-<a id="selectedProfile" target="_blank" class="mylink" href="https">Visit Profile</a></p>
-<a id="buildSelected" target="_blank" href="https">Build Graph</a></p>
+  <!-- <a id="selectedName"class="w3-btn-block w3-bottombar w3-border-blue">name</a> -->
+  <img id="selectedPic" class="w3-btn-block" src = ''>
+<a id="selectedImportance"class="w3-btn-block w3-bottombar w3-border-blue">importance</p>
+<a id="selectedDegree"class="w3-btn-block w3-bottombar w3-border-blue">0</a>
+<!-- <a id="idNumber" class="w3-btn-block w3-bottombar w3-border-blue">0</p> -->
+<!-- <a id="selectedProfile" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue" target="_blank" class="mylink" href="https">Visit Profile</a> -->
+<!-- <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue"target="_blank" href="https">Build Graph</a> -->
 </center>
-</div><p>
+</div>
 
-<div class="w3-main" style="margin-left:200px" id="test">
+<div class="w3-display-container" id="test">
  <span class="w3-opennav w3-hide-large" onclick="w3_open()">&#9776;</span>
-  <div id="mynetwork" class="wrapper"></div>
+      
+<div class="w3-card-4 w3-display-topmiddle">
+  <button class="w3-btn-block w3-hover-blue w3-red" onclick="freeze_graph()" id="freezeGraph" style="display:none;">Click to Freeze</button>
+</div>
 
-  <div id="data" class="wrapper">
+
+ <div class="w3-card-4 w3-display-middle" style="display:none;" id="graphingCard">
+
+          <header class="w3-container w3-blue">
+            <h1 id="welcome"></h1>
+          </header>
+          <div class="w3-container w3-black w3-border-black w3-bottombar w3-topbar">
+            <div class="w3-progress-container w3-round w3-large w3-blue">
+              <div class="w3-progressbar w3-round w3-black" id="progbar" style="width:0%"></div>
+            </div>
+
+          </div>
+
+          <footer class="w3-container w3-blue">
+            <h5 id="friendList"></h5>
+        </footer>
   </div>
-  </div>
+
+  <div id="mynetwork" class="wrapper" hidden></div>
+  <div id="data" class="wrapper"></div>
   </div>
 <a href="" id="download" target="_blank" download="graph.html">Save Image</a>
   <button type="button" onclick="canvas_image()">get image</button>
@@ -103,7 +120,9 @@ if (params) {
 
 
 function build_graph(test){
-  network = null;
+  $("#mynetwork").hide();
+  $("#graphingCard").show();
+
   cur_graph = new graph;
 
   options = {
@@ -184,14 +203,14 @@ function insertNodeInfo (argument) {
   $("#selectedPic").attr("src",nodeInfo.small_pic);
 
   $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
-  $("#idNumber").text("ID: " + nodeInfo.id);
+  $("#vkId").attr("value",nodeInfo.id);
   // $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
 
   if (nodeInfo.id in cur_graph.weightsDictionary.degree) {
     $("#selectedDegree").text("Connections: " + cur_graph.weightsDictionary.degree[nodeInfo.id]);
   } else {$("#selectedDegree").text("no connections")};
   
-  $("#selectedProfile").attr("href","https://www.vk.com/id"+nodeInfo.id);
+  $("#selectedName").attr("href","https://www.vk.com/id"+nodeInfo.id);
 
 
   if (nodeInfo.id && (nodeInfo.small_pic!="https://vk.com/images/deactivated_100.png")){
@@ -225,9 +244,10 @@ function parseURLParams() {
 
 function update_progress(current_val, total_val){
 
-    document.getElementById("friendList").innerHTML = "added "+ (current_val - total_val) +" of " + current_val + " friends";
-    document.getElementById("progbar").max = current_val;
-    document.getElementById("progbar").value = (current_val - total_val);
+    document.getElementById("friendList").innerHTML = "Added "+ (current_val - total_val) +" of " + current_val + " friends";
+    var progbar = document.getElementById("progbar")
+    var percent = (current_val - total_val)/current_val *100;
+    progbar.style.width = percent +'%';
 }
 
 
@@ -358,7 +378,6 @@ function api_FetchFriendList(result) {
       } else { 
         cur_graph.weight_nodes_popularity();
         cur_graph.weight_nodes_popularity_deg();
-        // cur_graph.weight_nodes_degree()
         cur_graph.set_weights("degree");
         cur_graph.add_city_info()
 
@@ -375,10 +394,19 @@ function api_FetchFriendList(result) {
       };
     };
 
-var cb = document.getElementById('showNodesCB');
-cb.onchange = function (){
-if(this.checked) {options.nodes.font.size = 14;} 
-  else {options.nodes.font.size = 0;}
+function showNodesCB(){
+
+options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0 
+// var cur_class = $("#toggleLabels").attr("class");
+var text = $("#toggleLabels").text();
+// $("#toggleLabels").attr("class", cur_class == "w3-btn-block w3-blue w3-hover-black" ? "w3-btn-block w3-black w3-hover-blue" : "w3-btn-block w3-blue w3-hover-black"); 
+$("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
+
+// if(options.nodes.font.size == 0) {options.nodes.font.size = 14;
+// $("#toggleLabels").attr("class","w3-btn-block w3-black w3-hover-blue")
+// } 
+  // else {options.nodes.font.size = 0;
+  // $("#toggleLabels").toggleClass( w3-btn-block w3-black w3-hover-blue")}
        
        network.setOptions(options);
        network.redraw();
@@ -478,6 +506,9 @@ function canvas_image(){
 
 //build graph
 function redrawAll() {
+    $("#graphingCard").hide();
+    $("#mynetwork").show();
+
 
 
     // create a network
@@ -502,6 +533,8 @@ function redrawAll() {
  
 
 
+    network.on("stabilized", function (params) { $("#freezeGraph").hide();});
+    network.on("startStabilizing", function (params) { $("#freezeGraph").show();});
     network.on("selectNode", function (params) {        
         insertNodeInfo(params);
         var parent = params.nodes[0];
