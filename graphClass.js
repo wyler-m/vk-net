@@ -15,6 +15,8 @@ class graph {
     this.nodeToInfo = {};  
     this.ownerInfo = {};
     this.first_pass = true;
+    this.city_dict = {};
+    this.unique_cities = [];
   }
 
   init_owner(res){
@@ -35,7 +37,16 @@ class graph {
 
   add_details(res){
     if (res.photo_200 == undefined) {res.photo_200 = "http://vk.com/images/camera_200.png"};
-    this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>"+res.city, small_pic:res.photo_100, group:res.city } );
+    this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>", small_pic:res.photo_100, group:res.city } );
+    if (!(this.unique_cities.includes(res.city))){this.unique_cities.push(res.city)}
+  } 
+
+  add_city_info(){
+    for (var i = this.nodes.length - 1; i >= 0; i--) {
+      if(this.city_dict[this.nodes[i].group]){
+        this.nodes[i]["title"] = this.nodes[i]["title"].concat(this.city_dict[this.nodes[i].group])
+      }
+    };
   }
 
   gotoNextNode(){
@@ -138,7 +149,7 @@ class graph {
     }
 
 
-    normalize_weights(scale_type,weight_type){
+    normalize_weights(scale_type,weight_type,rank){
       var dict_name = scale_type+" "+weight_type
       var scaling_function = {"linear":function(rank) {return (rank)},
                               "quad":function(rank) {return Math.pow(rank,2)},
@@ -150,10 +161,13 @@ class graph {
         this.weightsDictionary[dict_name] = {}
         var nodes = Object.keys(this.weightsDictionary.degree);
         for (var i = 0; i < nodes.length; i++) {
-
           var weight = this.weightsDictionary[weight_type][nodes[i]];
-          var node_rank = ranked_weights.indexOf(weight);
-          this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](node_rank);
+          if (rank) {
+            var node_rank = ranked_weights.indexOf(weight);
+            this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](node_rank);
+          } else{
+            this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](weight);
+          };
         };
       };
     }

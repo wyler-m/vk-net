@@ -3,6 +3,8 @@
  <head>
      <title>VK Visualizer</title>
      <link rel="stylesheet" href="vis.css">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
      <meta charset="utf-8">
      <!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
      <script src="setOps.js"></script>
@@ -18,30 +20,30 @@
  
 <body>
     
-	   
-<div id="container" >
-<menu id="controls">
 
-<h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+<div id="container" >
+<menu id="controls" >
+
 <div id = "controlDiv" >
+  <!-- <nav class="w3-sidenav w3-collapse w3-white" style="width:200px" id="mySidenav"> -->
+  <!-- <a href="#" onclick="w3_close()" class="w3-closenav w3-hide-large">Close &times;</a>  -->
+<h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+
   <p id="welcome">Enter An ID number and find out what your graph looks like:</p>
   <a id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">If you don't know your number, then login to VK.com</a> </p>
-  <input id="vkId" value="16081499"></p>
-  <button type="button" onclick="fetchFriendList()">Build Graph</button>
-  <!-- <button type="button" onclick="redrawAll()">Build Graph</button> -->
-  <button type="button" onclick="freeze_graph()">Freeze Graph</button>
-  <button type="button" onclick="change_weights_d()">Node Size: Connections</button>
-  <button type="button" onclick="change_weights_p()">Node Size: "linear popularity"</button>
-  <button type="button" onclick="change_weights_ap()">Node Size: "relative popularity"</button></br>
-  <!-- <button type="button" onclick="test_build()">test build</button> -->
-  <!-- <button type="button" onclick="canvas_image()">get image</button> -->
-  <!-- <button type="button" onclick="save_build()">save build</button> -->
+  <input id="vkId" class="w3-input w3-border w3-hover-blue" value="16081499"></p>
+  <button class="w3-btn-block" onclick="build_graph()">Build Graph</button>
+  <button class="w3-btn-block" onclick="freeze_graph()">Freeze Graph</button></br>
+  <button class="w3-btn-block" onclick="change_weights_d()">Node Size: Friends</button></br>
+  <button class="w3-btn-block" onclick="change_weights_p()">Node Size: Friends^2</button></br>
+  <button class="w3-btn-block" onclick="change_weights_ap()">Node Size: "popularity"</button></br>
+
   <input type="checkbox" id="showNodesCB">labels</input>
 
   <p id="testBox"></p>
   <progress id= "progbar" max="100" value="0"></progress>
   <p id="friendList"></p>
-
+<!-- </nav>   -->   
 </div>
 
 </menu>
@@ -58,20 +60,31 @@
 </center>
 </div><p>
 
-
+<div class="w3-main" style="margin-left:200px" id="test">
+ <span class="w3-opennav w3-hide-large" onclick="w3_open()">&#9776;</span>
   <div id="mynetwork" class="wrapper"></div>
+
   <div id="data" class="wrapper">
+  </div>
+  </div>
+  </div>
 <a href="" id="download" target="_blank" download="graph.html">Save Image</a>
-  </div>
-  </div>
+  <button type="button" onclick="canvas_image()">get image</button>
+  <button type="button" onclick="save_build()">save build</button>
+<button type="button" style="margin-right:200px" onclick="test_build()">test build</button>
+
   </body>
 
   <script>
-
+function w3_open() {
+  document.getElementById("mySidenav").style.display = "block";
+}
+function w3_close() {
+  document.getElementById("mySidenav").style.display = "none";
+}
 
 
 so = setOps;
-network = null;
 access_token = null;
 
 params = parseURLParams();
@@ -89,7 +102,11 @@ if (params) {
 };
 
 
-options = {
+function build_graph(test){
+  network = null;
+  cur_graph = new graph;
+
+  options = {
       nodes: {
         shape: 'dot',
         scaling: {
@@ -129,12 +146,10 @@ options = {
         hideEdgesOnDrag: true
       }
     };
-
-cur_graph = new graph;
-data_set = new vis.DataSet(options);
-
-
-
+    data_set = new vis.DataSet(options);
+    if (!test) {fetchFriendList()};
+    
+}
 
 $("#nodeInfo").hide();
 $("#buildSelected").hide();
@@ -157,8 +172,8 @@ function ga_onclick(element,action){
   }
 
 function insertNodeInfo (argument) {
-  var nodeInfo = cur_graph.nodeToInfo[argument.nodes[0]];
-  if (cur_graph.nodeToFriends[argument.nodes[0]]) {
+  var nodeInfo = data_set.get(argument.nodes[0])
+  if (cur_graph.nodeToFriends[nodeInfo.id]) {
     var total_friends = cur_graph.nodeToFriends[argument.nodes[0]].length;
   }else {var total_friends = 0
   };
@@ -228,6 +243,21 @@ function freeze_graph(){
   };
 }
  
+function fetchCityInfo(){
+  var city_ids = cur_graph.unique_cities.join();
+  var script = document.createElement('SCRIPT');
+  script.src = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids,'&lang=ru&callback=api_fetchCityInfo');
+
+  document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+function api_fetchCityInfo(result){
+  var cityArray = result["response"];
+  for (var element in cityArray){
+    cur_graph.city_dict[cityArray[element].cid] = cityArray[element].name;
+  }
+}
+
 function fetchDetails(id) {
     var script = document.createElement('SCRIPT');
     var y = '';
@@ -247,6 +277,7 @@ function api_FetchDetails(result) {
       if (!cur_graph.first_pass) {
       var res_array = result["response"];
         cur_graph.add_details_array(res_array);
+        fetchCityInfo();
       } 
       else {
       var res = result["response"][0];
@@ -304,6 +335,7 @@ function api_FetchFriendList(result) {
           fetchDetails(node.join());  
         }
       };
+
       update_progress(cur_graph.friends.length,cur_graph.unCheckedFriends.length);
       // cur_graph.update_progress();
       
@@ -328,6 +360,8 @@ function api_FetchFriendList(result) {
         cur_graph.weight_nodes_popularity_deg();
         // cur_graph.weight_nodes_degree()
         cur_graph.set_weights("degree");
+        cur_graph.add_city_info()
+
         redrawAll(); 
 //google analytics to see if anyone started using it
         ga( 'send', 'event', {
@@ -352,8 +386,8 @@ if(this.checked) {options.nodes.font.size = 14;}
  };
 
 function change_weights_d(){
-  cur_graph.normalize_weights("log","degree");
-  cur_graph.set_weights("log degree",data_set);
+  // cur_graph.normalize_weights("log","degree");
+  cur_graph.set_weights("degree",data_set);
   network.redraw();
 
   network.stopSimulation()
@@ -361,30 +395,24 @@ function change_weights_d(){
           'eventCategory': 'change weight',
           'eventAction': 'degree'
         }); 
-  // redrawAll()
 }
 
 function change_weights_p(){
-  cur_graph.normalize_weights("linear","popularity");
-  cur_graph.set_weights("linear popularity",data_set);
+  cur_graph.normalize_weights("quad","degree",false);
+  cur_graph.set_weights("quad degree",data_set);
   network.redraw();
   network.stopSimulation()
 
-  // for (var i = cur_graph.nodes.length - 1; i >= 0; i--) {
-  //   update_progress(i,cur_graph.nodes.length)
-  //   data_set.update(cur_graph.nodes[i])
-  // }
     ga( 'send', 'event', {
           'eventCategory': 'change weight',
           'eventAction': 'popularity'
         }); 
-  // redrawAll();
 }
 
 function change_weights_ap(){
-  cur_graph.normalize_weights("log","popularityDeg");
+  cur_graph.normalize_weights("linear","popularityDeg");
 
-  cur_graph.set_weights("log popularityDeg",data_set);
+  cur_graph.set_weights("linear popularityDeg",data_set);
   network.redraw();
   network.stopSimulation()
 
@@ -392,11 +420,11 @@ function change_weights_ap(){
           'eventCategory': 'change weight',
           'eventAction': 'average popularity'
         }); 
-  // redrawAll();
   
 }
 
 function test_build(){
+  build_graph(true);
 cur_graph.currentNode = test_data.currentNode  
 cur_graph.edges = test_data.edges   
 cur_graph.first_pass = test_data.first_pass   
@@ -479,7 +507,6 @@ function redrawAll() {
         var parent = params.nodes[0];
         var selected = network.getConnectedNodes(parent);
         selected.push(parent)
-        console.log(selected)
         hide_unhide_selected(so.complement(data_set.getIds(), selected),true)
         network.stopSimulation()
     });

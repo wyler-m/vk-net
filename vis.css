@@ -4,19 +4,36 @@ body, html {
     padding: 0px auto;
 }
 
+
 #container
 {
   width: 100vw;
   height: 100vh;
   border: 5px solid lightgray;
 }
+
+#controlDiv
+{
+  /*width: 100vw;*/
+  /*height: 100vh;*/
+}
+
 #mynetwork
 {
   height: 100%;
   width: 100%;
   
 }
+
+#test
+{
+  height: 100%;
+  width: 100%;
+  
+}
+
 #controls{
+  padding: 10px;
   margin-top: 0;
   position: absolute;
   width: 20%;
