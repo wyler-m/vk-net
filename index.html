@@ -9,8 +9,8 @@
 		<!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
 		<script src="setOps.js"></script>
 		<script src="graphClass.js"></script>
-		<script src="test_wyler.js"></script>
-		<!-- // <script src="test_data.js"></script> -->
+		<!-- // <script src="test_wyler.js"></script> -->
+		<script src="test_data.js"></script>
 		<!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
 		<script type="text/javascript" src="vis.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -31,9 +31,10 @@
 
   <!-- <p id="welcome">Enter An ID number and find out what your graph looks like:</p> -->
 	
-	<a id="selectedName" class="w3-btn-block w3-border w3-border-blue w3-white" target="_blank" href="#">name</a>
-	<input id="vkId" class="w3-input w3-border w3-hover-blue" value="86299933"></p>
-	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Build Graph</button>
+	<!-- <a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a> -->
+	<input id="vkId" class="w3-input w3-border w3-hover-blue" value="180440651"></p>
+	<a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Build Graph</a>
+	<!-- <span id="toolTipName" style="position:absolute;left:0;bottom:18px" class="w3-text w3-tag">asdasd</span> -->
 	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_d()">Node Size: Friends</button></br>
 	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_p()">Node Size: Friends^2</button></br>
 	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_ap()">Node Size: "popularity"</button></br>
@@ -47,39 +48,39 @@
 
 <div id="nodeInfo" >
   <center >
-  <!-- <a id="selectedName"class="w3-btn-block w3-bottombar w3-border-blue">name</a> -->
-  <img id="selectedPic" class="w3-btn-block" src = ''>
-<a id="selectedImportance"class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
-<a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
+  
+	<img id="selectedPic" class="w3-btn-block" src = ''>
+	<a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a>
+	<a id="selectedImportance"class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
+	<a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
 <!-- <a id="idNumber" class="w3-btn-block w3-bottombar w3-border-blue">0</p> -->
 <!-- <a id="selectedProfile" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue" target="_blank" class="mylink" href="https">Visit Profile</a> -->
-<!-- <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue"target="_blank" href="https">Build Graph</a> -->
+	<a id="buildSelected" class="w3-btn-block w3-hover-blue w3-white w3-border w3-border-blue"target="_blank" href="https">Build Graph</a>
 </center>
 </div>
 
 <div class="w3-display-container" id="test">
  <span class="w3-opennav w3-hide-large" onclick="w3_open()">&#9776;</span>
       
-<div class="w3-card-4 w3-display-topmiddle">
+<div class="w3-card-4 w3-display-bottommiddle">
   <button class="w3-btn-block w3-hover-blue w3-red" onclick="freeze_graph()" id="freezeGraph" style="display:none;">Click to Freeze</button>
 </div>
 
+ <div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:none;" id="graphingCard">
 
- <div class="w3-card-4 w3-display-middle" style="display:none;" id="graphingCard">
-
-          <header class="w3-container w3-white w3-border w3-border-blue">
-            <h1 id="welcome"></h1>
+          <header class="w3-container">
+            <h5 id="welcome"></h5>
           </header>
-          <div class="w3-container w3-white w3-border-black w3-bottombar w3-topbar">
-            <div class="w3-progress-container w3-round w3-large w3-white">
+          <div class="w3-container" id="progressContainer">
+            <div class="w3-progress-container w3-round w3-large ">
               <div class="w3-progressbar w3-round w3-blue" id="progbar" style="width:0%"></div>
             </div>
-
-          </div>
-
-          <footer class="w3-container w3-white w3-border w3-border-blue">
+          <footer class="w3-container">
             <h5 id="friendList"></h5>
         </footer>
+          </div>
+
+
   </div>
 
   <div id="mynetwork" class="wrapper" hidden></div>
@@ -105,6 +106,7 @@ so = setOps;
 access_token = null;
 
 params = parseURLParams();
+graph_dict = {}
 
 if (params) {
   for (var param in params) {
@@ -120,13 +122,31 @@ if (params) {
 
 
 function build_graph(test){
-  $("#mynetwork").hide();
-  $("#nodeInfo").hide();
-  $("#graphingCard").show();
 
-  cur_graph = new graph;
+	$("#mynetwork").hide();
+	$("#nodeInfo").hide();
+	$("#graphingCard").show()	
+	$("#graphingCard").attr("class","w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge");
+	$("#progressContainer").show();
+	
+	// var current_id = document.getElementById("vkId").value;
+	// if (typeof cur_graph !== "undefined") {
+	// 	graph_dict[current_id] = {"graph":JSON.parse(JSON.stringify(cur_graph)), "dataSet":JSON.parse(JSON.stringify(data_set))}
+	// 	delete cur_graph;
+	// 	delete data_set;		
+	// } else {
+	// 	if (current_id in graph_dict) {
+	// 		cur_graph = graph_dict[current_id].graph;	
+	// 		console.log(graph_dict[current_id].graph);
+	// 		console.log(graph_dict[current_id])
+	// 		data_set = graph_dict[current_id].dataSet;
+	// 		if (!test) {fetchFriendList()};
+	// 		// return
+	// 	} 
 
-  options = {
+	cur_graph = new graph;
+console.log(cur_graph)
+		options = {
       nodes: {
         shape: 'dot',
         scaling: {
@@ -167,9 +187,9 @@ function build_graph(test){
       }
     };
     data_set = new vis.DataSet(options);
-    if (!test) {fetchFriendList()};
-    
-}
+
+	if (!test) {fetchFriendList()};
+	};
 
 $("#nodeInfo").hide();
 $("#buildSelected").hide();
@@ -201,6 +221,8 @@ function insertNodeInfo (argument) {
   // $("#controlDiv").toggle();
 
   $("#selectedName").text(nodeInfo.label);
+
+  $("#toolTipName").attr("innerHTML","nodeInfo.label");
   $("#selectedPic").attr("src",nodeInfo.small_pic);
 
   $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
@@ -216,6 +238,7 @@ function insertNodeInfo (argument) {
 
   if (nodeInfo.id && (nodeInfo.small_pic!="https://vk.com/images/deactivated_100.png")){
     $("#buildSelected").text("Build Graph ("+ total_friends + " friends)");
+    $("#buildGraphButton").text("Build Graph ("+ total_friends + " friends)");
     $("#buildSelected").attr("href","https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id);
     $("#buildSelected").show();
 
@@ -507,7 +530,9 @@ function canvas_image(){
 
 //build graph
 function redrawAll() {
-    $("#graphingCard").hide();
+    // $("#graphingCard").show();
+    $("#graphingCard").attr("class","w3-card-4 w3-display-topmiddle w3-white w3-border w3-border-blue w3-round-xlarge");
+    $("#progressContainer").hide();
     $("#mynetwork").show();
 
 
