@@ -19,87 +19,108 @@
 	</head>
  
 <body>
-    
 
-<div id="container" >
-<menu id="controls" >
+<!-- <menu id="controls" > -->
+<nav class="w3-sidenav w3-white w3-card-2" id="mySidenav">
+<a href="javascript:void(0)" onclick="w3_close()" class="w3-closenav w3-large">&times;</a>
 
 <div id = "controlDiv" >
+
   <!-- <nav class="w3-sidenav w3-collapse w3-white" style="width:200px" id="mySidenav"> -->
   <!-- <a href="#" onclick="w3_close()" class="w3-closenav w3-hide-large">Close &times;</a>  -->
-	<h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+  <h1 id="logo"><img src= "vk.svg"> visualizer</h1>
 
   <!-- <p id="welcome">Enter An ID number and find out what your graph looks like:</p> -->
-	
-	<!-- <a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a> -->
-	<input id="vkId" class="w3-input w3-border w3-hover-blue" value="180440651"></p>
-	<a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Build Graph</a>
-	<!-- <span id="toolTipName" style="position:absolute;left:0;bottom:18px" class="w3-text w3-tag">asdasd</span> -->
-	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_d()">Node Size: Friends</button></br>
-	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_p()">Node Size: Friends^2</button></br>
-	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_weights_ap()">Node Size: "popularity"</button></br>
-	<button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodesCB()" id="toggleLabels">Show Labels</button>
-	<a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">Войти на VK.com</a>
+  
+  <!-- <a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a> -->
+  <input id="vkId" class="w3-input w3-border w3-hover-blue" value="180440651"></p>
+  <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Build Graph</a>
+  <!-- <span id="toolTipName" style="position:absolute;left:0;bottom:18px" class="w3-text w3-tag">asdasd</span> -->
+    <button onclick="myFunction('Demo1')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
+    <div id="Demo1" class="w3-accordion-content">
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_d()">Friends</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_p()">Friends^2</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_ap()">"popularity"</button></br>
+    </div>
 
-<!-- </nav>   -->   
-</div>
+  <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodesCB()" id="toggleLabels">Show Labels</button>
+  <a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">Войти на VK.com</a>
+</nav>
 
-</menu>
-
+<div id="container" >
+  <span class="w3-opennav w3-xlarge w3-display-topleft" style="z-index:1;padding:10px;" id="openMenu" onclick="w3_open()" hidden>&#9776;</span>
 <div id="nodeInfo" >
   <center >
   
-	<img id="selectedPic" class="w3-btn-block" src = ''>
-	<a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a>
-	<a id="selectedImportance"class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
-	<a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
+  <img id="selectedPic" class="w3-btn-block" src = ''>
+  <a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a>
+  <a id="selectedImportance"class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
+  <a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
 <!-- <a id="idNumber" class="w3-btn-block w3-bottombar w3-border-blue">0</p> -->
 <!-- <a id="selectedProfile" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue" target="_blank" class="mylink" href="https">Visit Profile</a> -->
-	<a id="buildSelected" class="w3-btn-block w3-hover-blue w3-white w3-border w3-border-blue"target="_blank" href="https">Build Graph</a>
+  <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-white w3-border w3-border-blue"target="_blank" href="https">Build Graph</a>
 </center>
 </div>
 
 <div class="w3-display-container" id="test">
- <span class="w3-opennav w3-hide-large" onclick="w3_open()">&#9776;</span>
       
-<div class="w3-card-4 w3-display-bottommiddle">
-  <button class="w3-btn-block w3-hover-blue w3-red" onclick="freeze_graph()" id="freezeGraph" style="display:none;">Click to Freeze</button>
+      <div class="w3-card-4 w3-display-bottommiddle">
+        <button class="w3-btn-block w3-hover-blue w3-red" onclick="freeze_graph()" id="freezeGraph" style="display:none;">Click to Freeze</button>
+      </div>
+
+      <div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:none;z-index:1" id="graphingCard">
+ 
+               <header class="w3-container">
+                 <h5 id="welcome"></h5>
+               </header>
+               <div class="w3-container" id="progressContainer">
+                 <div class="w3-progress-container w3-round w3-large ">
+                   <div class="w3-progressbar w3-round w3-blue" id="progbar" style="width:0%"></div>
+                 </div>
+               <footer class="w3-container">
+                 <h5 id="friendList"></h5>
+             </footer>
+               </div>
+ 
+ 
+       </div>
+ 
+       <div id="mynetwork" class="wrapper" hidden></div>
+       <div id="data" class="wrapper"></div>
 </div>
 
- <div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:none;" id="graphingCard">
+<!-- </nav>   -->   
+</div>
 
-          <header class="w3-container">
-            <h5 id="welcome"></h5>
-          </header>
-          <div class="w3-container" id="progressContainer">
-            <div class="w3-progress-container w3-round w3-large ">
-              <div class="w3-progressbar w3-round w3-blue" id="progbar" style="width:0%"></div>
-            </div>
-          <footer class="w3-container">
-            <h5 id="friendList"></h5>
-        </footer>
-          </div>
+<!-- </menu> -->
 
 
-  </div>
-
-  <div id="mynetwork" class="wrapper" hidden></div>
-  <div id="data" class="wrapper"></div>
-  </div>
 <a href="" id="download" target="_blank" download="graph.html">Save Image</a>
   <button type="button" onclick="canvas_image()">get image</button>
   <button type="button" onclick="save_build()">save build</button>
 <button type="button" style="margin-right:200px" onclick="test_build()">test build</button>
 
-  </body>
+</body>
 
   <script>
+
+function myFunction(id) {
+    var x = document.getElementById(id);
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else { 
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+
 function w3_open() {
-  document.getElementById("mySidenav").style.display = "block";
+    document.getElementById("mySidenav").style.display = "block";
+    $("#openMenu").hide();        
 }
 function w3_close() {
-  document.getElementById("mySidenav").style.display = "none";
-}
+    document.getElementById("mySidenav").style.display = "none";
+    $("#openMenu").show();        
+   }
 
 
 so = setOps;
@@ -145,8 +166,9 @@ function build_graph(test){
 	// 	} 
 
 	cur_graph = new graph;
-console.log(cur_graph)
-		options = {
+  console.log(cur_graph)
+		
+    options = {
       nodes: {
         shape: 'dot',
         scaling: {
@@ -289,18 +311,19 @@ function freeze_graph(){
  
 function fetchCityInfo(){
   var city_ids = cur_graph.unique_cities.join();
-  var script = document.createElement('SCRIPT');
-  script.src = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids,'&lang=ru&callback=api_fetchCityInfo');
+  var handlerURL = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids,'&lang=ru&callback=api_fetchCityInfo');
 
-  document.getElementsByTagName("head")[0].appendChild(script);
-}
-
-function api_fetchCityInfo(result){
-  var cityArray = result["response"];
-  for (var element in cityArray){
-    cur_graph.city_dict[cityArray[element].cid] = cityArray[element].name;
+  jQuery.getJSON(handlerURL + "&callback=?", 
+    function(jsonResult){
+        console.log(jsonResult);
+         var cityArray = jsonResult["response"];
+    for (var element in cityArray){
+      cur_graph.city_dict[cityArray[element].cid] = cityArray[element].name;
   }
+    });
 }
+
+
 
 function fetchDetails(id) {
     var script = document.createElement('SCRIPT');
@@ -313,7 +336,7 @@ function fetchDetails(id) {
     }
 
 function api_FetchDetails(result) {
-    
+    console.log(result)
     if ('error' in result) {
       console.log(result)
     } 
@@ -586,13 +609,17 @@ function redrawAll() {
   }
 
 
+
 //https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
 // https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
 //script.src = "https://api.vk.com/method/getProfiles?uid=355065657&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&order=hints&callback=callbackFunc';
 //script.src = 'https://api.vk.com/method/users.get?uids=2131567&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
 
-
+// https://api.vk.com/method/wall.get?owner_id=193316384&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
+// https://api.vk.com/method/wall.get?owner_id=42348445&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
+// https://api.vk.com/method/wall.getReposts?owner_id=193316384&post_id=3010&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
+// https://api.vk.com/method/likes.getList?owner_id=193316384&post_id=3010&type=post&owner_id=42348445&item_id=18553&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
 
