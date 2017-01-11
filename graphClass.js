@@ -10,6 +10,7 @@ class graph {
                     "popularityDeg":{}
                   };
     this.nodeToFriends = {};
+    this.nodeToNeighbors = {};
     this.unCheckedFriends = null;
     this.currentNode = null;
     this.nodeToInfo = {};  
@@ -61,6 +62,7 @@ class graph {
     this.nodeToFriends[this.currentNode] = res["response"];
     if (res["response"] && this.friends) {        
         var newLinks = so.intersection(this.friends,res["response"]);
+        this.nodeToNeighbors[this.currentNode] = newLinks;
         for (var i = newLinks.length - 1; i >= 0; i--) {
             this.make_link(newLinks[i],this.currentNode);          
         };
@@ -149,7 +151,7 @@ class graph {
     }
 
 
-    normalize_weights(scale_type,weight_type,rank){
+    normalize_weights(scale_type,weight_type,use_rank){
       var dict_name = scale_type+" "+weight_type
       var scaling_function = {"linear":function(rank) {return (rank)},
                               "quad":function(rank) {return Math.pow(rank,2)},
@@ -162,7 +164,7 @@ class graph {
         var nodes = Object.keys(this.weightsDictionary.degree);
         for (var i = 0; i < nodes.length; i++) {
           var weight = this.weightsDictionary[weight_type][nodes[i]];
-          if (rank) {
+          if (use_rank) {
             var node_rank = ranked_weights.indexOf(weight);
             this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](node_rank);
           } else{
