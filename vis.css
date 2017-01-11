@@ -27,11 +27,13 @@ body, html {
 }
 
 
-#mySidenav{
-  height: 100%;
+#controlDiv{
+  /*height: 50%;*/
+  display:inline-block;
   min-width: 200px;
   padding: 10px;
-  margin-top: 0;
+  /*margin-top: 0;*/
+  margin:10px;
   position: absolute;
   width: 20%;
   z-index: 1;
@@ -40,6 +42,7 @@ body, html {
 
 #nodeInfo {
   padding: 15px;
+  margin:10px;
   right: 0;
   position: absolute;
   width: 20%;
