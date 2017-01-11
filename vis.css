@@ -31,9 +31,9 @@ body, html {
   /*height: 50%;*/
   display:inline-block;
   min-width: 200px;
-  padding: 10px;
-  /*margin-top: 0;*/
-  margin:10px;
+  max-width: 300px;
+  margin-top: 0;
+  padding:20px;
   position: absolute;
   width: 20%;
   z-index: 1;
