@@ -28,12 +28,12 @@
   <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Build Graph</a>
     <button onclick="myFunction('Demo1')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
     <div id="Demo1" class="w3-accordion-content">
-        <button id="calcLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="constuct_like_dict()">calc likes</button></br>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_d()">Friends</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick='change_node_size("degree","")'>Friends</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_p()">Friends^2</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_ap()">"popularity"</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button></br>
+        <button id="calcLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="constuct_like_dict()">calc likes</button></br>
     </div>
 
   <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodesCB()" id="toggleLabels">Show Labels</button>
@@ -135,15 +135,6 @@ if (params) {
       }
    }; 
 };
-
-function constuct_like_dict(){
-
-  var likes_dict = {"received":{},"given":{}};
-  var update = update_progress;
-  build_like_dictionary(likes_dict,cur_graph,update);
-  cur_graph.weightsDictionary["given"] = likes_dict["given"];
-  cur_graph.weightsDictionary["received"] = likes_dict["received"];
-}
 
 function build_graph(test){
 
@@ -292,7 +283,6 @@ function parseURLParams() {
 }
 
 function update_progress(total_v, current_v){
-    console.log(total_v,current_v);
     document.getElementById("friendList").innerHTML = "Added "+ (total_v - current_v) +" of " + total_v + " friends";
     var progbar = document.getElementById("progbar")
     var percent = (total_v - current_v)/total_v *100;
@@ -441,6 +431,15 @@ function api_FetchFriendList(result) {
       };
     };
 
+function constuct_like_dict(){
+
+  var likes_dict = {"received":{},"given":{}};
+  var update = update_progress;
+  build_like_dictionary(likes_dict,cur_graph,update,access_token);
+  cur_graph.weightsDictionary["given"] = likes_dict["given"];
+  cur_graph.weightsDictionary["received"] = likes_dict["received"];
+}
+
 function showNodesCB(){
 
 options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0 
@@ -495,6 +494,22 @@ function change_weights_ap(){
           'eventCategory': 'change weight',
           'eventAction': 'average popularity'
         }); 
+}
+
+function change_node_size(weight_type,normilization){
+  //normilzation can be linear, quad, or log
+  //weigh_type is the name of the weight dictionary being used
+  if (normilization) {
+    cur_graph.normalize_weights(normilization,weight_type);
+    cur_graph.set_weights(normilization+" "+weight_type,data_set);
+  }else{
+    cur_graph.set_weights(weight_type,data_set)
+  };
+  // cur_graph.set_weights(weight_type,data_set);    
+  // cur_graph.set_weights("degree",data_set);
+
+  network.redraw();
+  network.stopSimulation()
 }
 
 function change_weights_received(){
