@@ -24,20 +24,23 @@
 <menu id = "controlDiv" >
 <div id = "hideDiv" >
   <h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+  <h4 id="foundName"></h4>
   <input id="vkId" class="w3-input w3-border w3-hover-blue" value="180440651"></p>
-  <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Build Graph</a>
-    <button onclick="myFunction('Demo1')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
+  <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</a>
+    <button onclick="collaps_control('Demo1')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
     <div id="Demo1" class="w3-accordion-content">
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick='change_node_size("degree","")'>Friends</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_p()">Friends^2</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_ap()">"popularity"</button></br>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button></br>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button></br>
+        <button id ="receivedLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button></br>
+        <button id ="givenLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button></br>
         <button id="calcLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="constuct_like_dict()">calc likes</button></br>
+        <div class="w3-progress-container w3-round w3-large w3-round" id="likesProgbarContainer" hidden>
+          <div class="w3-progressbar w3-round w3-red w3-text-black" id="likesProgbar" style="width:0%"></div>
+        </div>
     </div>
 
   <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodesCB()" id="toggleLabels">Show Labels</button>
-  <a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">Войти на VK.com</a>
 </div>
 <br>
 <button href="javascript:void(0)" onclick="w3_close()" id="closeMenu" class="w3-btn w3-small w3-round-xxlarge w3-hover-blue w3-border w3-border-blue w3-white"><</button>
@@ -53,7 +56,7 @@
   <a id="selectedImportance"class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
   <a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
 <!-- <a id="selectedProfile" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue" target="_blank" class="mylink" href="https">Visit Profile</a> -->
-  <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-white w3-border w3-border-blue"target="_blank" href="https">Build Graph</a>
+  <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-white w3-border w3-border-blue"target="_blank" href="https">Строй График</a>
 </center>
 </div>
 
@@ -76,13 +79,29 @@
                  <h5 id="friendList"></h5>
              </footer>
                </div>
- 
- 
        </div>
- 
+
+       <div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:block;z-index:1;padding:10px" id="searchCard">
+        <div id="searchDiv" hidden>
+               <header class="w3-container">
+                 <h4 id="foundNameCenter">Напиши Кличку</h4>
+               </header>
+               <div class="w3-container" id="search"></div>
+               <input id="searchBox" class="w3-input w3-border w3-hover-blue" value="" oninput="get_posts()"></p>
+               <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</button></br>
+               <footer class="w3-container">
+                 <h5 id="friendList"> </h5>
+             </footer>
+        </div>
+        <div id="loginDiv">
+  <a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60" >Войти на VK.com</a>      
+       </div>
+       </div>
+
        <div id="mynetwork" class="wrapper" hidden></div>
        
 </div>
+
 </div>
 <div id="data" class="wrapper"></div>
 
@@ -96,7 +115,7 @@
 
   <script>
 
-function myFunction(id) {
+function collaps_control(id) {
     var x = document.getElementById(id);
     if (x.className.indexOf("w3-show") == -1) {
         x.className += " w3-show";
@@ -118,6 +137,32 @@ function w3_close() {
    }
 
 
+function get_posts(){
+    var q = document.getElementById("searchBox").value
+     // = data.response[1]["uid"];
+    
+
+    var query = "https://api.vk.com/method/users.search?fields=photo_50&lang=ru&q="+q+"&access_token="+access_token
+    
+    $.get(query, function(data, status){ 
+      if (data.response[0]==1) {
+        $("#foundNameCenter").text(data.response[1].first_name+" "+data.response[1].last_name)
+        $("#foundName").text(data.response[1].first_name+" "+data.response[1].last_name)
+        $("#vkId").attr("value","123123");
+        document.getElementById("vkId").value = data.response[1]["uid"];
+      }else {
+        $("#foundNameCenter").text("Напиши Кличку")
+        $("#foundName").text("")
+        $("#vkId").attr("value","asd");
+    };
+    }
+    )
+  }
+
+
+
+
+
 so = setOps;
 access_token = null;
 
@@ -127,17 +172,18 @@ graph_dict = {}
 if (params) {
   for (var param in params) {
      if (param == "user_id") {
-        document.getElementById("vkId").value = params.user_id;
-        $("#loginP").hide();        
+        document.getElementById("vkId").value = params.user_id; 
       };
       if (param == "access_token"){
+        $("#loginP").hide();  
+        $("#searchDiv").show(); 
         access_token = params.access_token;
       }
    }; 
 };
 
 function build_graph(test){
-
+  $("#searchCard").hide();
 	$("#mynetwork").hide();
 	$("#nodeInfo").hide();
 	$("#graphingCard").show()	
@@ -206,17 +252,20 @@ function build_graph(test){
 
 	if (!test) {fetchFriendList()};
 	};
-
+w3_close()
+$("#loginDiv").show();
 $("#nodeInfo").hide();
+$("#givenLikes").hide();
+$("#receivedLikes").hide();
 $("#buildSelected").hide();
-$("#loginP").show();selectedName
+
 
 $("#selectedName").click(function(){
     ga_onclick("#selectedName","Check Profile");
 });
 
 $("#buildSelected").click(function(){
-    ga_onclick("#buildSelected","Build Graph");
+    ga_onclick("#buildSelected","Строй График");
 });
 
 function ga_onclick(element,action){
@@ -237,12 +286,14 @@ function insertNodeInfo (argument) {
   // $("#controlDiv").toggle();
 
   $("#selectedName").text(nodeInfo.label);
+  $("#foundName").text(nodeInfo.label);
 
   $("#toolTipName").attr("innerHTML","nodeInfo.label");
   $("#selectedPic").attr("src",nodeInfo.small_pic);
 
   $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
-  $("#vkId").attr("value",nodeInfo.id);
+  document.getElementById("vkId").value = nodeInfo.id;
+
   // $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
 
   if (nodeInfo.id in cur_graph.weightsDictionary.degree) {
@@ -253,8 +304,8 @@ function insertNodeInfo (argument) {
 
 
   if (nodeInfo.id && (nodeInfo.small_pic!="https://vk.com/images/deactivated_100.png")){
-    $("#buildSelected").text("Build Graph ("+ total_friends + " friends)");
-    $("#buildGraphButton").text("Build Graph ("+ total_friends + " friends)");
+    $("#buildSelected").text("Строй График ("+ total_friends + " friends)");
+    $("#buildGraphButton").text("Строй График ("+ total_friends + " friends)");
     $("#buildSelected").attr("href","https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id);
     $("#buildSelected").show();
 
@@ -417,7 +468,7 @@ function api_FetchFriendList(result) {
         cur_graph.weight_nodes_popularity_deg();
         cur_graph.set_weights("degree");
         cur_graph.add_city_info()
-
+        w3_open()
         redrawAll(); 
 //google analytics to see if anyone started using it
         ga( 'send', 'event', {
@@ -432,12 +483,13 @@ function api_FetchFriendList(result) {
     };
 
 function constuct_like_dict(){
-
+  $("#likesProgbarContainer").show();
   var likes_dict = {"received":{},"given":{}};
   var update = update_progress;
   build_like_dictionary(likes_dict,cur_graph,update,access_token);
   cur_graph.weightsDictionary["given"] = likes_dict["given"];
   cur_graph.weightsDictionary["received"] = likes_dict["received"];
+  $("#calcLikes").hide();
 }
 
 function showNodesCB(){
@@ -547,20 +599,20 @@ redrawAll()
 
 function save_build(){
     test_data = {
-"currentNode" : cur_graph.currentNode,  
-"nodeToNeighbors" : cur_graph.nodeToNeighbors,
-"edges" : cur_graph.edges,   
-"first_pass" : cur_graph.first_pass,   
-"friends" : cur_graph.friends,   
-"nodeToFriends" : cur_graph.nodeToFriends,  
-"nodeToInfo" : cur_graph.nodeToInfo,   
-"nodes" : cur_graph.nodes,   
-"nodesRetrieved" : cur_graph.nodesRetrieved,   
-"ownerInfo" : cur_graph.ownerInfo,   
-"unCheckedFriends" : cur_graph.unCheckedFriends,   
-"weightsDictionary" : cur_graph.weightsDictionary 
-}
-document.getElementById("data").innerHTML = JSON.stringify(test_data);
+    "currentNode" : cur_graph.currentNode,  
+    "nodeToNeighbors" : cur_graph.nodeToNeighbors,
+    "edges" : cur_graph.edges,   
+    "first_pass" : cur_graph.first_pass,   
+    "friends" : cur_graph.friends,   
+    "nodeToFriends" : cur_graph.nodeToFriends,  
+    "nodeToInfo" : cur_graph.nodeToInfo,   
+    "nodes" : cur_graph.nodes,   
+    "nodesRetrieved" : cur_graph.nodesRetrieved,   
+    "ownerInfo" : cur_graph.ownerInfo,   
+    "unCheckedFriends" : cur_graph.unCheckedFriends,   
+    "weightsDictionary" : cur_graph.weightsDictionary 
+    }
+    document.getElementById("data").innerHTML = JSON.stringify(test_data);
 
 }
 
@@ -582,7 +634,7 @@ function canvas_image(){
 }
 
 
-//build graph
+//Строй График
 function redrawAll() {
 
     $("#graphingCard").attr("class","w3-card-4 w3-display-topmiddle w3-white w3-border w3-border-blue w3-round-xlarge");
@@ -646,12 +698,16 @@ function redrawAll() {
 // https://api.vk.com/method/wall.get?owner_id=193316384&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
 // https://api.vk.com/method/wall.get?owner_id=42348445&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
 // https://api.vk.com/method/wall.getReposts?owner_id=193316384&post_id=3010&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
+// https://api.vk.com/method/users.search?q=123123123&sort=0&fields=photo_50&access_token=a76141a73a87fbe9c00ba3237ea6a3a412960486cbc6e0301ba0c98059b58f040023f9a0cdc08dd7abec8&expires_in=86400
 // https://api.vk.com/method/likes.getList?owner_id=193316384&post_id=3010&type=post&owner_id=42348445&item_id=18553&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
 
 // var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
-// https://api.vk.com/method/users.get?uids=1216918&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails
+
+// https://api.vk.com/method/users.search?q=rwyler&lang=ru&sort=1&fields=photo_50&access_token=a76141a73a87fbe9c00ba3237ea6a3a412960486cbc6e0301ba0c98059b58f040023f9a0cdc08dd7abec8&expires_in=86400
+
+
 // https://api.vk.com/method/users.get?uids=1216918,16081499,218868103&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=api_FetchDetails
 // 1216918
 // 16081499
