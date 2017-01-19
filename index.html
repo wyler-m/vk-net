@@ -8,6 +8,7 @@
 		<meta charset="utf-8">
 		<!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
     <script src="setOps.js"></script>
+    <script src="cb.js"></script>
 		<script src="poster.js"></script>
 		<script src="graphClass.js"></script>
 		<!-- // <script src="test_wyler.js"></script> -->
@@ -32,6 +33,7 @@
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick='change_node_size("degree","")'>Friends</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_p()">Friends^2</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_ap()">"popularity"</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_centrality()">centrality</button></br>
         <button id ="receivedLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button></br>
         <button id ="givenLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button></br>
         <button id="calcLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="constuct_like_dict()">calc likes</button></br>
@@ -160,9 +162,6 @@ function get_posts(){
   }
 
 
-
-
-
 so = setOps;
 access_token = null;
 
@@ -177,6 +176,8 @@ if (params) {
       if (param == "access_token"){
         $("#loginP").hide();  
         $("#searchDiv").show(); 
+        $("#calcLikes").show();
+
         access_token = params.access_token;
       }
    }; 
@@ -258,6 +259,7 @@ $("#nodeInfo").hide();
 $("#givenLikes").hide();
 $("#receivedLikes").hide();
 $("#buildSelected").hide();
+$("#calcLikes").hide();
 
 
 $("#selectedName").click(function(){
@@ -536,9 +538,17 @@ function change_weights_p(){
 }
 
 function change_weights_ap(){
-  cur_graph.normalize_weights("linear","popularityDeg");
-
+  cur_graph.normalize_weights("linear","popularityDeg",false);
   cur_graph.set_weights("linear popularityDeg",data_set);
+  network.redraw();
+  network.stopSimulation()
+}
+
+function change_weights_centrality(){
+  if (!("centrality" in cur_graph.weightsDictionary)) {
+    cur_graph.weightsDictionary["centrality"] = get_centrality(cur_graph,network);
+  };
+  cur_graph.set_weights("centrality",data_set);
   network.redraw();
   network.stopSimulation()
 
@@ -594,7 +604,7 @@ cur_graph.ownerInfo = test_data.ownerInfo
 cur_graph.unCheckedFriends = test_data.unCheckedFriends   
 cur_graph.weightsDictionary = test_data.weightsDictionary  
 redrawAll()
-
+change_weights_centrality();
 }
 
 function save_build(){
@@ -686,7 +696,6 @@ function redrawAll() {
 
     });
   }
-
 
 
 //https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
