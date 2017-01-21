@@ -453,7 +453,6 @@ function api_FetchFriendList(result) {
 // are there new friends and have there been friends added
       if (!("error" in result)) {
         cur_graph.add_new_friends(result);
-        // fetchDetails(cur_graph.currentNode);
       };
       
 //keep recursing until all the unchecked friends are finished

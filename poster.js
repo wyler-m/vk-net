@@ -2,14 +2,6 @@
 
 function build_like_dictionary(likes_dict,graph,update_function,access_token){
 
-function pausecomp(millis)
-{
-    var date = new Date();
-    var curDate = null;
-    do { curDate = new Date(); }
-    while(curDate-date < millis);
-}
-
 	so = setOps;
 
 	function get_likes(owner_id,item_id,access_token,current_step){
