@@ -8,7 +8,7 @@ function get_friends(graph,access_token){
 		// setTimeout(function(){
 			$.get(query, function(data, status){ 
 
-				update_progress(Object.keys(splice_dict).length-1, splice_index) // from index
+				update_progress(Object.keys(splice_dict).length-1, splice_index-1) // from index
 				if (splice_index>0) {
 			 		if (data["error"]!=undefined) {
 						console.log("splice error",splice_index)
