@@ -27,14 +27,16 @@
 <div id = "hideDiv" >
   <h1 id="logo"><img src= "vk.svg"> visualizer</h1>
   <h4 id="foundName"></h4>
-  <input id="vkId" class="w3-input w3-border w3-hover-blue" value="60219545"></p>
+  <input id="vkId" class="w3-input w3-border w3-hover-blue" value="16081499"></p>
   <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</a>
     <button onclick="collaps_control('Demo1')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
     <div id="Demo1" class="w3-accordion-content">
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick='change_node_size("degree","")'>Friends</button></br>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_p()">Friends^2</button></br>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_ap()">"popularity"</button></br>
         <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_centrality()">centrality</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick='change_node_size("degree","")'>Friends</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('degree','quad')">Friends^2</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('degree','log')">log(Friend)</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('degree','log','true')">log(Friend) normalized</button></br>
+        <button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_ap()">"popularity"</button></br>
         <button id ="receivedLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button></br>
         <button id ="givenLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button></br>
         <button id="calcLikes" class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="constuct_like_dict()">calc likes</button></br>
@@ -90,7 +92,7 @@
                  <h4 id="foundNameCenter">Напиши Кличку</h4>
                </header>
                <div class="w3-container" id="search"></div>
-               <input id="searchBox" class="w3-input w3-border w3-hover-blue" value="" oninput="get_posts()"></p>
+               <input id="searchBox" class="w3-input w3-border w3-hover-blue" value="" oninput="search_Input()"></p>
                <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</button></br>
                <footer class="w3-container">
                  <h5 id="friendList"> </h5>
@@ -140,10 +142,8 @@ function w3_close() {
    }
 
 
-function get_posts(){
+function search_Input(){
     var q = document.getElementById("searchBox").value
-     // = data.response[1]["uid"];
-    
 
     var query = "https://api.vk.com/method/users.search?fields=photo_50&lang=ru&q="+q+"&access_token="+access_token
     
@@ -183,7 +183,8 @@ if (params) {
       }
    }; 
 };
-nodes_to_friends = {};
+
+
 function build_graph(test){
 
   $("#searchCard").hide();
@@ -241,13 +242,14 @@ function build_graph(test){
 
 	if (!test) {fetchFriendList()};
 	};
+
 w3_close()
 $("#loginDiv").show();
 $("#nodeInfo").hide();
 $("#givenLikes").hide();
 $("#receivedLikes").hide();
 $("#buildSelected").hide();
-$("#calcLikes").hide();
+// $("#calcLikes").hide();
 
 
 $("#selectedName").click(function(){
@@ -282,14 +284,11 @@ function insertNodeInfo (argument) {
   $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
   document.getElementById("vkId").value = nodeInfo.id;
 
-  // $("#selectedImportance").text("Average Rank: " + Math.round(1000/(nodeInfo.value+.01)));
-
   if (nodeInfo.id in cur_graph.weightsDictionary.degree) {
     $("#selectedDegree").text("Connections: " + cur_graph.weightsDictionary.degree[nodeInfo.id]);
   } else {$("#selectedDegree").text("no connections")};
   
   $("#selectedName").attr("href","https://www.vk.com/id"+nodeInfo.id);
-
 
   if (nodeInfo.id && (nodeInfo.small_pic!="https://vk.com/images/deactivated_100.png")){
     $("#buildSelected").text("Строй График ("+ total_friends + " friends)");
@@ -315,10 +314,12 @@ function parseURLParams() {
 }
 
 function update_progress(total_v, current_v){
-    document.getElementById("friendList").innerHTML = "Added "+ (total_v - current_v)*25 +" of " + total_v*25 + " friends";
-    var progbar = document.getElementById("progbar")
-    var percent = (total_v - current_v)/total_v *100;
-    progbar.style.width = percent +'%';
+  var progbar = document.getElementById("progbar");
+  var text = document.getElementById("friendList");
+  if (current_v >= 0 ) {
+    text.innerHTML = "Added "+ (total_v - current_v)*25 +" of " + total_v*25 + " friends";
+    progbar.style.width = (total_v - current_v)/total_v *100 +'%';
+    } else {progbar.style.width = 0 +'%'; text.innerHTML = ""; } ;
 }
 
 
@@ -330,7 +331,7 @@ function freeze_graph(){
  
 function fetchCityInfo(){
   var city_ids = cur_graph.unique_cities.join();
-  var query = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids,'&lang=ru&callback=api_fetchCityInfo');
+  var query = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids,'&lang=ru&');
 
   $.get(query, function(result, status){              
          var cityArray = result["response"];
@@ -411,6 +412,7 @@ function init_graph(){
     cur_graph.weight_nodes_popularity_deg();
     cur_graph.set_weights("degree");
     cur_graph.add_city_info()
+    data_set
     w3_open()
     redrawAll(); 
 }
@@ -469,12 +471,13 @@ function change_weights_centrality(){
   network.stopSimulation()
 }
 
-function change_node_size(weight_type,normalization){
+function change_node_size(weight_type,normalization,use_rank){
   //normilzation can be linear, quad, or log
   //weigh_type is the name of the weight dictionary being used
-  if (normalization) {
-    cur_graph.normalize_weights(normalization,weight_type);
-    cur_graph.set_weights(normalization+" "+weight_type,data_set);
+  console.log("vars",weight_type,normalization,use_rank)
+  if (normalization.length > 0) {
+    cur_graph.normalize_weights(normalization,weight_type,use_rank == "true" ? true : false);
+    cur_graph.set_weights(normalization+" "+weight_type+" "+use_rank,data_set);
   }else{
     cur_graph.set_weights(weight_type,data_set)
   };
@@ -516,8 +519,6 @@ cur_graph.unCheckedFriends = test_data.unCheckedFriends
 cur_graph.weightsDictionary = test_data.weightsDictionary  
 redrawAll()
 change_weights_centrality();
-get_friends(nodes_to_friends,cur_graph.friends,access_token);
-
 }
 
 function save_build(){

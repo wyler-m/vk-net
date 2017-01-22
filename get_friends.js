@@ -21,7 +21,7 @@ function get_friends(graph,access_token){
 			 		}	
 			 	}else{
 			 		$.extend(graph.nodeToFriends, data.response);
-			 		init_graph() // from index
+			 		init_graph(); // from index
 				}	
 			})
 		// },150);

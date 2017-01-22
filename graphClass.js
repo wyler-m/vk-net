@@ -148,7 +148,7 @@ class graph {
 
 
     normalize_weights(scale_type,weight_type,use_rank){
-      var dict_name = scale_type+" "+weight_type
+      var dict_name = scale_type+" "+weight_type+" "+ use_rank == "" ? "" : use_rank == "true" ? true : false;
       var scaling_function = {"linear":function(rank) {return (rank)},
                               "quad":function(rank) {return Math.pow(rank,2)},
                               "log":function(rank) {return Math.round(Math.log(rank+1)*100)}  
@@ -161,6 +161,7 @@ class graph {
         for (var i = 0; i < nodes.length; i++) {
           var weight = this.weightsDictionary[weight_type][nodes[i]];
           if (use_rank) {
+            console.log("use_rank",use_rank)
             var node_rank = ranked_weights.indexOf(weight);
             this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](node_rank);
           } else{
