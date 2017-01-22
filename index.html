@@ -10,9 +10,10 @@
     <script src="setOps.js"></script>
     <script src="cb.js"></script>
 		<script src="poster.js"></script>
-		<script src="graphClass.js"></script>
+    <script src="graphClass.js"></script>
+		<script src="get_friends.js"></script>
 		<!-- // <script src="test_wyler.js"></script> -->
-		<script src="test_data.js"></script>
+		<script src="test_full.js"></script>
 		<!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
 		<script type="text/javascript" src="vis.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -26,7 +27,7 @@
 <div id = "hideDiv" >
   <h1 id="logo"><img src= "vk.svg"> visualizer</h1>
   <h4 id="foundName"></h4>
-  <input id="vkId" class="w3-input w3-border w3-hover-blue" value="180440651"></p>
+  <input id="vkId" class="w3-input w3-border w3-hover-blue" value="60219545"></p>
   <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</a>
     <button onclick="collaps_control('Demo1')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
     <div id="Demo1" class="w3-accordion-content">
@@ -182,8 +183,9 @@ if (params) {
       }
    }; 
 };
-
+nodes_to_friends = {};
 function build_graph(test){
+
   $("#searchCard").hide();
 	$("#mynetwork").hide();
 	$("#nodeInfo").hide();
@@ -191,20 +193,6 @@ function build_graph(test){
 	$("#graphingCard").attr("class","w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge");
 	$("#progressContainer").show();
 	
-	// var current_id = document.getElementById("vkId").value;
-	// if (typeof cur_graph !== "undefined") {
-	// 	graph_dict[current_id] = {"graph":JSON.parse(JSON.stringify(cur_graph)), "dataSet":JSON.parse(JSON.stringify(data_set))}
-	// 	delete cur_graph;
-	// 	delete data_set;		
-	// } else {
-	// 	if (current_id in graph_dict) {
-	// 		cur_graph = graph_dict[current_id].graph;	
-	// 		console.log(graph_dict[current_id].graph);
-	// 		console.log(graph_dict[current_id])
-	// 		data_set = graph_dict[current_id].dataSet;
-	// 		if (!test) {fetchFriendList()};
-	// 		// return
-	// 	} 
 
 	cur_graph = new graph;
   console.log(cur_graph)
@@ -263,11 +251,9 @@ $("#calcLikes").hide();
 
 
 $("#selectedName").click(function(){
-    ga_onclick("#selectedName","Check Profile");
 });
 
 $("#buildSelected").click(function(){
-    ga_onclick("#buildSelected","Строй График");
 });
 
 function ga_onclick(element,action){
@@ -312,13 +298,6 @@ function insertNodeInfo (argument) {
     $("#buildSelected").show();
 
   } else {$("#buildSelected").hide();};
-    
-// google analytics
-      ga( 'send', 'event', {
-          'eventCategory': 'graph interaction',
-          'eventAction': 'select node',
-          'eventLabel': nodeInfo.id
-        }); 
 
 };
 
@@ -336,7 +315,7 @@ function parseURLParams() {
 }
 
 function update_progress(total_v, current_v){
-    document.getElementById("friendList").innerHTML = "Added "+ (total_v - current_v) +" of " + total_v + " friends";
+    document.getElementById("friendList").innerHTML = "Added "+ (total_v - current_v)*25 +" of " + total_v*25 + " friends";
     var progbar = document.getElementById("progbar")
     var percent = (total_v - current_v)/total_v *100;
     progbar.style.width = percent +'%';
@@ -346,46 +325,34 @@ function update_progress(total_v, current_v){
 function freeze_graph(){  
   if (network) {
     network.stopSimulation();
-          ga( 'send', 'event', {
-          'eventCategory': 'graph interaction',
-          'eventAction': 'freeze graph',
-          'eventLabel': cur_graph.ownerInfo["id"],
-          'eventValue': cur_graph.get_density()
-        }); 
   };
 }
  
 function fetchCityInfo(){
   var city_ids = cur_graph.unique_cities.join();
-  var handlerURL = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids,'&lang=ru&callback=api_fetchCityInfo');
+  var query = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids,'&lang=ru&callback=api_fetchCityInfo');
 
-  jQuery.getJSON(handlerURL + "&callback=?", 
-    function(jsonResult){
-        console.log(jsonResult);
-         var cityArray = jsonResult["response"];
+  $.get(query, function(result, status){              
+         var cityArray = result["response"];
     for (var element in cityArray){
       cur_graph.city_dict[cityArray[element].cid] = cityArray[element].name;
-  }
-    });
+    }
+  });
 }
 
 
-
 function fetchDetails(id) {
-    var script = document.createElement('SCRIPT');
     var y = '';
     if (access_token) {
       y = "&access_token="+access_token;
     };
-    script.src = 'https://api.vk.com/method/users.get?uids='.concat(id,y,'&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=api_FetchDetails');   
-    document.getElementsByTagName("head")[0].appendChild(script);
-    }
 
-function api_FetchDetails(result) {
-    console.log(result)
-    if ('error' in result) {
-      console.log(result)
-    } 
+    var query = 'https://api.vk.com/method/users.get?uids='.concat(id,y,'&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100');   
+
+    $.get(query, function(result, status){              
+      if ('error' in result) {
+        fetchDetails(result.error.request_params[2].value)
+      } 
     else {
       if (!cur_graph.first_pass) {
       var res_array = result["response"];
@@ -399,7 +366,10 @@ function api_FetchDetails(result) {
         document.getElementById("welcome").innerHTML = res.first_name +" "+res.last_name;
       };
     };    
-}
+});}
+
+
+
 
 function fetchFriendList(id) {
     if (!id) {
@@ -408,80 +378,42 @@ function fetchFriendList(id) {
       fetchDetails(x);
     } else {x = id; cur_graph.currentNode = id;};
 
-    var script = document.createElement('SCRIPT');
     var y = '';
     if (access_token) {
       y = "&access_token="+access_token;
     };
-    script.src = 'https://api.vk.com/method/friends.get?uid='.concat(x,y,'&order=hints&callback=api_FetchFriendList');
-    
-    document.getElementsByTagName("head")[0].appendChild(script);
-    }
 
-function api_FetchFriendList(result) {
+    //get the list of friends
+    var query = 'https://api.vk.com/method/friends.get?uid='.concat(x,y,'&order=hints');
 
-//if error
-    if ("error" in result) { 
-        if ((result["error"]["error_code"]==6) && (cur_graph.currentNode != undefined)){
-          cur_graph.unCheckedFriends.push(cur_graph.currentNode);
-        }
-      };
-//check to see if there are any friends in friendlist
-    if (!cur_graph.friends) { 
-      cur_graph.init_friends(result);      
-      fetchFriendList(cur_graph.currentNode);
-//google analytics to see if graph was started
-      ga( 'send', 'event', {
-          'eventCategory': 'graph interaction',
-          'eventAction': 'started graph build',
-          'eventLabel': cur_graph.ownerInfo["id"],
-          'eventValue': cur_graph.unCheckedFriends.length
-        });  
-    } 
-//if not, then take intersection of the response and the friends
-    else {
-      if (!cur_graph.nodesRetrieved) {
-        cur_graph.nodesRetrieved = true;
-        var nodes = Object.assign([], cur_graph.friends); 
-        while (nodes.length>0){
+    $.get(query, function(result, status){
+    //add friends  to current graph
+      cur_graph.init_friends(result);  
+
+      //get the details for the nodes
+      var nodes = Object.assign([], cur_graph.friends); 
+      while (nodes.length>0){
           var node = nodes.splice(0,100);
           fetchDetails(node.join());  
-        }
-      };
-      update_progress(cur_graph.friends.length,cur_graph.unCheckedFriends.length);
-      
-// are there new friends and have there been friends added
-      if (!("error" in result)) {
-        cur_graph.add_new_friends(result);
-      };
-      
-//keep recursing until all the unchecked friends are finished
-      if (cur_graph.currentNode) {
+      } 
+      //builds all the links, delayed based on the number of calls to get node deatials
+      setTimeout(function() {
+        get_friends(cur_graph,access_token);
+      }, 3*cur_graph.friends.length);   
+    })
+}
 
-//add this into the fetch frineds list
-      var tempfriend = cur_graph.gotoNextNode() 
 
-        // fetchFriendList(cur_graph.gotoNextNode());  
-        fetchFriendList(tempfriend);  
-        // fetchFriendList(currentNode);  
-      } else { 
-        cur_graph.weight_nodes_popularity();
-        cur_graph.weight_nodes_popularity_deg();
-        cur_graph.set_weights("degree");
-        cur_graph.add_city_info()
-        w3_open()
-        redrawAll(); 
-//google analytics to see if anyone started using it
-        ga( 'send', 'event', {
-            'eventCategory': 'graph interaction',
-             'eventAction': 'finished graph build',
-             'eventLabel': cur_graph.ownerInfo["id"],
-             'eventValue': cur_graph.get_density()
-           });  
-         return
-        };
-      };
-    };
+//used in get_friends method
+function init_graph(){ 
+    cur_graph.add_all_connections();
+    cur_graph.weight_nodes_popularity();
+    cur_graph.weight_nodes_popularity_deg();
+    cur_graph.set_weights("degree");
+    cur_graph.add_city_info()
+    w3_open()
+    redrawAll(); 
+}
 
 function constuct_like_dict(){
   $("#likesProgbarContainer").show();
@@ -512,28 +444,13 @@ $("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
        network.stopSimulation();
  };
 
-function change_weights_d(){
-  // cur_graph.normalize_weights("log","degree");
-  cur_graph.set_weights("degree",data_set);
-  network.redraw();
 
-  network.stopSimulation()
-  ga( 'send', 'event', {
-          'eventCategory': 'change weight',
-          'eventAction': 'degree'
-        }); 
-}
 
 function change_weights_p(){
   cur_graph.normalize_weights("quad","degree",false);
   cur_graph.set_weights("quad degree",data_set);
   network.redraw();
   network.stopSimulation()
-
-    ga( 'send', 'event', {
-          'eventCategory': 'change weight',
-          'eventAction': 'popularity'
-        }); 
 }
 
 function change_weights_ap(){
@@ -550,19 +467,14 @@ function change_weights_centrality(){
   cur_graph.set_weights("centrality",data_set);
   network.redraw();
   network.stopSimulation()
-
-      ga( 'send', 'event', {
-          'eventCategory': 'change weight',
-          'eventAction': 'average popularity'
-        }); 
 }
 
-function change_node_size(weight_type,normilization){
+function change_node_size(weight_type,normalization){
   //normilzation can be linear, quad, or log
   //weigh_type is the name of the weight dictionary being used
-  if (normilization) {
-    cur_graph.normalize_weights(normilization,weight_type);
-    cur_graph.set_weights(normilization+" "+weight_type,data_set);
+  if (normalization) {
+    cur_graph.normalize_weights(normalization,weight_type);
+    cur_graph.set_weights(normalization+" "+weight_type,data_set);
   }else{
     cur_graph.set_weights(weight_type,data_set)
   };
@@ -594,7 +506,7 @@ function test_build(){
 cur_graph.currentNode = test_data.currentNode  
 cur_graph.edges = test_data.edges   
 cur_graph.first_pass = test_data.first_pass   
-cur_graph.friends = test_data.friends   
+cur_graph.friends = test_data.friends
 cur_graph.nodeToFriends = test_data.nodeToFriends  
 cur_graph.nodeToInfo = test_data.nodeToInfo   
 cur_graph.nodes = test_data.nodes   
@@ -604,6 +516,8 @@ cur_graph.unCheckedFriends = test_data.unCheckedFriends
 cur_graph.weightsDictionary = test_data.weightsDictionary  
 redrawAll()
 change_weights_centrality();
+get_friends(nodes_to_friends,cur_graph.friends,access_token);
+
 }
 
 function save_build(){

@@ -11,7 +11,6 @@ class graph {
                   };
     this.nodeToFriends = {};
     this.nodeToNeighbors = {};
-    this.unCheckedFriends = null;
     this.currentNode = null;
     this.nodeToInfo = {};  
     this.ownerInfo = {};
@@ -25,9 +24,7 @@ class graph {
   }
 
   init_friends(res){
-    this.unCheckedFriends = res["response"];
-    this.friends = res["response"].slice(0);
-    this.gotoNextNode();
+    this.friends = res["response"];
   }
 
   add_details_array(res_array){
@@ -49,34 +46,33 @@ class graph {
       }
     };
   }
+  
+  add_all_connections(){
+    for (var i in this.nodeToFriends){
+        this.add_new_connections(i)              
+      }
+    }
 
-  gotoNextNode(){
-    if (this.unCheckedFriends) {
-      this.currentNode = this.unCheckedFriends.pop();
-      return this.currentNode;
-    };
-    this.currentNode = null;
-  }
-
-  add_new_friends(res){
-    this.nodeToFriends[this.currentNode] = res["response"];
-    if (res["response"] && this.friends) {        
-        var newLinks = so.intersection(this.friends,res["response"]);
-        this.nodeToNeighbors[this.currentNode] = newLinks;
+  add_new_connections(currentNode){
+    if (this.nodeToFriends[currentNode]) {
+      var newLinks = so.intersection(this.friends,this.nodeToFriends[currentNode]);
+      if (newLinks) {
+        this.nodeToNeighbors[currentNode] = newLinks;
         for (var i = newLinks.length - 1; i >= 0; i--) {
-            this.make_link(newLinks[i],this.currentNode);          
+            this.make_link(newLinks[i],currentNode);          
         };
       };
+    };
   };
 
 
-
   make_link(source,target){
-    var sum = source + target;
-    if (sum in this.weightsDictionary.degree){
+    var sum_id = target+source;
+    var rev_sum_id = source+target;
+    if (rev_sum_id in this.weightsDictionary.degree){
       return;
     }
-    this.weightsDictionary.degree[sum] = 1;
+    this.weightsDictionary.degree[sum_id] = 1;
     this.count_degree(source); 
     this.count_degree(target);
     this.edges.push({"from":source,"to":target});
@@ -179,7 +175,6 @@ class graph {
       for (var i = this.nodes.length - 1; i >= 0; i--) {
         var deg = 0    
         if (!(this.nodes[i].small_pic=="https://vk.com/images/deactivated_100.png")){
-          console.log(i,this.nodes[i])
           deg = this.weightsDictionary[weight_type][this.nodes[i]["id"]];
           deg = deg ? deg : 0
         }
