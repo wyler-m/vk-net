@@ -9,7 +9,8 @@
 		<!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
     <script src="setOps.js"></script>
     <script src="get_centrality.js"></script>
-		<script src="get_likes.js"></script>
+    <!-- // <script src="get_likes.js"></script> -->
+		<script src="weight_likes.js"></script>
     <script src="graphClass.js"></script>
 		<script src="get_friends.js"></script>
 		<!-- // <script src="test_wyler.js"></script> -->
@@ -457,10 +458,11 @@ function init_graph(){
 function constuct_like_dict(){
   $("#likesProgbarContainer").show();
   var likes_dict = {"received":{},"given":{}};
-  var update = update_progress;
-  build_like_dictionary(likes_dict,cur_graph,update,access_token);
-  cur_graph.weightsDictionary["given"] = likes_dict["given"];
-  cur_graph.weightsDictionary["received"] = likes_dict["received"];
+  var likes_weighted_edges = [];
+  // build_like_dictionary(likes_dict,cur_graph,access_token);
+  build_like_dictionary(likes_dict,cur_graph,access_token);
+  // cur_graph.weightsDictionary["given"] = likes_dict["given"];
+  // cur_graph.weightsDictionary["received"] = likes_dict["received"];
   $("#calcLikes").hide();
 }
 

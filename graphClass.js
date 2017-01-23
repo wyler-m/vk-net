@@ -3,7 +3,7 @@ class graph {
     this.friends = null;
     this.nodesRetrieved = false;
     this.nodes = [];
-    this.edges = {"mutual":[],"one_way":[],"checked":{}};
+    this.edges = {"mutual":[],"one_way":[],"complete":[],"checked":{}};
     this.weightsDictionary = {
                     "degree":{},
                     "popularity":{},
@@ -58,7 +58,7 @@ class graph {
     for (var node in this.edges.checked){
       this.edges.one_way.push(this.edges.checked[node])
     }
-    }
+  }
 
   add_new_connections(currentNode){
     if (this.nodeToFriends[currentNode]) {
@@ -79,12 +79,14 @@ class graph {
     if (reversed_sum_id in this.edges.checked){
       this.edges.mutual.push({"from":source,"to":target,"hidden":false, "physics":true});
       this.edges.mutual.push({"from":target,"to":source,"hidden":true, "physics":false,"arrows":"to"});
+      this.edges.complete.push({"from":target,"to":source,"hidden":true, "physics":false,"arrows":"to"});
       this.count_degree(target);
       this.count_degree(source);      
 
       delete this.edges.checked[reversed_sum_id];
     } else {
       this.edges.checked[sum_id] = {"from":source,"to":target,"hidden":false, "physics":true,"arrows":"middle"};
+      this.edges.complete.push({"from":source,"to":target,"hidden":false, "physics":true,"arrows":"to"});
     }
   }
 

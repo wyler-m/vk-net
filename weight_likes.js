@@ -1,37 +1,7 @@
-<html>
-	<head>
-		<title>reposter</title>
-		<meta charset="utf-8">
-		<link rel="stylesheet" href="w3.css">
-		<script src="test_neighbors.js"></script>
-		<script src="setOps.js"></script>
-		<script src="graphClass.js"></script>
-		<script src="reposts.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	</head>
 
-	<body>
 
-		<div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:block;z-index:1" id="card">
- 
-               <header class="w3-container">
-                 <h5 id="welcome" style="padding=30px"></h5>
-               </header>
-               <div class="w3-container" id="progressContainer">
-               	<button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="check_elements()">go</button></br>
-               </div>
-               <footer class="w3-container">
-                 <h5 id="friendList"></h5>
-             </footer>
-               </div>
- 
- 
-       </div>
-	</body>
-	<script type="text/javascript">
+function build_like_dictionary(likes_weighted_edges,graph,access_token){
 
-access_token = "418fdf4e8dd85e54e8bf8e7c1e551395c677a21c27b59a87e35fe8226577a44a4f541209f5c5fd421c73c"
-	
 	function extend(obj, src) {
 	    for (var key in src) {
 	        if (src.hasOwnProperty(key)) obj[key] = src[key];
@@ -174,11 +144,11 @@ function build_query_likes_get(posts_array){
 			})
 		});
 		weight_edges(graph,weighted_edges_graph);
-		console.log(graph.edges)
+		
 	}
 
 	function weight_edges(graph,weighted_edges_graph){
-		something = graph.edges.map(function (edge){
+		graph.edges["mutual"].map(function (edge){
 			if ((edge.from in weighted_edges_graph) && (edge.to in weighted_edges_graph[edge.from])) {
 				edge["value"] = weighted_edges_graph[edge.from][edge.to];
 				edge["arrow"] = "to";
@@ -188,20 +158,17 @@ function build_query_likes_get(posts_array){
 		});
 	}
 
-	repost_min = 1;
-	repost_max = 5;
-	like_min = 1;
-	like_max = 20;
-	id_to_likes = {};
-	posts_to_check_reposts = [];
-	posts_to_check_likes = [];
-	weighted_edges_graph = {}
+	var repost_min = 1;
+	var repost_max = 5;
+	var like_min = 1;
+	var like_max = 20;
+	var id_to_likes = {};
+	var posts_to_check_reposts = [];
+	var posts_to_check_likes = [];
+	var weighted_edges_graph = {}
 
-	histogram = {"posts_to_check_reposts":{},"posts_to_check_likes":{}}
-	
+	var histogram = {"posts_to_check_reposts":{},"posts_to_check_likes":{}}
 
-	splice_dict = build_splice_dict(test_data.friends);
+	var splice_dict = build_splice_dict(test_data.friends);
 	get_mass_wall_posts(splice_dict,Object.keys(splice_dict).length-1)
-
-
-	</script>
+}

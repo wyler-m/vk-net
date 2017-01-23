@@ -1,6 +1,6 @@
 
 
-function build_like_dictionary(likes_dict,graph,update_function,access_token){
+function build_like_dictionary(likes_dict,graph,access_token){
 
 	so = setOps;
 	var	progbar = document.getElementById("likesProgbar")
