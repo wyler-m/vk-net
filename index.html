@@ -474,8 +474,8 @@ function change_weights_centrality(){
 function change_node_size(weight_type,normalization,use_rank){
   //normilzation can be linear, quad, or log
   //weigh_type is the name of the weight dictionary being used
-  console.log("vars",weight_type,normalization,use_rank)
   if (normalization.length > 0) {
+  console.log("vars",weight_type,normalization,use_rank)
     cur_graph.normalize_weights(normalization,weight_type,use_rank == "true" ? true : false);
     cur_graph.set_weights(normalization+" "+weight_type+" "+use_rank,data_set);
   }else{

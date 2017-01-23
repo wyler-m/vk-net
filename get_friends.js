@@ -11,7 +11,7 @@ function get_friends(graph,access_token){
 				update_progress(Object.keys(splice_dict).length-1, splice_index-1) // from index
 				if (splice_index>0) {
 			 		if (data["error"]!=undefined) {
-						console.log("splice error",splice_index)
+						console.log("splice error",splice_index,data)
 			 			setTimeout(function(){
 			 			mass_friend_list(splice_dict,splice_index)
 			 		},300);

@@ -4,6 +4,7 @@ class graph {
     this.nodesRetrieved = false;
     this.nodes = [];
     this.edges = [];
+    this.followers = [];
     this.weightsDictionary = {
                     "degree":{},
                     "popularity":{},
@@ -59,7 +60,7 @@ class graph {
       if (newLinks) {
         this.nodeToNeighbors[currentNode] = newLinks;
         for (var i = newLinks.length - 1; i >= 0; i--) {
-            this.make_link(newLinks[i],currentNode);          
+            this.make_link(currentNode,newLinks[i]);          
         };
       };
     };
@@ -68,14 +69,16 @@ class graph {
 
   make_link(source,target){
     var sum_id = target+source;
-    var rev_sum_id = source+target;
-    if (rev_sum_id in this.weightsDictionary.degree){
-      return;
+    var reversed_sum_id = source+target;
+    if (reversed_sum_id in this.weightsDictionary.degree){
+      this.edges.push({"from":source,"to":target,"hidden":false, "physics":false,"arrows":"to"});
+      // this.count_degree(source); 
+      this.count_degree(target);
+    } else {
+      this.count_degree(target);
+      this.edges.push({"from":source,"to":target,"hidden":false, "physics":true,"arrows":"to"});
+      this.weightsDictionary.degree[sum_id] = 1;
     }
-    this.weightsDictionary.degree[sum_id] = 1;
-    this.count_degree(source); 
-    this.count_degree(target);
-    this.edges.push({"from":source,"to":target});
   }
 
   count_degree(id){
@@ -176,6 +179,8 @@ class graph {
       for (var i = this.nodes.length - 1; i >= 0; i--) {
         var deg = 0    
         if (!(this.nodes[i].small_pic=="https://vk.com/images/deactivated_100.png")){
+            console.log("eight type",weight_type)
+
           deg = this.weightsDictionary[weight_type][this.nodes[i]["id"]];
           deg = deg ? deg : 0
         }
