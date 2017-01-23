@@ -3,8 +3,7 @@ class graph {
     this.friends = null;
     this.nodesRetrieved = false;
     this.nodes = [];
-    this.edges = [];
-    this.followers = [];
+    this.edges = {"mutual":[],"one_way":[],"checked":{}};
     this.weightsDictionary = {
                     "degree":{},
                     "popularity":{},
@@ -35,9 +34,11 @@ class graph {
   }
 
   add_details(res){
-    if (res.photo_200 == undefined) {res.photo_200 = "http://vk.com/images/camera_200.png"};
-    this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>", small_pic:res.photo_100, group:res.city } );
-    if (!(this.unique_cities.includes(res.city))){this.unique_cities.push(res.city)}
+    if (!(res.deactivated)){
+      if (res.photo_200 == undefined) {res.photo_200 = "http://vk.com/images/camera_200.png"};
+      if (!(this.unique_cities.includes(res.city))){this.unique_cities.push(res.city)}
+      this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>", small_pic:res.photo_100, group:res.city } );
+    } else {console.log(res)}
   } 
 
   add_city_info(){
@@ -49,9 +50,14 @@ class graph {
   }
   
   add_all_connections(){
+    //build mutual friends edges
     for (var i in this.nodeToFriends){
         this.add_new_connections(i)              
       }
+    //build subscribers dictionary
+    for (var node in this.edges.checked){
+      this.edges.one_way.push(this.edges.checked[node])
+    }
     }
 
   add_new_connections(currentNode){
@@ -70,14 +76,15 @@ class graph {
   make_link(source,target){
     var sum_id = target+source;
     var reversed_sum_id = source+target;
-    if (reversed_sum_id in this.weightsDictionary.degree){
-      this.edges.push({"from":source,"to":target,"hidden":false, "physics":false,"arrows":"to"});
-      // this.count_degree(source); 
+    if (reversed_sum_id in this.edges.checked){
+      this.edges.mutual.push({"from":source,"to":target,"hidden":false, "physics":true});
+      this.edges.mutual.push({"from":target,"to":source,"hidden":true, "physics":false,"arrows":"to"});
       this.count_degree(target);
+      this.count_degree(source);      
+
+      delete this.edges.checked[reversed_sum_id];
     } else {
-      this.count_degree(target);
-      this.edges.push({"from":source,"to":target,"hidden":false, "physics":true,"arrows":"to"});
-      this.weightsDictionary.degree[sum_id] = 1;
+      this.edges.checked[sum_id] = {"from":source,"to":target,"hidden":false, "physics":true,"arrows":"middle"};
     }
   }
 
@@ -88,14 +95,14 @@ class graph {
   }
 
   get_density(){
-        return this.edges.length / this.nodes.length / (this.nodes.length - 1) * 2;
+        return this.edges.mutual.length / this.nodes.length / (this.nodes.length - 1) * 2;
     }
 
 //generate nodes popularity 
   weight_nodes_popularity(){
     //iterate through edges, to get the "popularity" for each node
-    for (var i = 0; i < this.edges.length; i++) {
-      this.run_pop_dict(this.edges[i].to, this.edges[i].from);
+    for (var i = 0; i < this.edges.mutual.length; i++) {
+      this.run_pop_dict(this.edges.mutual[i].to, this.edges.mutual[i].from);
     };
 
   }
@@ -151,20 +158,23 @@ class graph {
 
 
     normalize_weights(scale_type,weight_type,use_rank){
-      var dict_name = scale_type+" "+weight_type+" "+ use_rank == "" ? "" : use_rank == "true" ? true : false;
+      use_rank = use_rank == "true" ? "true" : "false";
+      var dict_name = scale_type+" "+weight_type +" "+use_rank;
+      console.log(dict_name)
       var scaling_function = {"linear":function(rank) {return (rank)},
                               "quad":function(rank) {return Math.pow(rank,2)},
                               "log":function(rank) {return Math.round(Math.log(rank+1)*100)}  
                               }
 
-      var ranked_weights = this.rank_weights(weight_type);
       if (!(dict_name in this.weightsDictionary)) {
         this.weightsDictionary[dict_name] = {}
         var nodes = Object.keys(this.weightsDictionary.degree);
+        if (use_rank == "true") {
+          var ranked_weights = this.rank_weights(weight_type);          
+        };
         for (var i = 0; i < nodes.length; i++) {
           var weight = this.weightsDictionary[weight_type][nodes[i]];
-          if (use_rank) {
-            console.log("use_rank",use_rank)
+          if (use_rank == "true") {
             var node_rank = ranked_weights.indexOf(weight);
             this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](node_rank);
           } else{
@@ -179,8 +189,6 @@ class graph {
       for (var i = this.nodes.length - 1; i >= 0; i--) {
         var deg = 0    
         if (!(this.nodes[i].small_pic=="https://vk.com/images/deactivated_100.png")){
-            console.log("eight type",weight_type)
-
           deg = this.weightsDictionary[weight_type][this.nodes[i]["id"]];
           deg = deg ? deg : 0
         }

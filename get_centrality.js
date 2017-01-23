@@ -35,7 +35,7 @@ function get_centrality(graph,network){
 		while (Q.length > 0){ 	// while Q not empty do
 			var v = Q.shift();	// dequeue v ← Q;
 			S.push(v)			// push v → S;		
-			v_neighbors = getNeigbor(v,network)
+			v_neighbors = getNeigbor(v,network)		// From outside the class
 			v_neighbors.forEach(function (w){  		// foreach neighbor w of v do
 	 			// w found for the first time? 
 				if (d[w] < 0) { 					// if d[w] < 0 then

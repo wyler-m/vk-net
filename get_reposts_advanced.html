@@ -1,0 +1,104 @@
+<html>
+	<head>
+		<title>reposter</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="w3.css">
+		<script src="test_wyler.js"></script>
+		<script src="setOps.js"></script>
+		<script src="graphClass.js"></script>
+		<script src="reposts.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+		<div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:block;z-index:1" id="card">
+ 
+               <header class="w3-container">
+                 <h5 id="welcome" style="padding=30px"></h5>
+               </header>
+               <div class="w3-container" id="progressContainer">
+               	<button class="w3-btn-block w3-hover-blue w3-border w3-border-red w3-white" style="width:90%" onclick="check_elements()">go</button></br>
+               </div>
+               <footer class="w3-container">
+                 <h5 id="friendList"></h5>
+             </footer>
+               </div>
+ 
+ 
+       </div>
+	</body>
+	<script type="text/javascript">
+
+access_token = "418fdf4e8dd85e54e8bf8e7c1e551395c677a21c27b59a87e35fe8226577a44a4f541209f5c5fd421c73c"
+	
+	function get_mass_wall_posts(splice_dict,splice_index){
+		code = build_query(splice_dict[splice_index]);
+		var query = `https://api.vk.com/method/execute?access_token=${access_token}&code=${code}`;
+		// setTimeout(function(){
+			$.get(query, function(data, status){ 
+				console.log("data",data)
+				if (splice_index>-1) {
+			 		if (data["error"]!=undefined) {
+						console.log("splice error",splice_index,data)
+			 			setTimeout(function(){
+			 				get_mass_wall_posts(splice_dict,splice_index)
+			 			},300);
+			 		}else{
+			 			data.response.map(function (posts_array){posts_array.shift(); 
+			 				posts_array.map(function (post){
+				 				if (!(post.reposts.count < 10)) {
+				 					posts_to_check.push(post)
+				 				}
+			 				});
+			 			;})
+			 			get_mass_wall_posts(splice_dict,splice_index-1)
+			 		}	
+			 	}else{
+			 		console.log(posts_to_check);
+			 		console.log("done!")
+				}	
+			})
+		// },150);
+	}
+
+
+	// function build_query(friends){
+	// 	var code_block = ""
+	// 	if (friends) {
+	// 		var first = friends.pop();
+	// 			 code_block = `return{"${first}": API.wall.get({"owner_id":${first}})`;
+	// 		for (var i in friends) {
+	// 			code_block += `,"${friends[i]}": API.wall.get({"owner_id":${friends[i]}})`;
+	// 			};
+	// 		code_block += "};"
+	// 		console.log(code_block)		
+	// 		return code_block
+	// 	}
+	// }
+
+	function build_query(friends){
+		var code_block = ""
+		if (friends) {
+			var first = friends.pop();
+				 code_block = `return[API.wall.get({"owner_id":${first}})`;
+			for (var i in friends) {
+				code_block += `,API.wall.get({"owner_id":${friends[i]}})`;
+				};
+			code_block += "];"
+			return code_block
+		}
+	}
+	post_min = 10
+	posts_to_check = [];
+	var splice_dict = {};
+	var splices = 0;
+	var temp_friend_list = Object.assign([], test_data.friends);
+	while (temp_friend_list.length>0){
+		splice_dict[splices] = temp_friend_list.splice(0,25);
+		splices++;
+	}
+	get_mass_wall_posts(splice_dict,Object.keys(splice_dict).length-1)
+
+
+	</script>
