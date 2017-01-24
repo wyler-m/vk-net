@@ -287,373 +287,355 @@ $("#givenLikes").hide();
 $("#receivedLikes").hide();
 $("#buildSelected").hide();
 // $("#calcLikes").hide();
+$("#selectedName").click(function() {});
+$("#buildSelected").click(function() {});
 
+function ga_onclick(element, action) {
+  ga('send', 'event', {
+    'eventCategory': 'link out',
+    'eventAction': action,
+    'eventLabel': $(element).attr("href")
+  });
+}
 
-$("#selectedName").click(function(){
-});
-
-$("#buildSelected").click(function(){
-});
-
-function ga_onclick(element,action){
-      ga( 'send', 'event', {
-          'eventCategory': 'link out',
-          'eventAction': action,
-          'eventLabel': $(element).attr("href")
-        }); 
-  }
-
-function insertNodeInfo (argument) {
+function insertNodeInfo(argument) {
   var nodeInfo = data_set.get(argument.nodes[0])
   if (cur_graph.nodeToFriends[nodeInfo.id]) {
     var total_friends = cur_graph.nodeToFriends[argument.nodes[0]].length;
-  }else {var total_friends = 0
+  } else {
+    var total_friends = 0
   };
   $("#nodeInfo").toggle();
   // $("#controlDiv").toggle();
-
   $("#selectedName").text(nodeInfo.label);
   $("#foundName").text(nodeInfo.label);
-
-  $("#toolTipName").attr("innerHTML","nodeInfo.label");
-  $("#selectedPic").attr("src",nodeInfo.small_pic);
-
+  $("#toolTipName").attr("innerHTML", "nodeInfo.label");
+  $("#selectedPic").attr("src", nodeInfo.small_pic);
   $("#selectedImportance").text("Average Rank: " + nodeInfo.value);
   document.getElementById("vkId").value = nodeInfo.id;
-
   if (nodeInfo.id in cur_graph.weightsDictionary.degree) {
     $("#selectedDegree").text("Connections: " + cur_graph.weightsDictionary.degree[nodeInfo.id]);
-  } else {$("#selectedDegree").text("no connections")};
-  
-  $("#selectedName").attr("href","https://www.vk.com/id"+nodeInfo.id);
+  } else {
+    $("#selectedDegree").text("no connections")
+  };
 
-  if (nodeInfo.id && (nodeInfo.small_pic!="https://vk.com/images/deactivated_100.png")){
-    $("#buildSelected").text("Строй График ("+ total_friends + " friends)");
-    $("#buildGraphButton").text("Строй График ("+ total_friends + " friends)");
-    $("#buildSelected").attr("href","https://wyler-m.github.io/vk-net#user_id="+nodeInfo.id);
+  $("#selectedName").attr("href", "https://www.vk.com/id" + nodeInfo.id);
+  if (nodeInfo.id && (nodeInfo.small_pic != "https://vk.com/images/deactivated_100.png")) {
+    $("#buildSelected").text("Строй График (" + total_friends + " friends)");
+    $("#buildGraphButton").text("Строй График (" + total_friends + " friends)");
+    $("#buildSelected").attr("href", "https://wyler-m.github.io/vk-net#user_id=" + nodeInfo.id);
     $("#buildSelected").show();
-
-  } else {$("#buildSelected").hide();};
-
+  } else {
+    $("#buildSelected").hide();
+  };
 };
 
 function parseURLParams() {
-    var params = {};
-    var args = window.location.href.split('#');
-    if (args[1]) {
-      var param_array = args[1].split('&');
-      for(var i in param_array){
-          x = param_array[i].split('=');
-          params[x[0]] = x[1];
-      }
-    };
-    return params;
+  var params = {};
+  var args = window.location.href.split('#');
+  if (args[1]) {
+    var param_array = args[1].split('&');
+    for (var i in param_array) {
+      x = param_array[i].split('=');
+      params[x[0]] = x[1];
+    }
+  };
+  return params;
 }
 
-function update_progress(total_v, current_v){
+function update_progress(total_v, current_v) {
   var progbar = document.getElementById("progbar");
   var text = document.getElementById("friendList");
-  if (current_v >= 0 ) {
-    text.innerHTML = "Added "+ (total_v - current_v)*25 +" of " + total_v*25 + " friends";
-    progbar.style.width = (total_v - current_v)/total_v *100 +'%';
-    } else {progbar.style.width = 0 +'%'; text.innerHTML = ""; } ;
+  if (current_v >= 0) {
+    text.innerHTML = "Added " + (total_v - current_v) * 25 + " of " + total_v * 25 + " friends";
+    progbar.style.width = (total_v - current_v) / total_v * 100 + '%';
+  } else {
+    progbar.style.width = 0 + '%';
+    text.innerHTML = "";
+  };
 }
 
-
-function freeze_graph(){  
+function freeze_graph() {
   if (network) {
     network.stopSimulation();
   };
 }
- 
-function fetchCityInfo(){
-  var city_ids = cur_graph.unique_cities.join();
-  var query = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids,'&lang=ru&');
 
-  $.get(query, function(result, status){              
-         var cityArray = result["response"];
-    for (var element in cityArray){
+function fetchCityInfo() {
+  var city_ids = cur_graph.unique_cities.join();
+  var query = 'https://api.vk.com/method/database.getCitiesById?city_ids='.concat(city_ids, '&lang=ru&');
+  $.get(query, function(result, status) {
+    var cityArray = result["response"];
+    for (var element in cityArray) {
       cur_graph.city_dict[cityArray[element].cid] = cityArray[element].name;
     }
   });
 }
 
-
 function fetchDetails(id) {
-    var y = '';
-    if (access_token) {
-      y = "&access_token="+access_token;
-    };
-
-    var query = 'https://api.vk.com/method/users.get?uids='.concat(id,y,'&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100');   
-
-    $.get(query, function(result, status){              
-      if ('error' in result) {
-        console.log("error in fetch result",result)
-        fetchDetails(result.error.request_params[2].value)
-      } 
-    else {
+  var y = '';
+  if (access_token) {
+    y = "&access_token=" + access_token;
+  };
+  var query = 'https://api.vk.com/method/users.get?uids='.concat(id, y, '&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100');
+  $.get(query, function(result, status) {
+    if ('error' in result) {
+      console.log("error in fetch result", result)
+      fetchDetails(result.error.request_params[2].value)
+    } else {
       if (!cur_graph.first_pass) {
-      var res_array = result["response"];
+        var res_array = result["response"];
         cur_graph.add_details_array(res_array);
         fetchCityInfo();
-      } 
-      else {
-      var res = result["response"][0];
+      } else {
+        var res = result["response"][0];
         cur_graph.first_pass = false;
         cur_graph.init_owner(res);
-        document.getElementById("welcome").innerHTML = res.first_name +" "+res.last_name;
+        document.getElementById("welcome").innerHTML = res.first_name + " " + res.last_name;
       };
-    };    
-});}
-
-
-
+    };
+  });
+}
 
 function fetchFriendList(id) {
-    if (!id) {
-      var x;
-      x = document.getElementById("vkId").value;
-      fetchDetails(x);
-    } else {x = id; cur_graph.currentNode = id;};
-
-    var y = '';
-    if (access_token) {
-      y = "&access_token="+access_token;
-    };
-
-    //get the list of friends
-    var query = 'https://api.vk.com/method/friends.get?uid='.concat(x,y,'&order=hints');
-
-    $.get(query, function(result, status){
+  if (!id) {
+    var x;
+    x = document.getElementById("vkId").value;
+    fetchDetails(x);
+  } else {
+    x = id;
+    cur_graph.currentNode = id;
+  };
+  var y = '';
+  if (access_token) {
+    y = "&access_token=" + access_token;
+  };
+  //get the list of friends
+  var query = 'https://api.vk.com/method/friends.get?uid='.concat(x, y, '&order=hints');
+  $.get(query, function(result, status) {
     //add friends  to current graph
-      cur_graph.init_friends(result);  
-
-      //get the details for the nodes
-      var nodes = Object.assign([], cur_graph.friends); 
-      while (nodes.length>0){
-          var node = nodes.splice(0,100);
-          fetchDetails(node.join());  
-      } 
-      //builds all the links, delayed based on the number of calls to get node deatials
-      setTimeout(function() {
-        get_friends(cur_graph,access_token);
-      }, 3*cur_graph.friends.length);   
-    })
+    cur_graph.init_friends(result);
+    //get the details for the nodes
+    var nodes = Object.assign([], cur_graph.friends);
+    while (nodes.length > 0) {
+      var node = nodes.splice(0, 100);
+      fetchDetails(node.join());
+    }
+    //builds all the links, delayed based on the number of calls to get node deatials
+    setTimeout(function() {
+      get_friends(cur_graph, access_token);
+    }, 3 * cur_graph.friends.length);
+  })
 }
-
-
 //used in get_friends method
-function init_graph(){ 
-    cur_graph.add_all_connections();
-    cur_graph.weight_nodes_popularity();
-    cur_graph.weight_nodes_popularity_deg();
-    cur_graph.set_weights("degree");
-    cur_graph.add_city_info()
-    data_set
-    w3_open()
-    redrawAll(); 
+function init_graph() {
+  cur_graph.add_all_connections();
+  cur_graph.weight_nodes_popularity();
+  cur_graph.weight_nodes_popularity_deg();
+  cur_graph.set_weights("degree");
+  cur_graph.add_city_info()
+  data_set
+  w3_open()
+  redrawAll();
 }
 
-function constuct_like_dict(){
+function test() {
+  var data = {
+    nodes: data_set,
+    edges: cur_graph.edges.likes // cur_graph.edges.one_way
+  };
+  network.setData(data);
+}
+
+function constuct_like_dict() {
   $("#likesProgbarContainer").show();
-  var likes_dict = {"received":{},"given":{}};
+  var likes_dict = {
+    "received": {},
+    "given": {}
+  };
   var likes_weighted_edges = [];
   // build_like_dictionary(likes_dict,cur_graph,access_token);
-  build_like_dictionary(likes_dict,cur_graph,access_token);
+  console.log("grap edges outside", cur_graph.edges);
+  build_like_dictionary(likes_dict, cur_graph, access_token);
+  console.log("grap edges after", cur_graph.edges);
   // cur_graph.weightsDictionary["given"] = likes_dict["given"];
   // cur_graph.weightsDictionary["received"] = likes_dict["received"];
   $("#calcLikes").hide();
 }
 
-function showNodesCB(){
-
-options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0 
-// var cur_class = $("#toggleLabels").attr("class");
-var text = $("#toggleLabels").text();
-// $("#toggleLabels").attr("class", cur_class == "w3-btn-block w3-blue w3-hover-black" ? "w3-btn-block w3-black w3-hover-blue" : "w3-btn-block w3-blue w3-hover-black"); 
-$("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
-
-// if(options.nodes.font.size == 0) {options.nodes.font.size = 14;
-// $("#toggleLabels").attr("class","w3-btn-block w3-black w3-hover-blue")
-// } 
+function showNodesCB() {
+  options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0
+    // var cur_class = $("#toggleLabels").attr("class");
+  var text = $("#toggleLabels").text();
+  // $("#toggleLabels").attr("class", cur_class == "w3-btn-block w3-blue w3-hover-black" ? "w3-btn-block w3-black w3-hover-blue" : "w3-btn-block w3-blue w3-hover-black");
+  $("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" : "Show Labels");
+  // if(options.nodes.font.size == 0) {options.nodes.font.size = 14;
+  // $("#toggleLabels").attr("class","w3-btn-block w3-black w3-hover-blue")
+  // }
   // else {options.nodes.font.size = 0;
   // $("#toggleLabels").toggleClass( w3-btn-block w3-black w3-hover-blue")}
-       
-       network.setOptions(options);
-       network.redraw();
-       network.stopSimulation();
- };
 
+  network.setOptions(options);
+  network.redraw();
+  network.stopSimulation();
+};
 
-
-function change_weights_p(){
-  cur_graph.normalize_weights("quad","degree","true");
-  cur_graph.set_weights("quad degree true",data_set);
+function change_weights_p() {
+  cur_graph.normalize_weights("quad", "degree", "true");
+  cur_graph.set_weights("quad degree true", data_set);
   network.redraw();
   network.stopSimulation()
 }
 
-function change_weights_ap(){
-  cur_graph.normalize_weights("linear","popularityDeg",false);
-  cur_graph.set_weights("linear popularityDeg",data_set);
+function change_weights_ap() {
+  cur_graph.normalize_weights("linear", "popularityDeg", false);
+  cur_graph.set_weights("linear popularityDeg", data_set);
   network.redraw();
   network.stopSimulation()
 }
 
-function change_weights_centrality(){
-
-
-  cur_graph.set_weights("centrality",data_set);
+function change_weights_centrality() {
+  cur_graph.set_weights("centrality", data_set);
   network.redraw();
   network.stopSimulation()
 }
 
-function change_node_size(weight_type,normalization,use_rank){
+function change_node_size(weight_type, normalization, use_rank) {
   //normilzation can be linear, quad, or log
   //weigh_type is the name of the weight dictionary being used: degree,centrality,popularity,popularityDeg
   if (!("centrality" in cur_graph.weightsDictionary)) {
-    cur_graph.weightsDictionary["centrality"] = get_centrality(cur_graph,network)
+    cur_graph.weightsDictionary["centrality"] = get_centrality(cur_graph, network)
   };
-
-
   if (normalization.length > 0) {
-    console.log("vars",weight_type,normalization,use_rank)
-    cur_graph.normalize_weights(normalization,weight_type,use_rank == "true" ? "true" : "false");
-    console.log(normalization+" "+weight_type+" "+use_rank)
-    cur_graph.set_weights(normalization+" "+weight_type+" "+use_rank,data_set);
-  }else{
-    cur_graph.set_weights(weight_type,data_set)
+    console.log("vars", weight_type, normalization, use_rank)
+    cur_graph.normalize_weights(normalization, weight_type, use_rank == "true" ? "true" : "false");
+    console.log(normalization + " " + weight_type + " " + use_rank)
+    cur_graph.set_weights(normalization + " " + weight_type + " " + use_rank, data_set);
+  } else {
+    cur_graph.set_weights(weight_type, data_set)
   };
-  // cur_graph.set_weights(weight_type,data_set);    
+  // cur_graph.set_weights(weight_type,data_set);
   // cur_graph.set_weights("degree",data_set);
-
   network.redraw();
   network.stopSimulation()
 }
 
-function change_weights_received(){
+function change_weights_received() {
   // cur_graph.normalize_weights("log","received");
   // cur_graph.set_weights("log received",data_set);
-  cur_graph.set_weights("received",data_set);
+  cur_graph.set_weights("received", data_set);
   network.redraw();
   network.stopSimulation()
 }
 
-function change_weights_given(){
+function change_weights_given() {
   // cur_graph.normalize_weights("log","given");
   // cur_graph.set_weights("log given",data_set);
-  cur_graph.set_weights("given",data_set);
+  cur_graph.set_weights("given", data_set);
   network.redraw();
   network.stopSimulation()
 }
 
-function test_build(){
+function test_build() {
   build_graph(true);
-cur_graph.currentNode = test_data.currentNode  
-cur_graph.edges.mutual = test_data.edges.mutual   
-cur_graph.first_pass = test_data.first_pass   
-cur_graph.friends = test_data.friends
-cur_graph.nodeToFriends = test_data.nodeToFriends  
-cur_graph.nodeToInfo = test_data.nodeToInfo   
-cur_graph.nodes = test_data.nodes   
-cur_graph.nodesRetrieved = test_data.nodesRetrieved   
-cur_graph.ownerInfo = test_data.ownerInfo   
-cur_graph.unCheckedFriends = test_data.unCheckedFriends   
-cur_graph.weightsDictionary = test_data.weightsDictionary  
-redrawAll()
-change_weights_centrality();
+  cur_graph.currentNode = test_data.currentNode
+  cur_graph.edges.mutual = test_data.edges.mutual
+  cur_graph.first_pass = test_data.first_pass
+  cur_graph.friends = test_data.friends
+  cur_graph.nodeToFriends = test_data.nodeToFriends
+  cur_graph.nodeToInfo = test_data.nodeToInfo
+  cur_graph.nodes = test_data.nodes
+  cur_graph.nodesRetrieved = test_data.nodesRetrieved
+  cur_graph.ownerInfo = test_data.ownerInfo
+  cur_graph.unCheckedFriends = test_data.unCheckedFriends
+  cur_graph.weightsDictionary = test_data.weightsDictionary
+  redrawAll()
+  change_weights_centrality();
 }
 
-function save_build(){
-    test_data = {
-    "currentNode" : cur_graph.currentNode,  
-    "nodeToNeighbors" : cur_graph.nodeToNeighbors,
-    "edges" : cur_graph.edges.mutual,   
-    "first_pass" : cur_graph.first_pass,   
-    "friends" : cur_graph.friends,   
-    "nodeToFriends" : cur_graph.nodeToFriends,  
-    "nodeToInfo" : cur_graph.nodeToInfo,   
-    "nodes" : cur_graph.nodes,   
-    "nodesRetrieved" : cur_graph.nodesRetrieved,   
-    "ownerInfo" : cur_graph.ownerInfo,   
-    "unCheckedFriends" : cur_graph.unCheckedFriends,   
-    "weightsDictionary" : cur_graph.weightsDictionary 
+function save_build() {
+  test_data = {
+    "currentNode": cur_graph.currentNode,
+    "nodeToNeighbors": cur_graph.nodeToNeighbors,
+    "edges": cur_graph.edges.mutual,
+    "first_pass": cur_graph.first_pass,
+    "friends": cur_graph.friends,
+    "nodeToFriends": cur_graph.nodeToFriends,
+    "nodeToInfo": cur_graph.nodeToInfo,
+    "nodes": cur_graph.nodes,
+    "nodesRetrieved": cur_graph.nodesRetrieved,
+    "ownerInfo": cur_graph.ownerInfo,
+    "unCheckedFriends": cur_graph.unCheckedFriends,
+    "weightsDictionary": cur_graph.weightsDictionary
+  }
+  document.getElementById("data").innerHTML = JSON.stringify(test_data);
+}
+
+function hide_unhide_selected(selected, hide) {
+  var nodes_to_hide = selected.map(function(x) {
+    return {
+      "id": x,
+      "hidden": hide
     }
-    document.getElementById("data").innerHTML = JSON.stringify(test_data);
-
-}
-
-function hide_unhide_selected(selected,hide){
-
-  var nodes_to_hide = selected.map(function(x){
-   return {"id":x,"hidden":hide}})
+  })
   data_set.update(nodes_to_hide)
 }
 
-
-function canvas_image(){
+function canvas_image() {
   var canvas = document.getElementsByTagName("canvas");
-  var img    = canvas[0].toDataURL("image/png");
-  var img2    = canvas[0].toDataURL("data:application/octet-stream");
+  var img = canvas[0].toDataURL("image/png");
+  var img2 = canvas[0].toDataURL("data:application/octet-stream");
   var apple = document.getElementById("download");
   apple.href = img2;
-  
+
 }
-
-
 //Строй График
 function redrawAll() {
+  $("#graphingCard").attr("class", "w3-card-4 w3-display-topmiddle w3-white w3-border w3-border-blue w3-round-xlarge");
+  $("#progressContainer").hide();
+  $("#mynetwork").show();
+  // create a network
+  var container = document.getElementById('mynetwork');
 
-    $("#graphingCard").attr("class","w3-card-4 w3-display-topmiddle w3-white w3-border w3-border-blue w3-round-xlarge");
-    $("#progressContainer").hide();
-    $("#mynetwork").show();
+  data_set.add(cur_graph.nodes);
 
-
-    // create a network
-    var container = document.getElementById('mynetwork');
-    
-    data_set.add(cur_graph.nodes);
-    
-    var data = {
-      nodes: data_set,
-      edges: cur_graph.edges.mutual // cur_graph.edges.one_way 
-    };
-
-    network = new vis.Network(container, data, options);
-
-    network.on("stabilized", function (params) { $("#freezeGraph").hide();});
-    network.on("startStabilizing", function (params) { $("#freezeGraph").show();});
-    network.on("selectNode", function (params) {        
-        insertNodeInfo(params);
-        var parent = params.nodes[0];
-        var selected = network.getConnectedNodes(parent);
-        selected.push(parent)
-        hide_unhide_selected(so.complement(data_set.getIds(), selected),true)
-        network.stopSimulation()
-    });
-
-    network.on("dragEnd", function (params) {console.log(params,"dragEnd");
-      network.stopSimulation()});
-
-    network.on("deselectNode", function (params) {
-        $("#nodeInfo").hide();
-        var parent = params.nodes[0];
-        var selected = network.getConnectedNodes(parent);
-        selected.push(parent)
-        hide_unhide_selected(data_set.getIds(),false)
-        network.stopSimulation()
-
-    });
-  }
-
-
+  var data = {
+    nodes: data_set,
+    edges: cur_graph.edges.mutual // cur_graph.edges.one_way
+  };
+  network = new vis.Network(container, data, options);
+  network.on("stabilized", function(params) {
+    $("#freezeGraph").hide();
+  });
+  network.on("startStabilizing", function(params) {
+    $("#freezeGraph").show();
+  });
+  network.on("selectNode", function(params) {
+    insertNodeInfo(params);
+    var parent = params.nodes[0];
+    var selected = network.getConnectedNodes(parent);
+    selected.push(parent)
+    hide_unhide_selected(so.complement(data_set.getIds(), selected), true)
+    network.stopSimulation()
+  });
+  network.on("dragEnd", function(params) {
+    console.log(params, "dragEnd");
+    network.stopSimulation()
+  });
+  network.on("deselectNode", function(params) {
+    $("#nodeInfo").hide();
+    var parent = params.nodes[0];
+    var selected = network.getConnectedNodes(parent);
+    selected.push(parent)
+    hide_unhide_selected(data_set.getIds(), false)
+    network.stopSimulation()
+  });
+}
 //https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
 // https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
 //script.src = "https://api.vk.com/method/getProfiles?uid=355065657&callback=callbackFunc";
 //script.src = 'https://api.vk.com/method/friends.get?uid=218868103&order=hints&callback=callbackFunc';
 //script.src = 'https://api.vk.com/method/users.get?uids=2131567&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
-
 // https://api.vk.com/method/wall.get?owner_id=193316384&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
 // https://api.vk.com/method/wall.get?owner_id=42348445&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
 // https://api.vk.com/method/wall.getReposts?owner_id=193316384&post_id=3010&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
@@ -661,33 +643,25 @@ function redrawAll() {
 // https://api.vk.com/method/likes.getList?owner_id=193316384&post_id=3010&type=post&owner_id=42348445&item_id=18553&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
 // http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
 // http://www.almende.com/contact
-
 // var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
-
 // https://api.vk.com/method/users.search?q=rwyler&lang=ru&sort=1&fields=photo_50&access_token=a76141a73a87fbe9c00ba3237ea6a3a412960486cbc6e0301ba0c98059b58f040023f9a0cdc08dd7abec8&expires_in=86400
-
-
 // https://api.vk.com/method/users.get?uids=1216918,16081499,218868103&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=api_FetchDetails
 // 1216918
 // 16081499
 // 218868103
-
 //https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60
-
 // https://api.vk.com/method/friends.get?uid=218868103&v=58&order=hints&lang=ru&fields=first_name,last_name,city,domain,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=callbackFunc
-
-</script>
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-86997959-1', 'auto');
-  ga('send', 'pageview');
-</script>
-
-</html> 
-
-
-
+< /script> < script >
+  (function(i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r;
+    i[r] = i[r] || function() {
+      (i[r].q = i[r].q || []).push(arguments)
+    }, i[r].l = 1 * new Date();
+    a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0];
+    a.async = 1;
+    a.src = g;
+    m.parentNode.insertBefore(a, m)
+  })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+ga('create', 'UA-86997959-1', 'auto');
+ga('send', 'pageview'); < /script> < /html>

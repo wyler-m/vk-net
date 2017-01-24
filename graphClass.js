@@ -78,8 +78,8 @@ class graph {
     var reversed_sum_id = source+target;
     if (reversed_sum_id in this.edges.checked){
       this.edges.mutual.push({"from":source,"to":target,"hidden":false, "physics":true});
-      this.edges.mutual.push({"from":target,"to":source,"hidden":true, "physics":false,"arrows":"to"});
-      this.edges.complete.push({"from":target,"to":source,"hidden":true, "physics":false,"arrows":"to"});
+      this.edges.mutual.push({"from":target,"to":source,"hidden":true, "physics":false});
+      this.edges.complete.push({"from":target,"to":source,"hidden":false, "physics":false});
       this.count_degree(target);
       this.count_degree(source);      
 
