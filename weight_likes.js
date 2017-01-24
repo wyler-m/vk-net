@@ -21,12 +21,12 @@ function build_like_dictionary(likes_weighted_edges,graph,access_token){
 				$("#receivedLikes").show();}
 	}
 
-	function build_splice_dict(test_array){
+	function build_splice_dict(array_ids){
 	console.log("build splice",graph.edges)
 
 		var splice_dict = {};
 		var splices = 0;
-		var temp_friend_list = Object.assign([], test_array);
+		var temp_friend_list = Object.assign([], array_ids);
 		while (temp_friend_list.length>0){
 			splice_dict[splices] = temp_friend_list.splice(0,24);
 			splices++;

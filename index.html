@@ -593,11 +593,38 @@ function save_build(){
 
 }
 
-function hide_unhide_selected(selected,hide){
-
-  var nodes_to_hide = selected.map(function(x){
+function hide_unhide_selected(unselected,selected,hide){
+  //TODO set a "current like dictionary variable"
+  var nodes_to_hide = unselected.map(function(x){
    return {"id":x,"hidden":hide}})
-  data_set.update(nodes_to_hide)
+  
+  if (hide){
+    var temp_edges_dict = Object.assign([], cur_graph.edges["mutual"]);
+    var edges_to_show_dict = [];
+    selected.map(function (id) {
+      for (edge in temp_edges_dict){
+        if ((temp_edges_dict[edge].to == id) && (selected.indexOf(temp_edges_dict[edge].from)>-1)){
+          console.log('selected nodes',edge,id,temp_edges_dict[edge],selected)
+          edges_to_show_dict.push(temp_edges_dict[edge]);
+        }
+      }
+    })
+    var data = {
+      nodes: data_set,
+      edges: edges_to_show_dict // cur_graph.edges.one_way
+    };
+    network.setData(data);
+  }else {
+    edges_to_show_dict = cur_graph.edges.mutual;
+    var data = {
+      nodes: data_set,
+      edges: edges_to_show_dict // cur_graph.edges.one_way
+    };
+    network.setData(data);
+  }
+  data_set.update(nodes_to_hide);
+
+
 }
 
 
@@ -638,7 +665,7 @@ function redrawAll() {
         var parent = params.nodes[0];
         var selected = network.getConnectedNodes(parent);
         selected.push(parent)
-        hide_unhide_selected(so.complement(data_set.getIds(), selected),true)
+        hide_unhide_selected(so.complement(data_set.getIds(), selected),selected,true)
         network.stopSimulation()
     });
 
@@ -650,7 +677,7 @@ function redrawAll() {
         var parent = params.nodes[0];
         var selected = network.getConnectedNodes(parent);
         selected.push(parent)
-        hide_unhide_selected(data_set.getIds(),false)
+        hide_unhide_selected(data_set.getIds(),selected,false)
         network.stopSimulation()
 
     });
