@@ -1,6 +1,6 @@
 
 
-function build_like_dictionary(likes_weighted_edges,graph,access_token){
+function build_like_dictionary(graph,access_token){
 	console.log("starting inside",graph.edges)
 	function extend(obj, src) {
 	    for (var key in src) {
@@ -10,15 +10,15 @@ function build_like_dictionary(likes_weighted_edges,graph,access_token){
 	}
 
 	var	progbar = document.getElementById("likesProgbar")
-
-	function mark_progress(current_step){
-			percent_completed = current_step / (counter + temp_nodes.length) * 100
+	
+	function mark_progress(current_step,max_step){
+			$("#likesProgbarContainer").show();
+			percent_completed = (max_step - current_step) / (max_step) * 100
 			progbar.style.width = percent_completed +'%';
-			progbar.innerHTML = current_step+"/"+(counter + temp_nodes.length)
+			progbar.innerHTML = (max_step - current_step)+"/"+(max_step)
 			if (percent_completed >= 100){
 				$("#likesProgbarContainer").hide()
-				$("#givenLikes").show();
-				$("#receivedLikes").show();}
+			}
 	}
 
 	function build_splice_dict(array_ids){
@@ -33,6 +33,71 @@ function build_like_dictionary(likes_weighted_edges,graph,access_token){
 		}
 		console.log("splice ditc",splice_dict)
 		return splice_dict;
+	}
+
+
+	function make_link(source,target,G){
+
+		if (source in G) {
+			if (target in G[source]) {
+				G[source][target]++;
+			} else{
+				G[source][target] = 1;
+			};
+		} else{
+			G[source] = {}
+			G[source][target] = 1;
+		};
+	}
+
+	function sum_likes(edge) {
+		if (edge.to in graph.weightsDictionary["received"]) {
+			graph.weightsDictionary["received"][edge.to] += edge["value"]; 
+		} else{
+			graph.weightsDictionary["received"][edge.to] = edge["value"]; 
+		};
+
+		if (edge.from in graph.weightsDictionary["given"]) {
+			graph.weightsDictionary["given"][edge.from] += edge["value"]; 
+		} else{
+			graph.weightsDictionary["given"][edge.from] = edge["value"]; 
+		};
+	}
+
+	function weight_edges(graph,weighted_edges_graph){
+		graph.edges["likes"] = [];
+			for (index in graph.edges["complete"]){
+				console.log(graph.edges["complete"][index]);
+				edge = Object.assign([], graph.edges["complete"][index]);
+				if ((edge.from in weighted_edges_graph) && (edge.to in weighted_edges_graph[edge.from])) {
+				edge["value"] = weighted_edges_graph[edge.from][edge.to];
+				edge["arrows"] = "to";
+				edge["physics"] = true;
+				edge["title"] = edge["value"];
+				edge["arrowStrikethrough"] = false;
+				edge["hidden"] = false;
+				graph.edges["likes"].push(edge);
+				sum_likes(edge);			
+				} 
+			}
+	}
+	function build_weighted_edges_graph(id_to_likes,posts_to_check_likes){
+		// node list
+	console.log("build weighted edges",graph.edges)
+
+		so = setOps;
+		posts_to_check_likes.map(function (element){
+			var target = element.from_id;
+			var post_id = element.id;
+			var likers = id_to_likes[post_id].users;
+			var likers_among_friends = so.union(likers,graph.friends);
+			likers_among_friends.map( function (source){
+				make_link(source,target,weighted_edges_graph);
+			})
+		});
+		weight_edges(graph,weighted_edges_graph);
+		console.log("done calculating weights from likes")
+		set_type_edges("likes");
 	}
 
 	function build_query_wall_get(friends){
@@ -51,6 +116,7 @@ function build_like_dictionary(likes_weighted_edges,graph,access_token){
 	}
 
 	function get_mass_wall_posts(splice_dict,splice_index){
+	mark_progress(splice_index,Object.keys(splice_dict).length);
 	console.log("get mass wall",graph.edges)
 
 			if (splice_index>-1) {
@@ -99,23 +165,25 @@ function build_like_dictionary(likes_weighted_edges,graph,access_token){
 		}
 	}
 
-function build_query_likes_get(posts_array){
-	console.log("query get likes",graph.edges)
+	function build_query_likes_get(posts_array){
+		console.log("query get likes",graph.edges)
 
-		var code_block = ""
-		if (posts_array) {
-			var first = posts_array.pop();
-				 code_block = `return{"${first.id}":API.likes.getList({"type":"post","owner_id":${first.from_id},"item_id":${first.id},"count":1000})`;
-			for (var i in posts_array) {
-				code_block += `,"${posts_array[i].id}":API.likes.getList({"type":"post","owner_id":${posts_array[i].from_id},"item_id":${posts_array[i].id},"count":1000})`;
-				};
-			code_block += "};"
-			return code_block
+			var code_block = ""
+			if (posts_array) {
+				var first = posts_array.pop();
+					 code_block = `return{"${first.id}":API.likes.getList({"type":"post","owner_id":${first.from_id},"item_id":${first.id},"count":1000})`;
+				for (var i in posts_array) {
+					code_block += `,"${posts_array[i].id}":API.likes.getList({"type":"post","owner_id":${posts_array[i].from_id},"item_id":${posts_array[i].id},"count":1000})`;
+					};
+				code_block += "};"
+				return code_block
+			}
 		}
-	}
+
 
 
 	function check_posts(splice_dict,splice_index){
+	mark_progress(splice_index,Object.keys(splice_dict).length);
 	console.log("check posts",graph.edges)
 
 			if (splice_index>-1) {
@@ -136,62 +204,14 @@ function build_query_likes_get(posts_array){
 			}else{
 				console.log("done with posts");
 				build_weighted_edges_graph(id_to_likes,posts_to_check_likes);
+				$("#givenLikes").show();
+				$("#receivedLikes").show();
+				$("#likeEdges").show();
 			}
 		}
 
 
-	function make_link(source,target,G){
 
-		if (source in G) {
-			if (target in G[source]) {
-				G[source][target]++;
-			} else{
-				G[source][target] = 1;
-			};
-		} else{
-			G[source] = {}
-			G[source][target] = 1;
-		};
-	}
-
-	function build_weighted_edges_graph(id_to_likes,posts_to_check_likes){
-		// node list
-	console.log("build weighted edges",graph.edges)
-
-		so = setOps;
-		posts_to_check_likes.map(function (element){
-			var target = element.from_id;
-			var post_id = element.id;
-			var likers = id_to_likes[post_id].users;
-			var likers_among_friends = so.union(likers,graph.friends);
-			likers_among_friends.map( function (source){
-				make_link(source,target,weighted_edges_graph);
-			})
-		});
-		weight_edges(graph,weighted_edges_graph);
-		console.log("done calculating weights from likes")
-		test();
-	}
-
-	function weight_edges(graph,weighted_edges_graph){
-		console.log("grap edges inside",graph.edges)
-		graph.edges["likes"] = [];
-		graph.edges["mutual"].map(function (edge){
-			if ((edge.from in weighted_edges_graph) && (edge.to in weighted_edges_graph[edge.from])) {
-				edge["value"] = weighted_edges_graph[parseInt(edge.from)][parseInt(edge.to)];
-				edge["arrows"] = "to";
-				edge["physics"] = true;
-				edge["title"] = edge["value"];
-				edge["arrowStrikethrough"] = false;
-				edge["hidden"] = false;
-
-			graph.edges["likes"].push(edge);			
-
-			} else {
-				// edge["value"] = 0;
-			};
-		});
-	}
 	
 	var repost_min = 1;
 	var repost_max = 5;

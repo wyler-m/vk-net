@@ -5,9 +5,8 @@ function get_friends(graph,access_token){
 	function mass_friend_list(splice_dict,splice_index){
 		code = build_query(splice_dict[splice_index]);
 		var query = `https://api.vk.com/method/execute?access_token=${access_token}&code=${code}`;
-		// setTimeout(function(){
+		
 			$.get(query, function(data, status){ 
-
 				update_progress(Object.keys(splice_dict).length-1, splice_index-1) // from index
 				if (splice_index>=0) {
 			 		if (data["error"]!=undefined) {
@@ -22,9 +21,9 @@ function get_friends(graph,access_token){
 			 	}else{
 			 		$.extend(graph.nodeToFriends, data.response);
 			 		init_graph(); // from index
+			 		construct_like_dict() //from index
 				}	
 			})
-		// },150);
 	}
 
 	function build_query(friends){

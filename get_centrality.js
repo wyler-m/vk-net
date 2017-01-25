@@ -4,6 +4,7 @@ function get_centrality(graph,network){
 	var V = graph.nodes;
 
 	function getNeigbor(node) {
+
 		return network.getConnectedNodes(node);
 	}
 

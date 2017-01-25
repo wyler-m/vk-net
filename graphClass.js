@@ -55,8 +55,9 @@ class graph {
         this.add_new_connections(i)              
       }
     //build subscribers dictionary
-    for (var node in this.edges.checked){
-      this.edges.one_way.push(this.edges.checked[node])
+    for (var sum_id in this.edges.checked){
+      this.edges.one_way.push(this.edges.checked[sum_id])
+      this.edges.complete.push(this.edges.checked[sum_id])
     }
   }
 
@@ -66,7 +67,7 @@ class graph {
       if (newLinks) {
         this.nodeToNeighbors[currentNode] = newLinks;
         for (var i = newLinks.length - 1; i >= 0; i--) {
-            this.make_link(currentNode,newLinks[i]);          
+            this.make_link(parseInt(currentNode),parseInt(newLinks[i]));          
         };
       };
     };
@@ -75,18 +76,16 @@ class graph {
 
   make_link(source,target){
     var sum_id = target+source;
-    var reversed_sum_id = source+target;
-    if (reversed_sum_id in this.edges.checked){
+    if (sum_id in this.edges.checked){
       this.edges.mutual.push({"from":source,"to":target,"hidden":false, "physics":true});
       this.edges.mutual.push({"from":target,"to":source,"hidden":true, "physics":false});
-      this.edges.complete.push({"from":target,"to":source,"hidden":false, "physics":false});
+      this.edges.complete.push({"from":target,"to":source,"hidden":false, "physics":true});
       this.count_degree(target);
       this.count_degree(source);      
 
-      delete this.edges.checked[reversed_sum_id];
+      delete this.edges.checked[sum_id];
     } else {
       this.edges.checked[sum_id] = {"from":source,"to":target,"hidden":false, "physics":true,"arrows":"middle"};
-      this.edges.complete.push({"from":source,"to":target,"hidden":false, "physics":true,"arrows":"to"});
     }
   }
 
@@ -95,10 +94,6 @@ class graph {
       this.weightsDictionary.degree[id] ++ ;
     } else {this.weightsDictionary.degree[id] = 1};
   }
-
-  get_density(){
-        return this.edges.mutual.length / this.nodes.length / (this.nodes.length - 1) * 2;
-    }
 
 //generate nodes popularity 
   weight_nodes_popularity(){

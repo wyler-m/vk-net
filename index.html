@@ -68,21 +68,22 @@
 
         <button id ="receivedLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button></br>
         <button id ="givenLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button></br>
-        <button id="calcLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="construct_like_dict()">calc likes</button></br>
+        <!-- <button id="calcLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="construct_like_dict()">calc likes</button></br> -->
         
         <div class="w3-progress-container w3-round w3-large w3-round" id="likesProgbarContainer" hidden>
           <div class="w3-progressbar w3-round w3-red w3-text-black" id="likesProgbar" style="width:0%"></div>
         </div>
     </div>
-    <button onclick="collaps_control('followers_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Followers</button>
+    <button onclick="collaps_control('followers_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Edge Type</button>
 
     <div id="followers_controls" class="w3-accordion-content">
-        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_centrality()">Mutual Friends</button></br>
-        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick='change_node_size("degree","")'>Friends and Followers</button></br>
-        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('degree','quad')">Only Followers</button></br>
+        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('complete')">Friends And Followers</button></br>
+        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('mutual')">No followers</button></br>
+        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('one_way')">Only Followers</button></br>
+        <button id="likeEdges"class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('likes')">Likes</button></br>
     </div>
 
-  <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodesCB()" id="toggleLabels">Show Labels</button>
+  <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodeLables()" id="toggleLabels">Show Labels</button>
 </div>
 <br>
 <button href="javascript:void(0)" onclick="w3_close()" id="closeMenu" class="w3-btn w3-small w3-round-xxlarge w3-hover-blue w3-border w3-border-blue w3-white"><</button>
@@ -188,7 +189,6 @@ function search_Input(){
       if (data.response[0]==1) {
         $("#foundNameCenter").text(data.response[1].first_name+" "+data.response[1].last_name)
         $("#foundName").text(data.response[1].first_name+" "+data.response[1].last_name)
-        $("#vkId").attr("value","123123");
         document.getElementById("vkId").value = data.response[1]["uid"];
       }else {
         $("#foundNameCenter").text("Напиши Кличку")
@@ -210,6 +210,8 @@ if (params) {
   for (var param in params) {
      if (param == "user_id") {
         document.getElementById("vkId").value = params.user_id; 
+        $("#foundNameCenter").text = params.user_id; 
+        $("#foundNameCenter").text = params.user_id; 
       };
       if (param == "access_token"){
         $("#loginP").hide();  
@@ -223,10 +225,13 @@ if (params) {
 
 
 function build_graph(test){
-
+  $("#calcLikes").show();
   $("#searchCard").hide();
 	$("#mynetwork").hide();
-	$("#nodeInfo").hide();
+  $("#nodeInfo").hide();
+  $("#receivedLikes").hide();
+  $("#givenLikes").hide();
+  $("#likeEdges").hide();
 	$("#graphingCard").show()	
 	$("#graphingCard").attr("class","w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge");
 	$("#progressContainer").show();
@@ -249,11 +254,14 @@ function build_graph(test){
       },
       edges: {
         width: 0.15,
-        color: {inherit: 'from'},
+        color: {inherit: 'from',
+        opacity:.5},
         smooth: {
           type: 'continuous'
-        }
+        },
+        chosen:true
       },
+
       physics: {
         stabilization: {
           iterations:100
@@ -277,7 +285,9 @@ function build_graph(test){
     };
     data_set = new vis.DataSet(options);
 
-	if (!test) {fetchFriendList()};
+	if (!test) { 
+    fetchFriendList();
+    };
 	};
 
 w3_close()
@@ -455,27 +465,29 @@ function init_graph(){
     redrawAll(); 
 }
 
-function test() {
+function set_type_edges(type) {
+  new_edge_dict = true;
+  network.storePositions();
   var data = {
     nodes: data_set,
-    edges: cur_graph.edges.likes // cur_graph.edges.one_way
+    edges: cur_graph.edges[type] // cur_graph.edges.one_way
   };
   network.setData(data);
+  setTimeout(function() {
+    network.stopSimulation();
+  },3000);
 }
 
 
 function construct_like_dict(){
   $("#likesProgbarContainer").show();
-  var likes_dict = {"received":{},"given":{}};
+  cur_graph.weightsDictionary["given"] = {};
+  cur_graph.weightsDictionary["received"] = {};
   var likes_weighted_edges = [];
-  // build_like_dictionary(likes_dict,cur_graph,access_token);
-  build_like_dictionary(likes_dict,cur_graph,access_token);
-  // cur_graph.weightsDictionary["given"] = likes_dict["given"];
-  // cur_graph.weightsDictionary["received"] = likes_dict["received"];
-  $("#calcLikes").hide();
+  build_like_dictionary(cur_graph,access_token);
 }
 
-function showNodesCB(){
+function showNodeLables(){
 
 options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0 
 // var cur_class = $("#toggleLabels").attr("class");
@@ -494,40 +506,33 @@ $("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
        network.stopSimulation();
  };
 
+//get all the edges in a group
+ // var connected_edges = [];
+        // selected_nodes.push(parent)
+        
+        // selected_nodes.forEach( function(node, index) {
+        //   var edges = network.getConnectedEdges(node);
+        //   edges.forEach( function(edge, index) {
+        //       if (so.intersection(network.getConnectedNodes(edge),selected_nodes).length == 2) {
+        //         connected_edges = so.union(connected_edges,[edge]);
+        //       };    
+        //   });
+        // });
+        // network.setSelection({"nodes":parent,"edges":connected_edges});
 
-
-function change_weights_p(){
-  cur_graph.normalize_weights("quad","degree","true");
-  cur_graph.set_weights("quad degree true",data_set);
-  network.redraw();
-  network.stopSimulation()
-}
-
-function change_weights_ap(){
-  cur_graph.normalize_weights("linear","popularityDeg",false);
-  cur_graph.set_weights("linear popularityDeg",data_set);
-  network.redraw();
-  network.stopSimulation()
-}
-
-function change_weights_centrality(){
-
-
-  cur_graph.set_weights("centrality",data_set);
-  network.redraw();
-  network.stopSimulation()
-}
-
+new_edge_dict = false;
 function change_node_size(weight_type,normalization,use_rank){
   //normilzation can be linear, quad, or log
   //weigh_type is the name of the weight dictionary being used: degree,centrality,popularity,popularityDeg
-  if (!("centrality" in cur_graph.weightsDictionary)) {
+  if (!("centrality" in cur_graph.weightsDictionary)) { //||(!new_edge_dict))
+    console.log("recalculated?");
     cur_graph.weightsDictionary["centrality"] = get_centrality(cur_graph,network)
+    new_edge_dict = true;
   };
 
 
   if (normalization.length > 0) {
-    console.log("vars",weight_type,normalization,use_rank)
+    console.log("weighting",weight_type,normalization,use_rank)
     cur_graph.normalize_weights(normalization,weight_type,use_rank == "true" ? "true" : "false");
     console.log(normalization+" "+weight_type+" "+use_rank)
     cur_graph.set_weights(normalization+" "+weight_type+" "+use_rank,data_set);
@@ -594,36 +599,10 @@ function save_build(){
 }
 
 function hide_unhide_selected(unselected,selected,hide){
-  //TODO set a "current like dictionary variable"
+  console.log("selected",selected,unselected,hide)
   var nodes_to_hide = unselected.map(function(x){
    return {"id":x,"hidden":hide}})
-  
-  if (hide){
-    var temp_edges_dict = Object.assign([], cur_graph.edges["mutual"]);
-    var edges_to_show_dict = [];
-    selected.map(function (id) {
-      for (edge in temp_edges_dict){
-        if ((temp_edges_dict[edge].to == id) && (selected.indexOf(temp_edges_dict[edge].from)>-1)){
-          console.log('selected nodes',edge,id,temp_edges_dict[edge],selected)
-          edges_to_show_dict.push(temp_edges_dict[edge]);
-        }
-      }
-    })
-    var data = {
-      nodes: data_set,
-      edges: edges_to_show_dict // cur_graph.edges.one_way
-    };
-    network.setData(data);
-  }else {
-    edges_to_show_dict = cur_graph.edges.mutual;
-    var data = {
-      nodes: data_set,
-      edges: edges_to_show_dict // cur_graph.edges.one_way
-    };
-    network.setData(data);
-  }
   data_set.update(nodes_to_hide);
-
 
 }
 
@@ -660,17 +639,22 @@ function redrawAll() {
 
     network.on("stabilized", function (params) { $("#freezeGraph").hide();});
     network.on("startStabilizing", function (params) { $("#freezeGraph").show();});
-    network.on("selectNode", function (params) {        
+    network.on("selectNode", function (params) { 
+
+        console.log(params)
         insertNodeInfo(params);
         var parent = params.nodes[0];
-        var selected = network.getConnectedNodes(parent);
-        selected.push(parent)
-        hide_unhide_selected(so.complement(data_set.getIds(), selected),selected,true)
+        var selected_nodes = network.getConnectedNodes(parent);
+        selected_nodes.push(parent);
+        hide_unhide_selected(so.complement(data_set.getIds(), selected_nodes),selected_nodes,true)
         network.stopSimulation()
     });
 
-    network.on("dragEnd", function (params) {console.log(params,"dragEnd");
-      network.stopSimulation()});
+    network.on("dragEnd", function (params) {
+        setTimeout(function() {
+          network.stopSimulation();
+          },3000);
+    });
 
     network.on("deselectNode", function (params) {
         $("#nodeInfo").hide();
@@ -681,6 +665,7 @@ function redrawAll() {
         network.stopSimulation()
 
     });
+
   }
 
 

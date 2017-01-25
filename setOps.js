@@ -18,7 +18,7 @@
 // so.difference(a, b); // => [1, 2, 4, 5]
 
 // // The relative complement, or a minus b. A\B
-// so.complement(a, b); // => [1]
+// so.complement(a, b); // => [1,2]
 
 // // Set equality. A = B
 // so.equals(a, b); // => false
