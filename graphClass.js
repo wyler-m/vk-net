@@ -17,6 +17,9 @@ class graph {
     this.first_pass = true;
     this.city_dict = {};
     this.unique_cities = [];
+    this.node_weight_type = 'degree';
+    this.node_normalization = 'linear';
+    this.node_use_rank = 'false';
   }
 
   init_owner(res){

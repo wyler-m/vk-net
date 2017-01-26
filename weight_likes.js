@@ -67,7 +67,6 @@ function build_like_dictionary(graph,access_token){
 	function weight_edges(graph,weighted_edges_graph){
 		graph.edges["likes"] = [];
 			for (index in graph.edges["complete"]){
-				console.log(graph.edges["complete"][index]);
 				edge = Object.assign([], graph.edges["complete"][index]);
 				if ((edge.from in weighted_edges_graph) && (edge.to in weighted_edges_graph[edge.from])) {
 				edge["value"] = weighted_edges_graph[edge.from][edge.to];

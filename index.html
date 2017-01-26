@@ -1,159 +1,158 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>VK Visualizer</title>
-		<link rel="stylesheet" href="vis.css">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="w3.css">
-		<meta charset="utf-8">
-		<!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
+
+<head>
+    <title>VK Visualizer</title>
+    <link rel="stylesheet" href="vis.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="w3.css">
+    <meta charset="utf-8">
+    <!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
     <script src="setOps.js"></script>
     <script src="get_centrality.js"></script>
     <!-- // <script src="get_likes.js"></script> -->
-		<script src="weight_likes.js"></script>
+    <script src="weight_likes.js"></script>
     <script src="graphClass.js"></script>
-		<script src="get_friends.js"></script>
-		<!-- // <script src="test_wyler.js"></script> -->
-		<script src="test_full.js"></script>
-		<!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
-		<script type="text/javascript" src="vis.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-		<!-- // <script type="text/javascript" src="jLouvain.js"></script> -->
+    <script src="get_friends.js"></script>
+    <!-- // <script src="test_wyler.js"></script> -->
+    <script src="test_full.js"></script>
+    <!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
+    <script type="text/javascript" src="vis.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- // <script type="text/javascript" src="jLouvain.js"></script> -->
+</head>
 
-	</head>
- 
 <body>
+    <menu id="controlDiv">
+        <div id="hideDiv">
+            <h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+            <h4 id="foundName"></h4>
+            <input id="vkId" class="w3-input w3-border w3-hover-blue" value="16081499">
+            </p>
+            <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</a>
+            <button onclick="collaps_control('node_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
+            <div id="node_controls" class="w3-accordion-content">
+                
+                scaling
+                <div class="w3-btn-bar">
+                        <img src="http://img.sparknotes.com/figures/F/fa846fa782f745cd8a6fc1cebcb8e275/exp1.gif"class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('quad')"style="width:33.3%">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Linear_sorption_isotherm.svg/656px-Linear_sorption_isotherm.svg.png" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('linear')"style="width:33.3%">
+                                <img src="http://www.itl.nist.gov/div898/handbook/eda/section3/gif/expcdf.gif" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('log')"style="width:33.3%">
 
-<menu id = "controlDiv" >
-<div id = "hideDiv" >
-  <h1 id="logo"><img src= "vk.svg"> visualizer</h1>
-  <h4 id="foundName"></h4>
-  <input id="vkId" class="w3-input w3-border w3-hover-blue" value="16081499"></p>
-  <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</a>
-    <button onclick="collaps_control('node_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
-    <div id="node_controls" class="w3-accordion-content">
-        
-
-    <div class="w3-dropdown-hover" style="width:100">
-      <button class="w3-btn w3-hover-red w3-border w3-border-red w3-white" style="width:150%" onclick="change_node_size('centrality','linear','false')">Centrality</button></br>
-      <div class="w3-dropdown-content w3-border">
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','linear','true')">linear - indexed</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','log','false')">log - normal</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','log','true')">log - indexed</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','quad','false')">quad - normal</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','quad','true')">quad - indexed</a>
-      </div>
-    </div>
-    <div class="w3-dropdown-hover" style="width:100">
-      <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:150%" onclick="change_node_size('degree','linear','false')">Connections</button></br>
-      <div class="w3-dropdown-content w3-border">
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','linear','true')">linear - indexed</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','log','false')">log - normal</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','log','true')">log - indexed</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','quad','false')">quad - normal</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','quad','true')">quad - indexed</a>
-      </div>
-    </div>
-    <div class="w3-dropdown-hover" style="width:100">
-        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:150%" onclick="change_node_size('popularityDeg','linear','false')">"popularity"</button></br>
-      <div class="w3-dropdown-content w3-border">
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','linear','true')">linear - indexed</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','log','false')">log - normal</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','log','true')">log - indexed</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','quad','false')">quad - normal</a>
-        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','quad','true')">quad - indexed</a>
-      </div>
-    </div> 
-
-
-        <button id ="receivedLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button></br>
-        <button id ="givenLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button></br>
-        <!-- <button id="calcLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="construct_like_dict()">calc likes</button></br> -->
-        
-        <div class="w3-progress-container w3-round w3-large w3-round" id="likesProgbarContainer" hidden>
-          <div class="w3-progressbar w3-round w3-red w3-text-black" id="likesProgbar" style="width:0%"></div>
+                </div>
+                normalization
+                <div class="w3-btn-bar">
+                  <button style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('true')">raw</a>
+                            <button style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('false')">indexed</a>
+                </div>
+                weights
+                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('centrality')">centrality</button>
+                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('degree')">degree</button>
+                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('popularityDeg')">"popularityDeg"</button>
+                <div class="w3-dropdown-hover" style="width:33%">
+                    <div class="w3-dropdown-content w3-border">
+                                    <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','quad','false')">quad - normal</a>
+                                        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','quad','true')">quad - indexed</a>
+                    </div>
+                </div>
+                <div class="w3-dropdown-hover" style="width:30%">
+                    <div class="w3-dropdown-content w3-border">
+                        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','linear','true')">linear - indexed</a>
+                            <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','log','false')">log - normal</a>
+                                <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','log','true')">log - indexed</a>
+                                    <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','quad','false')">quad - normal</a>
+                                        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','quad','true')">quad - indexed</a>
+                    </div>
+                </div>
+                <div class="w3-dropdown-hover" style="width:33%">
+                    <div class="w3-dropdown-content w3-border">
+                      
+                                <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','log','true')">log - indexed</a>
+                                    <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','quad','false')">quad - normal</a>
+                                        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','quad','true')">quad - indexed</a>
+                    </div>
+                </div>
+                <button id="receivedLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button>
+                </br>
+                <button id="givenLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button>
+                </br>
+                <!-- <button id="calcLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="construct_like_dict()">calc likes</button></br> -->
+                <div class="w3-progress-container w3-round w3-large w3-round" id="likesProgbarContainer" hidden>
+                    <div class="w3-progressbar w3-round w3-red w3-text-black" id="likesProgbar" style="width:0%"></div>
+                </div>
+            </div>
+            <button onclick="collaps_control('followers_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Edge Type</button>
+            <div id="followers_controls" class="w3-accordion-content">
+                <button class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('complete')">Friends And Followers</button>
+                </br>
+                <button class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('mutual')">No followers</button>
+                </br>
+                <button class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('one_way')">Only Followers</button>
+                </br>
+                <button id="likeEdges" class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('likes')">Likes</button>
+                </br>
+            </div>
+            <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodeLables()" id="toggleLabels">Show Labels</button>
         </div>
-    </div>
-    <button onclick="collaps_control('followers_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Edge Type</button>
-
-    <div id="followers_controls" class="w3-accordion-content">
-        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('complete')">Friends And Followers</button></br>
-        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('mutual')">No followers</button></br>
-        <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('one_way')">Only Followers</button></br>
-        <button id="likeEdges"class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('likes')">Likes</button></br>
-    </div>
-
-  <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodeLables()" id="toggleLabels">Show Labels</button>
-</div>
-<br>
-<button href="javascript:void(0)" onclick="w3_close()" id="closeMenu" class="w3-btn w3-small w3-round-xxlarge w3-hover-blue w3-border w3-border-blue w3-white"><</button>
-  <button href="javascript:void(0)" onclick="w3_open()" id="openMenu"  class="w3-btn w3-small w3-round-xxlarge w3-hover-blue w3-border w3-border-blue w3-white">></button>
-</menu>
-
-<div id="container" >
-<div id="nodeInfo" >
-  <center  >
-  
-  <img id="selectedPic" class="w3-btn-block" src = ''>
-  <a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a>
-  <a id="selectedImportance"class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
+        <br>
+        <button href="javascript:void(0)" onclick="w3_close()" id="closeMenu" class="w3-btn w3-small w3-round-xxlarge w3-hover-blue w3-border w3-border-blue w3-white">
+            <</button>
+                <button href="javascript:void(0)" onclick="w3_open()" id="openMenu" class="w3-btn w3-small w3-round-xxlarge w3-hover-blue w3-border w3-border-blue w3-white">></button>
+    </menu>
+    <div id="container">
+        <div id="nodeInfo">
+            <center>
+                <img id="selectedPic" class="w3-btn-block" src=''>
+                <a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a>
+                <a id="selectedImportance" class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
   <a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
-<!-- <a id="selectedProfile" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue" target="_blank" class="mylink" href="https">Visit Profile</a> -->
-  <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-white w3-border w3-border-blue"target="_blank" href="https">Строй График</a>
-</center>
-</div>
-
-<div class="w3-display-container" id="test">
-      
-      <div class="w3-card-4 w3-display-bottommiddle">
-        <button class="w3-btn-block w3-hover-blue w3-red" onclick="freeze_graph()" id="freezeGraph" style="display:none;">Click to Freeze</button>
-      </div>
-
-      <div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:none;z-index:1" id="graphingCard">
- 
-               <header class="w3-container">
-                 <h5 id="welcome"></h5>
-               </header>
-               <div class="w3-container" id="progressContainer">
-                 <div class="w3-progress-container w3-round w3-large ">
-                   <div class="w3-progressbar w3-round w3-blue" id="progbar" style="width:0%"></div>
-                 </div>
-               <footer class="w3-container">
-                 <h5 id="friendList"></h5>
-             </footer>
-               </div>
-       </div>
-
-       <div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:block;z-index:1;padding:10px" id="searchCard">
-        <div id="searchDiv" hidden>
-               <header class="w3-container">
-                 <h4 id="foundNameCenter">Напиши Кличку</h4>
-               </header>
-               <div class="w3-container" id="search"></div>
-               <input id="searchBox" class="w3-input w3-border w3-hover-blue" value="" oninput="search_Input()"></p>
-               <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</button></br>
-               <footer class="w3-container">
-                 <h5 id="friendList"> </h5>
-             </footer>
+                <!-- <a id="selectedProfile" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue" target="_blank" class="mylink" href="https">Visit Profile</a> -->
+                <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-white w3-border w3-border-blue" target="_blank" href="https">Строй График</a>
+            </center>
         </div>
-        <div id="loginDiv">
-  <a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60" >Войти на VK.com</a>      
-       </div>
-       </div>
-
-       <div id="mynetwork" class="wrapper" hidden></div>
-       
-</div>
-
-</div>
-<div id="data" class="wrapper"></div>
-
-
-<a href="" id="download" target="_blank" download="graph.html">Save Image</a>
-  <button type="button" onclick="canvas_image()">get image</button>
-  <button type="button" onclick="save_build()">save build</button>
-<button type="button" style="margin-right:200px" onclick="test_build()">test build</button>
-
+        <div class="w3-display-container" id="test">
+            <div class="w3-card-4 w3-display-bottommiddle">
+                <button class="w3-btn-block w3-hover-blue w3-red" onclick="freeze_graph()" id="freezeGraph" style="display:none;">Click to Freeze</button>
+            </div>
+            <div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:none;z-index:1" id="graphingCard">
+                <header class="w3-container">
+                    <h5 id="welcome"></h5>
+                </header>
+                <div class="w3-container" id="progressContainer">
+                    <div class="w3-progress-container w3-round w3-large ">
+                        <div class="w3-progressbar w3-round w3-blue" id="progbar" style="width:0%"></div>
+                    </div>
+                    <footer class="w3-container">
+                        <h5 id="friendList"></h5>
+                    </footer>
+                </div>
+            </div>
+            <div class="w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge" style="display:block;z-index:1;padding:10px" id="searchCard">
+                <div id="searchDiv" hidden>
+                    <header class="w3-container">
+                        <h4 id="foundNameCenter">Напиши Кличку</h4>
+                    </header>
+                    <div class="w3-container" id="search"></div>
+                    <input id="searchBox" class="w3-input w3-border w3-hover-blue" value="" oninput="search_Input()">
+                    </p>
+                    <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</button>
+                    </br>
+                    <footer class="w3-container">
+                        <h5 id="friendList"> </h5>
+                    </footer>
+                </div>
+                <div id="loginDiv">
+                    <a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">Войти на VK.com</a>
+                </div>
+            </div>
+            <div id="mynetwork" class="wrapper" hidden></div>
+        </div>
+    </div>
+    <div id="data" class="wrapper"></div>
+    <a href="" id="download" target="_blank" download="graph.html">Save Image</a>
+    <button type="button" onclick="canvas_image()">get image</button>
+    <button type="button" onclick="save_build()">save build</button>
+    <button type="button" style="margin-right:200px" onclick="test_build()">test build</button>
 </body>
 
   <script>
@@ -521,7 +520,12 @@ $("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
         // network.setSelection({"nodes":parent,"edges":connected_edges});
 
 new_edge_dict = false;
-function change_node_size(weight_type,normalization,use_rank){
+
+
+
+
+function change_node_size(input){
+  console.log("great",cur_graph.node_weight_type,cur_graph.node_normalization,cur_graph.node_use_rank,input)
   //normilzation can be linear, quad, or log
   //weigh_type is the name of the weight dictionary being used: degree,centrality,popularity,popularityDeg
   if (!("centrality" in cur_graph.weightsDictionary)) { //||(!new_edge_dict))
@@ -529,15 +533,18 @@ function change_node_size(weight_type,normalization,use_rank){
     cur_graph.weightsDictionary["centrality"] = get_centrality(cur_graph,network)
     new_edge_dict = true;
   };
-
-
-  if (normalization.length > 0) {
-    console.log("weighting",weight_type,normalization,use_rank)
-    cur_graph.normalize_weights(normalization,weight_type,use_rank == "true" ? "true" : "false");
-    console.log(normalization+" "+weight_type+" "+use_rank)
-    cur_graph.set_weights(normalization+" "+weight_type+" "+use_rank,data_set);
+  if (Object.keys(cur_graph.weightsDictionary).indexOf(input)>0) {console.log(input); cur_graph.node_weight_type = Object.assign('',input)};
+  if (["linear","log","quad"].indexOf(input)>0) {console.log(input);cur_graph.node_normalization = Object.assign('',input)};
+  if (["true","false"].indexOf(input)>0) {console.log(input);cur_graph.node_use_rank = Object.assign('',input)};
+  
+  
+  if (cur_graph.node_normalization == "log") {
+    console.log("weighting",cur_graph.node_weight_type,cur_graph.node_normalization,cur_graph.node_use_rank)
+    cur_graph.normalize_weights(cur_graph.node_normalization,cur_graph.node_weight_type,cur_graph.node_use_rank == "true" ? "true" : "false");
+    console.log(cur_graph.node_normalization+" "+cur_graph.node_weight_type+" "+cur_graph.node_use_rank)
+    cur_graph.set_weights(cur_graph.node_normalization+" "+cur_graph.node_weight_type+" "+cur_graph.node_use_rank,data_set);
   }else{
-    cur_graph.set_weights(weight_type,data_set)
+    cur_graph.set_weights(cur_graph.node_weight_type,data_set)
   };
   // cur_graph.set_weights(weight_type,data_set);    
   // cur_graph.set_weights("degree",data_set);
