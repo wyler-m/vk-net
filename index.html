@@ -35,52 +35,31 @@
                 
                 scaling
                 <div class="w3-btn-bar">
-                        <img src="http://img.sparknotes.com/figures/F/fa846fa782f745cd8a6fc1cebcb8e275/exp1.gif"class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('quad')"style="width:33.3%">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Linear_sorption_isotherm.svg/656px-Linear_sorption_isotherm.svg.png" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('linear')"style="width:33.3%">
-                                <img src="http://www.itl.nist.gov/div898/handbook/eda/section3/gif/expcdf.gif" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('log')"style="width:33.3%">
+                        <img src="http://img.sparknotes.com/figures/F/fa846fa782f745cd8a6fc1cebcb8e275/exp1.gif"class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('quad')"style="width:33.3%">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Linear_sorption_isotherm.svg/656px-Linear_sorption_isotherm.svg.png" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('linear')"style="width:33.3%">
+                                <img src="http://www.itl.nist.gov/div898/handbook/eda/section3/gif/expcdf.gif" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('log')"style="width:33.3%">
 
                 </div>
                 normalization
                 <div class="w3-btn-bar">
-                  <button style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('true')">raw</a>
-                            <button style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="change_node_size('false')">indexed</a>
+                  <button style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_use_rank('false')">raw</a>
+                            <button style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_use_rank('true')">indexed</a>
                 </div>
                 weights
-                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('centrality')">centrality</button>
-                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('degree')">degree</button>
-                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_node_size('popularityDeg')">"popularityDeg"</button>
-                <div class="w3-dropdown-hover" style="width:33%">
-                    <div class="w3-dropdown-content w3-border">
-                                    <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','quad','false')">quad - normal</a>
-                                        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('degree','quad','true')">quad - indexed</a>
-                    </div>
-                </div>
-                <div class="w3-dropdown-hover" style="width:30%">
-                    <div class="w3-dropdown-content w3-border">
-                        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','linear','true')">linear - indexed</a>
-                            <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','log','false')">log - normal</a>
-                                <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','log','true')">log - indexed</a>
-                                    <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','quad','false')">quad - normal</a>
-                                        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('centrality','quad','true')">quad - indexed</a>
-                    </div>
-                </div>
-                <div class="w3-dropdown-hover" style="width:33%">
-                    <div class="w3-dropdown-content w3-border">
-                      
-                                <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','log','true')">log - indexed</a>
-                                    <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','quad','false')">quad - normal</a>
-                                        <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="change_node_size('popularity','quad','true')">quad - indexed</a>
-                    </div>
-                </div>
-                <button id="receivedLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_received()">received likes</button>
+                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('centrality')">centrality</button>
+                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('degree')">degree</button>
+                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('popularityDeg')">"popularityDeg"</button>
+               
+                <button id="receivedLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('received')">received likes</button>
                 </br>
-                <button id="givenLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="change_weights_given()">given likes</button>
+                <button id="givenLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('given')">given likes</button>
                 </br>
-                <!-- <button id="calcLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="construct_like_dict()">calc likes</button></br> -->
+                
                 <div class="w3-progress-container w3-round w3-large w3-round" id="likesProgbarContainer" hidden>
                     <div class="w3-progressbar w3-round w3-red w3-text-black" id="likesProgbar" style="width:0%"></div>
                 </div>
-            </div>
+                </div>
+            
             <button onclick="collaps_control('followers_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Edge Type</button>
             <div id="followers_controls" class="w3-accordion-content">
                 <button class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('complete')">Friends And Followers</button>
@@ -457,7 +436,7 @@ function init_graph(){
     cur_graph.add_all_connections();
     cur_graph.weight_nodes_popularity();
     cur_graph.weight_nodes_popularity_deg();
-    cur_graph.set_weights("degree");
+    cur_graph.set_weights();
     cur_graph.add_city_info()
     data_set
     w3_open()
@@ -522,49 +501,35 @@ $("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
 new_edge_dict = false;
 
 
-
-
-function change_node_size(input){
-  console.log("great",cur_graph.node_weight_type,cur_graph.node_normalization,cur_graph.node_use_rank,input)
+function update_node_normalization (input) {
   //normilzation can be linear, quad, or log
-  //weigh_type is the name of the weight dictionary being used: degree,centrality,popularity,popularityDeg
-  if (!("centrality" in cur_graph.weightsDictionary)) { //||(!new_edge_dict))
-    console.log("recalculated?");
+  cur_graph.node_normalization = input;
+  change_node_size(input)
+}
+
+function update_node_use_rank (input) {
+  // true or false
+  cur_graph.node_use_rank = input;
+  change_node_size(input)
+}
+
+function update_node_weight_type (input) {
+  //weigh_type is the name of the weight dictionary being used: degree,centrality,popularity,popularityDeg 
+  cur_graph.node_weight_type = input;
+  change_node_size()
+}
+
+function change_node_size(){
+  
+  if (!("centrality" in cur_graph.weightsDictionary)) { 
+    console.log("centrality calculated");
     cur_graph.weightsDictionary["centrality"] = get_centrality(cur_graph,network)
     new_edge_dict = true;
   };
-  if (Object.keys(cur_graph.weightsDictionary).indexOf(input)>0) {console.log(input); cur_graph.node_weight_type = Object.assign('',input)};
-  if (["linear","log","quad"].indexOf(input)>0) {console.log(input);cur_graph.node_normalization = Object.assign('',input)};
-  if (["true","false"].indexOf(input)>0) {console.log(input);cur_graph.node_use_rank = Object.assign('',input)};
-  
-  
-  if (cur_graph.node_normalization == "log") {
-    console.log("weighting",cur_graph.node_weight_type,cur_graph.node_normalization,cur_graph.node_use_rank)
-    cur_graph.normalize_weights(cur_graph.node_normalization,cur_graph.node_weight_type,cur_graph.node_use_rank == "true" ? "true" : "false");
-    console.log(cur_graph.node_normalization+" "+cur_graph.node_weight_type+" "+cur_graph.node_use_rank)
-    cur_graph.set_weights(cur_graph.node_normalization+" "+cur_graph.node_weight_type+" "+cur_graph.node_use_rank,data_set);
-  }else{
-    cur_graph.set_weights(cur_graph.node_weight_type,data_set)
-  };
-  // cur_graph.set_weights(weight_type,data_set);    
-  // cur_graph.set_weights("degree",data_set);
 
-  network.redraw();
-  network.stopSimulation()
-}
-
-function change_weights_received(){
-  // cur_graph.normalize_weights("log","received");
-  // cur_graph.set_weights("log received",data_set);
-  cur_graph.set_weights("received",data_set);
-  network.redraw();
-  network.stopSimulation()
-}
-
-function change_weights_given(){
-  // cur_graph.normalize_weights("log","given");
-  // cur_graph.set_weights("log given",data_set);
-  cur_graph.set_weights("given",data_set);
+  cur_graph.update_weight_dict_name()                
+  cur_graph.normalize_weights();
+  cur_graph.set_weights(data_set);
   network.redraw();
   network.stopSimulation()
 }

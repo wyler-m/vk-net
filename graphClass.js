@@ -20,6 +20,7 @@ class graph {
     this.node_weight_type = 'degree';
     this.node_normalization = 'linear';
     this.node_use_rank = 'false';
+    this.weight_dict_name = 'degree';
   }
 
   init_owner(res){
@@ -143,12 +144,12 @@ class graph {
     }
 
 
-    rank_weights(weight_type){
+    rank_weights(){
       var ranked_weights = [];
       var nodes = Object.keys(this.weightsDictionary.degree);
       for (var node in this.nodes){
         var uid = this.nodes[node].id
-        var weight = this.weightsDictionary[weight_type][uid];
+        var weight = this.weightsDictionary[this.weight_dict_name][uid];
         if (ranked_weights.indexOf(weight) < 0){
           ranked_weights.push(weight);
         }
@@ -157,39 +158,42 @@ class graph {
     }
 
 
-    normalize_weights(scale_type,weight_type,use_rank){
-      use_rank = use_rank == "true" ? "true" : "false";
-      var dict_name = scale_type+" "+weight_type +" "+use_rank;
-      console.log(dict_name)
+    normalize_weights(){
+      console.log("inside normailze weights",this.weight_dict_name)
       var scaling_function = {"linear":function(rank) {return (rank)},
                               "quad":function(rank) {return Math.pow(rank,2)},
                               "log":function(rank) {return Math.round(Math.log(rank+1)*100)}  
                               }
 
-      if (!(dict_name in this.weightsDictionary)) {
-        this.weightsDictionary[dict_name] = {}
+      if (!(this.weight_dict_name in this.weightsDictionary)) {
+        this.weightsDictionary[this.weight_dict_name] = {}
         var nodes = Object.keys(this.weightsDictionary.degree);
-        if (use_rank == "true") {
-          var ranked_weights = this.rank_weights(weight_type);          
+        if (this.node_use_rank == "true") {
+          var ranked_weights = this.rank_weights();          
         };
+        console.log(ranked_weights)
         for (var i = 0; i < nodes.length; i++) {
-          var weight = this.weightsDictionary[weight_type][nodes[i]];
-          if (use_rank == "true") {
+          var weight = this.weightsDictionary[this.node_weight_type][nodes[i]];
+          
+          if (this.node_use_rank == "true") {
             var node_rank = ranked_weights.indexOf(weight);
-            this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](node_rank);
+            this.weightsDictionary[this.weight_dict_name][nodes[i]] = scaling_function[this.node_normalization](node_rank);
           } else{
-            this.weightsDictionary[dict_name][nodes[i]] = scaling_function[scale_type](weight);
+            this.weightsDictionary[this.weight_dict_name][nodes[i]] = scaling_function[this.node_normalization](weight);
           };
         };
       };
     }
     
+    update_weight_dict_name(){
+      this.weight_dict_name = this.node_normalization+" "+this.node_weight_type +" "+this.node_use_rank;        
+ }
 
-    set_weights(weight_type,network_data_set){
+    set_weights(network_data_set){
       for (var i = this.nodes.length - 1; i >= 0; i--) {
         var deg = 0    
         if (!(this.nodes[i].small_pic=="https://vk.com/images/deactivated_100.png")){
-          deg = this.weightsDictionary[weight_type][this.nodes[i]["id"]];
+          deg = this.weightsDictionary[this.weight_dict_name][this.nodes[i]["id"]];
           deg = deg ? deg : 0
         }
           this.nodes[i].value = deg
