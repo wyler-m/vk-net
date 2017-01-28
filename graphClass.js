@@ -21,6 +21,8 @@ class graph {
     this.node_normalization = 'linear';
     this.node_use_rank = 'false';
     this.weight_dict_name = 'degree';
+    this.current_edges_dict = 'complete';
+    this.new_edge_dict = true;
   }
 
   init_owner(res){
@@ -149,7 +151,7 @@ class graph {
       var nodes = Object.keys(this.weightsDictionary.degree);
       for (var node in this.nodes){
         var uid = this.nodes[node].id
-        var weight = this.weightsDictionary[this.weight_dict_name][uid];
+        var weight = this.weightsDictionary[this.node_weight_type][uid];
         if (ranked_weights.indexOf(weight) < 0){
           ranked_weights.push(weight);
         }

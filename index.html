@@ -3,19 +3,19 @@
 
 <head>
     <title>VK Visualizer</title>
-    <link rel="stylesheet" href="vis.css">
+    <link rel="stylesheet" href="css/vis.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="w3.css">
+    <link rel="stylesheet" href="css/w3.css">
     <meta charset="utf-8">
     <!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
     <script src="setOps.js"></script>
     <script src="get_centrality.js"></script>
     <!-- // <script src="get_likes.js"></script> -->
-    <script src="weight_likes.js"></script>
+    <script src="get_likes.js"></script>
     <script src="graphClass.js"></script>
     <script src="get_friends.js"></script>
     <!-- // <script src="test_wyler.js"></script> -->
-    <script src="test_full.js"></script>
+    <script src="test_data/test_full.js"></script>
     <!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
     <script type="text/javascript" src="vis.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -25,34 +25,35 @@
 <body>
     <menu id="controlDiv">
         <div id="hideDiv">
-            <h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+            <h1 id="logo"><img src= "img/vk.svg"> visualizer</h1>
             <h4 id="foundName"></h4>
             <input id="vkId" class="w3-input w3-border w3-hover-blue" value="16081499">
             </p>
             <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</a>
+            <a id="Subgraph" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="take_subgraph()">Subgraph</a>
             <button onclick="collaps_control('node_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Node Size</button>
             <div id="node_controls" class="w3-accordion-content">
                 
                 scaling
                 <div class="w3-btn-bar">
-                        <img src="http://img.sparknotes.com/figures/F/fa846fa782f745cd8a6fc1cebcb8e275/exp1.gif"class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('quad')"style="width:33.3%">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Linear_sorption_isotherm.svg/656px-Linear_sorption_isotherm.svg.png" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('linear')"style="width:33.3%">
-                                <img src="http://www.itl.nist.gov/div898/handbook/eda/section3/gif/expcdf.gif" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('log')"style="width:33.3%">
+                        <img id="quadID" src="http://img.sparknotes.com/figures/F/fa846fa782f745cd8a6fc1cebcb8e275/exp1.gif"class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('quad')"style="width:33.3%">
+                        <img id="linearID" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Linear_sorption_isotherm.svg/656px-Linear_sorption_isotherm.svg.png" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('linear')"style="width:33.3%">
+                        <img id="logID" src="http://www.itl.nist.gov/div898/handbook/eda/section3/gif/expcdf.gif" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_normalization('log')"style="width:33.3%">
 
                 </div>
                 normalization
                 <div class="w3-btn-bar">
-                  <button style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_use_rank('false')">raw</a>
-                            <button style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_use_rank('true')">indexed</a>
+                  <button id="falseID" style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_use_rank('false')">raw</a>
+                  <button id="trueID" style="width:50%" class="w3-btn w3-hover-red w3-border w3-border-red w3-white" onclick="update_node_use_rank('true')">indexed</a>
                 </div>
                 weights
-                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('centrality')">centrality</button>
-                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('degree')">degree</button>
-                    <button class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('popularityDeg')">"popularityDeg"</button>
+                    <button id="centralityID" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('centrality')">centrality</button>
+                    <button id="degreeID" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('degree')">degree</button>
+                    <button id="popularityDegID" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('popularityDeg')">"popularityDeg"</button>
                
-                <button id="receivedLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('received')">received likes</button>
+                <button id="receivedID" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('received')">received likes</button>
                 </br>
-                <button id="givenLikes" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('given')">given likes</button>
+                <button id="givenID" class="w3-btn-block w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="update_node_weight_type('given')">given likes</button>
                 </br>
                 
                 <div class="w3-progress-container w3-round w3-large w3-round" id="likesProgbarContainer" hidden>
@@ -62,13 +63,13 @@
             
             <button onclick="collaps_control('followers_controls')" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white">Edge Type</button>
             <div id="followers_controls" class="w3-accordion-content">
-                <button class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('complete')">Friends And Followers</button>
+                <button id="completeID" class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('complete')">Friends And Followers</button>
                 </br>
-                <button class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('mutual')">No followers</button>
+                <button id="mutualID" class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('mutual')">No followers</button>
                 </br>
-                <button class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('one_way')">Only Followers</button>
+                <button id="one_wayID" class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('one_way')">Only Followers</button>
                 </br>
-                <button id="likeEdges" class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('likes')">Likes</button>
+                <button id="likesID" class="w3-btn-group w3-hover-red w3-border w3-border-red w3-white" style="width:90%" onclick="set_type_edges('likes')">Likes</button>
                 </br>
             </div>
             <button class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="showNodeLables()" id="toggleLabels">Show Labels</button>
@@ -84,8 +85,7 @@
                 <img id="selectedPic" class="w3-btn-block" src=''>
                 <a id="selectedName" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" target="_blank" href="#">name</a>
                 <a id="selectedImportance" class="w3-btn-block w3-white w3-border w3-border-blue">importance</p>
-  <a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
-                <!-- <a id="selectedProfile" class="w3-btn-block w3-hover-blue w3-bottombar w3-border-blue" target="_blank" class="mylink" href="https">Visit Profile</a> -->
+                <a id="selectedDegree"class="w3-btn-block w3-white w3-border w3-border-blue">0</a>
                 <a id="buildSelected" class="w3-btn-block w3-hover-blue w3-white w3-border w3-border-blue" target="_blank" href="https">Строй График</a>
             </center>
         </div>
@@ -161,35 +161,73 @@ function w3_close() {
 function search_Input(){
     var q = document.getElementById("searchBox").value
 
-    var query = "https://api.vk.com/method/users.search?fields=photo_50&lang=ru&q="+q+"&access_token="+access_token
+
+    if (q) {
+      var query = "https://api.vk.com/method/users.search?fields=photo_50&lang=ru&q="+q+"&access_token="+access_token
     
+    
+
     $.get(query, function(data, status){ 
-      if (data.response[0]==1) {
+      if (("response" in data)&&(data.response[0]==1)) {
         $("#foundNameCenter").text(data.response[1].first_name+" "+data.response[1].last_name)
         $("#foundName").text(data.response[1].first_name+" "+data.response[1].last_name)
         document.getElementById("vkId").value = data.response[1]["uid"];
-      }else {
-        $("#foundNameCenter").text("Напиши Кличку")
+      } else {
+         if (q.slice(0,1) == "id") 
+         {q = q.split("id").pop();}
+         console.log(q)
+         var query = "https://api.vk.com/method/getProfiles?lang=ru&uid="+q;
+         $.get(query, function(data, status){ 
+            console.log(data)
+               $("#foundNameCenter").text(data.response[0].first_name+" "+data.response[0].last_name)
+               $("#foundName").text(data.response[0].first_name+" "+data.response[0].last_name)
+               document.getElementById("vkId").value = data.response[0].uid;
+         })
+      };
+    })
+
+    } else{
+      if (global_user_id) {
+         document.getElementById("vkId").value = global_user_id; 
+         var query = "https://api.vk.com/method/getProfiles?lang=ru&uid="+global_user_id;
+         $.get(query, function(data, status){ 
+            console.log(data)
+               $("#foundNameCenter").text(data.response[0].first_name+" "+data.response[0].last_name)
+               $("#foundName").text(data.response[0].first_name+" "+data.response[0].last_name)
+               document.getElementById("vkId").value = data.response[0].uid;
+         })
+      } else{
         $("#foundName").text("")
         $("#vkId").attr("value","asd");
+      };
+        
+
     };
-    }
-    )
+
   }
 
 
 so = setOps;
 access_token = null;
-
+global_user_id = null;
 params = parseURLParams();
 graph_dict = {}
 
 if (params) {
   for (var param in params) {
      if (param == "user_id") {
-        document.getElementById("vkId").value = params.user_id; 
-        $("#foundNameCenter").text = params.user_id; 
-        $("#foundNameCenter").text = params.user_id; 
+         global_user_id=params.user_id; 
+        document.getElementById("vkId").value = global_user_id; 
+         var query = "https://api.vk.com/method/getProfiles?lang=ru&uid="+global_user_id;
+         $.get(query, function(data, status){ 
+            console.log(data)
+               $("#foundNameCenter").text(data.response[0].first_name+" "+data.response[0].last_name)
+               $("#foundName").text(data.response[0].first_name+" "+data.response[0].last_name)
+               document.getElementById("vkId").value = data.response[0].uid;
+               $("#searchBox").val("Напиши Кличку")
+         })
+
+
       };
       if (param == "access_token"){
         $("#loginP").hide();  
@@ -201,15 +239,20 @@ if (params) {
    }; 
 };
 
+function showLikeRelatedElements() {
+   $("#givenID").show();
+   $("#receivedID").show();
+   $("#likesID").show();
+}
 
 function build_graph(test){
   $("#calcLikes").show();
   $("#searchCard").hide();
 	$("#mynetwork").hide();
   $("#nodeInfo").hide();
-  $("#receivedLikes").hide();
-  $("#givenLikes").hide();
-  $("#likeEdges").hide();
+  $("#receivedID").hide();
+  $("#givenID").hide();
+  $("#likesID").hide();
 	$("#graphingCard").show()	
 	$("#graphingCard").attr("class","w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge");
 	$("#progressContainer").show();
@@ -271,8 +314,8 @@ function build_graph(test){
 w3_close()
 $("#loginDiv").show();
 $("#nodeInfo").hide();
-$("#givenLikes").hide();
-$("#receivedLikes").hide();
+$("#givenID").hide();
+$("#receivedID").hide();
 $("#buildSelected").hide();
 // $("#calcLikes").hide();
 
@@ -443,8 +486,40 @@ function init_graph(){
     redrawAll(); 
 }
 
+function take_subgraph() {
+
+   var parent = network.getSelectedNodes()
+   var selected = network.getConnectedNodes(parent);
+
+
+// get all the edges in a group
+   var sub_edges = [];
+   cur_graph.edges[cur_graph.current_edges_dict].forEach( function(element, index) {
+      if ((selected.indexOf(element.to)>-1)&&(selected.indexOf(element.from)>-1)){
+            sub_edges.push(element)
+      }
+   });
+
+   cur_graph.new_edge_dict = true;
+   network.storePositions();
+   data_set.update(data_set.get(selected))
+   var data = {
+       nodes: data_set,
+       edges: sub_edges // cur_graph.edges.one_way
+     };
+
+   network.setData(data);
+     setTimeout(function() {
+       network.stopSimulation();
+     },3000);
+
+
+}
+
 function set_type_edges(type) {
-  new_edge_dict = true;
+   set_colors_edges(type)
+   cur_graph.current_edges_dict = type;
+  cur_graph.new_edge_dict = true;
   network.storePositions();
   var data = {
     nodes: data_set,
@@ -467,39 +542,43 @@ function construct_like_dict(){
 
 function showNodeLables(){
 
-options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0 
-// var cur_class = $("#toggleLabels").attr("class");
-var text = $("#toggleLabels").text();
-// $("#toggleLabels").attr("class", cur_class == "w3-btn-block w3-blue w3-hover-black" ? "w3-btn-block w3-black w3-hover-blue" : "w3-btn-block w3-blue w3-hover-black"); 
-$("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
+      options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0 
+      var text = $("#toggleLabels").text();
+      $("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
 
-// if(options.nodes.font.size == 0) {options.nodes.font.size = 14;
-// $("#toggleLabels").attr("class","w3-btn-block w3-black w3-hover-blue")
-// } 
-  // else {options.nodes.font.size = 0;
-  // $("#toggleLabels").toggleClass( w3-btn-block w3-black w3-hover-blue")}
-       
        network.setOptions(options);
        network.redraw();
        network.stopSimulation();
  };
 
-//get all the edges in a group
- // var connected_edges = [];
-        // selected_nodes.push(parent)
-        
-        // selected_nodes.forEach( function(node, index) {
-        //   var edges = network.getConnectedEdges(node);
-        //   edges.forEach( function(edge, index) {
-        //       if (so.intersection(network.getConnectedNodes(edge),selected_nodes).length == 2) {
-        //         connected_edges = so.union(connected_edges,[edge]);
-        //       };    
-        //   });
-        // });
-        // network.setSelection({"nodes":parent,"edges":connected_edges});
 
-new_edge_dict = false;
 
+// cur_graph.new_edge_dict = false;
+
+colored_node_buttons = ["log","quad","linear","degree","centrality","true","false","degree","centrality","popularityDeg","received","given"];
+function set_colors_weights(){
+   
+   so.complement(colored_node_buttons,cur_graph.weight_dict_name.split(" ")).forEach(function(id){
+    var x = document.getElementById(id+"ID");
+    x.className = x.className.replace(" w3-blue", " w3-white");      
+   });
+   cur_graph.weight_dict_name.split(" ").forEach(function(id){
+    var x = document.getElementById(id+"ID");
+    x.className = x.className.replace(" w3-white", " w3-blue");
+   });
+ }
+
+
+colored_edge_buttons = ["complete","mutual","one_way","likes"];
+function set_colors_edges(id){
+   colored_edge_buttons.forEach(function(potential_id){
+         var x = document.getElementById(potential_id+"ID");
+         x.className = x.className.replace(" w3-blue", " w3-white");      
+   });
+
+    var x = document.getElementById(id+"ID");
+    x.className = x.className.replace(" w3-white", " w3-blue");
+}
 
 function update_node_normalization (input) {
   //normilzation can be linear, quad, or log
@@ -521,13 +600,14 @@ function update_node_weight_type (input) {
 
 function change_node_size(){
   
-  if (!("centrality" in cur_graph.weightsDictionary)) { 
+  if (!("centrality" in cur_graph.weightsDictionary) || cur_graph.new_edge_dict) { 
     console.log("centrality calculated");
     cur_graph.weightsDictionary["centrality"] = get_centrality(cur_graph,network)
-    new_edge_dict = true;
+    cur_graph.new_edge_dict = false;
   };
-
+  
   cur_graph.update_weight_dict_name()                
+  set_colors_weights();
   cur_graph.normalize_weights();
   cur_graph.set_weights(data_set);
   network.redraw();
@@ -535,49 +615,19 @@ function change_node_size(){
 }
 
 function test_build(){
-  build_graph(true);
-cur_graph.currentNode = test_data.currentNode  
-cur_graph.edges.mutual = test_data.edges.mutual   
-cur_graph.first_pass = test_data.first_pass   
-cur_graph.friends = test_data.friends
-cur_graph.nodeToFriends = test_data.nodeToFriends  
-cur_graph.nodeToInfo = test_data.nodeToInfo   
-cur_graph.nodes = test_data.nodes   
-cur_graph.nodesRetrieved = test_data.nodesRetrieved   
-cur_graph.ownerInfo = test_data.ownerInfo   
-cur_graph.unCheckedFriends = test_data.unCheckedFriends   
-cur_graph.weightsDictionary = test_data.weightsDictionary  
+
+build_graph(true);
+cur_graph = test_data
 redrawAll()
-change_weights_centrality();
+
 }
 
 function save_build(){
-    test_data = {
-    "currentNode" : cur_graph.currentNode,  
-    "nodeToNeighbors" : cur_graph.nodeToNeighbors,
-    "edges" : cur_graph.edges.mutual,   
-    "first_pass" : cur_graph.first_pass,   
-    "friends" : cur_graph.friends,   
-    "nodeToFriends" : cur_graph.nodeToFriends,  
-    "nodeToInfo" : cur_graph.nodeToInfo,   
-    "nodes" : cur_graph.nodes,   
-    "nodesRetrieved" : cur_graph.nodesRetrieved,   
-    "ownerInfo" : cur_graph.ownerInfo,   
-    "unCheckedFriends" : cur_graph.unCheckedFriends,   
-    "weightsDictionary" : cur_graph.weightsDictionary 
-    }
+    test_data = cur_graph;
     document.getElementById("data").innerHTML = JSON.stringify(test_data);
 
 }
-
-function hide_unhide_selected(unselected,selected,hide){
-  console.log("selected",selected,unselected,hide)
-  var nodes_to_hide = unselected.map(function(x){
-   return {"id":x,"hidden":hide}})
-  data_set.update(nodes_to_hide);
-
-}
-
+    
 
 function canvas_image(){
   var canvas = document.getElementsByTagName("canvas");
@@ -592,82 +642,71 @@ function canvas_image(){
 //Строй График
 function redrawAll() {
 
-    $("#graphingCard").attr("class","w3-card-4 w3-display-topmiddle w3-white w3-border w3-border-blue w3-round-xlarge");
-    $("#progressContainer").hide();
-    $("#mynetwork").show();
+  $("#graphingCard").attr("class", "w3-card-4 w3-display-topmiddle w3-white w3-border w3-border-blue w3-round-xlarge");
+  $("#progressContainer").hide();
+  $("#mynetwork").show();
 
 
-    // create a network
-    var container = document.getElementById('mynetwork');
-    
-    data_set.add(cur_graph.nodes);
-    
-    var data = {
-      nodes: data_set,
-      edges: cur_graph.edges.mutual // cur_graph.edges.one_way 
-    };
+  // create a network
+  var container = document.getElementById('mynetwork');
 
-    network = new vis.Network(container, data, options);
+  data_set.add(cur_graph.nodes);
 
-    network.on("stabilized", function (params) { $("#freezeGraph").hide();});
-    network.on("startStabilizing", function (params) { $("#freezeGraph").show();});
-    network.on("selectNode", function (params) { 
+  var data = {
+    nodes: data_set,
+    edges: cur_graph.edges.mutual // cur_graph.edges.one_way 
+  };
 
-        console.log(params)
-        insertNodeInfo(params);
-        var parent = params.nodes[0];
-        var selected_nodes = network.getConnectedNodes(parent);
-        selected_nodes.push(parent);
-        hide_unhide_selected(so.complement(data_set.getIds(), selected_nodes),selected_nodes,true)
-        network.stopSimulation()
-    });
+  network = new vis.Network(container, data, options);
 
-    network.on("dragEnd", function (params) {
-        setTimeout(function() {
-          network.stopSimulation();
-          },3000);
-    });
+  network.on("stabilized", function(params) {
+    $("#freezeGraph").hide();
+  });
+  network.on("startStabilizing", function(params) {
+    $("#freezeGraph").show();
+  });
+  network.on("selectNode", function(params) {
 
-    network.on("deselectNode", function (params) {
-        $("#nodeInfo").hide();
-        var parent = params.nodes[0];
-        var selected = network.getConnectedNodes(parent);
-        selected.push(parent)
-        hide_unhide_selected(data_set.getIds(),selected,false)
-        network.stopSimulation()
+    console.log(params)
+    insertNodeInfo(params);
+    var parent = params.nodes[0];
+    var selected_nodes = network.getConnectedNodes(parent);
+    selected_nodes.push(parent);
+    hide_unhide_selected(so.complement(data_set.getIds(), selected_nodes), selected_nodes, true)
+    network.stopSimulation()
+  });
 
-    });
+  network.on("dragEnd", function(params) {
+    setTimeout(function() {
+      network.stopSimulation();
+    }, 3000);
+  });
+
+  network.on("deselectNode", function(params) {
+    $("#nodeInfo").hide();
+    var parent = params.nodes[0];
+    var selected = network.getConnectedNodes(parent);
+    selected.push(parent)
+    hide_unhide_selected(data_set.getIds(), selected, false)
+    network.stopSimulation()
+
+  });
+
+
+  function hide_unhide_selected(unselected, selected, hide) {
+    console.log("selected", selected, unselected, hide)
+    var nodes_to_hide = unselected.map(function(x) {
+      return {
+        "id": x,
+        "hidden": hide
+      }
+    })
+    data_set.update(nodes_to_hide);
 
   }
 
+}
 
-//https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
-// https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
-//script.src = "https://api.vk.com/method/getProfiles?uid=355065657&callback=callbackFunc";
-//script.src = 'https://api.vk.com/method/friends.get?uid=218868103&order=hints&callback=callbackFunc';
-//script.src = 'https://api.vk.com/method/users.get?uids=2131567&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
-
-// https://api.vk.com/method/wall.get?owner_id=193316384&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
-// https://api.vk.com/method/wall.get?owner_id=42348445&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
-// https://api.vk.com/method/wall.getReposts?owner_id=193316384&post_id=3010&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
-// https://api.vk.com/method/users.search?q=123123123&sort=0&fields=photo_50&access_token=a76141a73a87fbe9c00ba3237ea6a3a412960486cbc6e0301ba0c98059b58f040023f9a0cdc08dd7abec8&expires_in=86400
-// https://api.vk.com/method/likes.getList?owner_id=193316384&post_id=3010&type=post&owner_id=42348445&item_id=18553&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
-// http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
-// http://www.almende.com/contact
-
-// var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
-
-// https://api.vk.com/method/users.search?q=rwyler&lang=ru&sort=1&fields=photo_50&access_token=a76141a73a87fbe9c00ba3237ea6a3a412960486cbc6e0301ba0c98059b58f040023f9a0cdc08dd7abec8&expires_in=86400
-
-
-// https://api.vk.com/method/users.get?uids=1216918,16081499,218868103&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=api_FetchDetails
-// 1216918
-// 16081499
-// 218868103
-
-//https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60
-
-// https://api.vk.com/method/friends.get?uid=218868103&v=58&order=hints&lang=ru&fields=first_name,last_name,city,domain,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=callbackFunc
 
 </script>
 

@@ -1,0 +1,28 @@
+
+//https://api.vk.com/method/friends.get?uid=47617807&order=hints&access_token=cfbe0fe419001f72bd87116a7d0daddff97e99a3943fbc29fcca4457fb33b91e8aaf05b6c4e55f5230c50
+// https://wyler-m.github.io/vk-net/#access_token=404fa1c22ba9ba03d1b0f23912316fb7032d1090b648165672555b8cf174bd3fe9249c924cbe8ffc0662a&expires_in=86400&user_id=218868103
+//script.src = "https://api.vk.com/method/getProfiles?uid=355065657&callback=callbackFunc";
+//script.src = 'https://api.vk.com/method/friends.get?uid=218868103&order=hints&callback=callbackFunc';
+//script.src = 'https://api.vk.com/method/users.get?uids=2131567&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town&callback=callbackFunc'
+
+// https://api.vk.com/method/wall.get?owner_id=193316384&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
+// https://api.vk.com/method/wall.get?owner_id=42348445&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
+// https://api.vk.com/method/wall.getReposts?owner_id=193316384&post_id=3010&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
+// https://api.vk.com/method/users.search?q=123123123&sort=0&fields=photo_50&access_token=a76141a73a87fbe9c00ba3237ea6a3a412960486cbc6e0301ba0c98059b58f040023f9a0cdc08dd7abec8&expires_in=86400
+// https://api.vk.com/method/likes.getList?owner_id=193316384&post_id=3010&type=post&owner_id=42348445&item_id=18553&access_token=4422579b4a347e86bba654b10f65a0d67b83b9da4fa7f5f100c3a550614e06c0b0d09a477628dff10d38c
+// http://visjs.org/examples/network/exampleApplications/worldCupPerformance.html
+// http://www.almende.com/contact
+
+// var url = 'https://api.vk.com/method/users.get?uids='.concat(window.urlParams.user_id,'&lang=en&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200&callback=api_FetchDetails').concat(window.urlParams.access_token);
+
+// https://api.vk.com/method/users.search?q=rwyler&lang=ru&sort=1&fields=photo_50&access_token=a76141a73a87fbe9c00ba3237ea6a3a412960486cbc6e0301ba0c98059b58f040023f9a0cdc08dd7abec8&expires_in=86400
+
+
+// https://api.vk.com/method/users.get?uids=1216918,16081499,218868103&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=api_FetchDetails
+// 1216918
+// 16081499
+// 218868103
+
+//https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60
+
+// https://api.vk.com/method/friends.get?uid=218868103&v=58&order=hints&lang=ru&fields=first_name,last_name,city,domain,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=callbackFunc
