@@ -16,7 +16,7 @@
     <script src="get_friends.js"></script>
     <!-- // <script src="test_wyler.js"></script> -->
     <script src="test_data/test_full.js"></script>
-    <!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
+    <script src="http://vk.com/js/api/xd_connection.js?2";  type="text/javascript"></script>
     <script type="text/javascript" src="vis.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <!-- // <script type="text/javascript" src="jLouvain.js"></script> -->
@@ -121,7 +121,7 @@
                     </footer>
                 </div>
                 <div id="loginDiv">
-                    <a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=4966960&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">Войти на VK.com</a>
+                    <a class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" id="loginP" href="https://oauth.vk.com/authorize?client_id=5777716&display=page&redirect_uri=https://wyler-m.github.io/vk-net/&scope=friends&response_type=token&v=5.60">Войти на VK.com</a>
                 </div>
             </div>
             <div id="mynetwork" class="wrapper" hidden></div>
@@ -166,8 +166,9 @@ function search_Input(){
       var query = "https://api.vk.com/method/users.search?fields=photo_50&lang=ru&q="+q+"&access_token="+access_token
     
     
-
-    $.get(query, function(data, status){ 
+      VK.api("users.search",{"q":q,"access_token":access_token,"fields":"photo_50","lang":"ru"}, function(data){
+    // $.get(query, function(data, status){ 
+      console.log("data",data);
       if (("response" in data)&&(data.response[0]==1)) {
         $("#foundNameCenter").text(data.response[1].first_name+" "+data.response[1].last_name)
         $("#foundName").text(data.response[1].first_name+" "+data.response[1].last_name)
@@ -177,7 +178,8 @@ function search_Input(){
          {q = q.split("id").pop();}
          console.log(q)
          var query = "https://api.vk.com/method/getProfiles?lang=ru&uid="+q;
-         $.get(query, function(data, status){ 
+         VK.api("users.getProfiles",{"uid":q,"fields":"photo_50","lang":"ru"}, function(data){
+         // $.get(query, function(data, status){ 
             console.log(data)
                $("#foundNameCenter").text(data.response[0].first_name+" "+data.response[0].last_name)
                $("#foundName").text(data.response[0].first_name+" "+data.response[0].last_name)
