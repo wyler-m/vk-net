@@ -403,7 +403,6 @@ function fetchFriendList(id) {
 
 function api_FetchFriendList(result) {
   
-  console.log("result",result);
 //if error
     if ("execute_errors" in result) { 
         if ((result["execute_errors"]["error_code"]==6) && (cur_graph.currentNode != undefined)){

@@ -76,7 +76,7 @@ class graph {
 
 
   make_link(source,target){
-    var sum = source + target;
+    var sum = parseInt(source) + parseInt(target);
     if (sum in this.weightsDictionary.degree){
       return;
     }
