@@ -1,6 +1,6 @@
 class graph {
   constructor(){
-    this.friends = null;
+    this.friends = null; //array of ids
     this.nodesRetrieved = false;
     this.nodes = [];
     this.edges = [];
@@ -11,8 +11,8 @@ class graph {
                   };
     this.nodeToFriends = {};
     this.nodeToNeighbors = {};
-    this.unCheckedFriends = null;
-    this.currentNode = null;
+    this.unCheckedFriends = null; //array of ids
+    this.currentNode = null; 
     this.nodeToInfo = {};  
     this.ownerInfo = {};
     this.first_pass = true;
@@ -25,8 +25,9 @@ class graph {
   }
 
   init_friends(res){
-    this.unCheckedFriends = res["response"];
-    this.friends = res["response"].slice(0);
+    console.log("init_friends",res);
+    this.unCheckedFriends = res;
+    this.friends = res.slice(0);
     this.gotoNextNode();
   }
 
@@ -58,17 +59,22 @@ class graph {
     this.currentNode = null;
   }
 
-  add_new_friends(res){
-    this.nodeToFriends[this.currentNode] = res["response"];
-    if (res["response"] && this.friends) {        
-        var newLinks = so.intersection(this.friends,res["response"]);
-        this.nodeToNeighbors[this.currentNode] = newLinks;
+  add_new_friends(source,friends){
+    this.nodeToFriends[source] = friends;
+    if (friends && this.friends) {        
+        var newLinks = so.intersection(this.friends,friends);
+        this.nodeToNeighbors[source] = newLinks;
         for (var i = newLinks.length - 1; i >= 0; i--) {
-            this.make_link(newLinks[i],this.currentNode);          
+            this.make_link(newLinks[i],source);          
         };
       };
   };
 
+  remove_checked(source){
+    console.log("someing",this.unCheckedFriends,[source]);
+    this.unCheckedFriends = so.complement(this.unCheckedFriends, [source]);
+    console.log("did we remove the right pepel?",this.unCheckedFriends);
+  }
 
 
   make_link(source,target){
