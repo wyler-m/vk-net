@@ -190,21 +190,6 @@ function build_graph(test){
 	$("#graphingCard").attr("class","w3-card-4 w3-display-middle w3-white w3-border w3-border-blue w3-round-xlarge");
 	$("#progressContainer").show();
 	
-	// var current_id = document.getElementById("vkId").value;
-	// if (typeof cur_graph !== "undefined") {
-	// 	graph_dict[current_id] = {"graph":JSON.parse(JSON.stringify(cur_graph)), "dataSet":JSON.parse(JSON.stringify(data_set))}
-	// 	delete cur_graph;
-	// 	delete data_set;		
-	// } else {
-	// 	if (current_id in graph_dict) {
-	// 		cur_graph = graph_dict[current_id].graph;	
-	// 		
-	// 		
-	// 		data_set = graph_dict[current_id].dataSet;
-	// 		if (!test) {fetchFriendList()};
-	// 		// return
-	// 	} 
-
 	cur_graph = new graph;
   
 		
@@ -410,32 +395,19 @@ function fetchFriendList(id) {
 
     var script = document.createElement('SCRIPT');
     var y = '';
-    // if (access_token) {
-    //   y = "&access_token="+access_token;
-    // };
     
-    
-
     script.src = `https://api.vk.com/method/execute.getFriends?v=5.74&access_token=${access_token}&userIds=${target_id}&callback=api_FetchFriendList`;
      
-    // script.src = 'https://api.vk.com/method/friends.get?v=3&uid='.concat(target_id,y,'&order=hints&callback=api_FetchFriendList');
-    
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
 function api_FetchFriendList(result) {
   
-
+  console.log("result",result);
 //if error
-    if ("error" in result) { 
-        if ((result["error"]["error_code"]==6) && (cur_graph.currentNode != undefined)){
-          
+    if ("execute_errors" in result) { 
+        if ((result["execute_errors"]["error_code"]==6) && (cur_graph.currentNode != undefined)){
         }
-      }
-// if there are unchecked friends in the response
-    if ("unchecked" in result.response) {
-      
-        cur_graph.unCheckedFriends = result.response.unchecked;
       }
 //check to see if there are any friends in friendlist
     if (!cur_graph.friends) { 
@@ -450,12 +422,8 @@ function api_FetchFriendList(result) {
           'eventLabel': cur_graph.ownerInfo["id"],
           'eventValue': cur_graph.unCheckedFriends.length
         });  
-    } 
-//if not, then take intersection of the response and the friends
-    else {
-
-      //if this the second retrieval,get all the friends details
-      if (!cur_graph.nodesRetrieved) {
+    } else {//if no friends in friendlist, then take intersection of the response and the friends
+      if (!cur_graph.nodesRetrieved) { //if this the second retrieval,get all the friends details
         cur_graph.nodesRetrieved = true; //only need to retrieve once
         var nodes = Object.assign([], cur_graph.friends); // make a copy of the friends list
         while (nodes.length>0){ //iterate ver all the friends
@@ -464,26 +432,24 @@ function api_FetchFriendList(result) {
         }
       };
       update_progress(cur_graph.friends.length,cur_graph.unCheckedFriends.length);
-      
+
+
+
 // are there new friends and have there been friends added
-      if (!("error" in result)) {
-        
-        while (result.response.length>0){
-          var friend_map = result.response.pop();
-          
-          cur_graph.add_new_friends(friend_map.source,friend_map.friends);
-          cur_graph.remove_checked(friend_map.source);
-        }
-      };
+      if ("response" in result) {   
+          Object.keys(result.response).forEach(function(entry) {
+            var friend_map = result.response[entry];
+            cur_graph.add_new_friends(friend_map.source,friend_map.friends);
+            cur_graph.remove_checked(friend_map.source);
+          });
+      }
       
+// any leftover friends from previous 
+
 //keep recursing until all the unchecked friends are finished
       if (cur_graph.unCheckedFriends.length>0) {
-
-      //add this into the fetch frineds list
-      // var tempfriend = cur_graph.gotoNextNode() 
-      
       setTimeout(function(){
-        fetchFriendList(cur_graph.unCheckedFriends);  
+        fetchFriendList(cur_graph.unCheckedFriends.slice(0,25));  
       },300);
 
       } else { 

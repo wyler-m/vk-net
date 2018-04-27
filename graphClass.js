@@ -71,9 +71,7 @@ class graph {
   };
 
   remove_checked(source){
-    console.log("someing",this.unCheckedFriends,[source]);
     this.unCheckedFriends = so.complement(this.unCheckedFriends, [source]);
-    console.log("did we remove the right pepel?",this.unCheckedFriends);
   }
 
 
@@ -185,7 +183,6 @@ class graph {
       for (var i = this.nodes.length - 1; i >= 0; i--) {
         var deg = 0    
         if (!(this.nodes[i].small_pic=="https://vk.com/images/deactivated_100.png")){
-          console.log(i,this.nodes[i])
           deg = this.weightsDictionary[weight_type][this.nodes[i]["id"]];
           deg = deg ? deg : 0
         }
