@@ -461,9 +461,8 @@ function api_FetchFriendList(result) {
 //add this into the fetch frineds list
       var tempfriend = cur_graph.gotoNextNode() 
 
-        // fetchFriendList(cur_graph.gotoNextNode());  
-        fetchFriendList(tempfriend);  
-        // fetchFriendList(currentNode);  
+      fetchFriendList(tempfriend);  
+      
       } else { 
         cur_graph.weight_nodes_popularity();
         cur_graph.weight_nodes_popularity_deg();
