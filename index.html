@@ -360,7 +360,7 @@ function fetchDetails(id) {
     if (access_token) {
       y = "&access_token="+access_token;
     };
-    script.src = 'https://api.vk.com/method/users.get?v=5.101&uids='.concat(id,y,'&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=api_FetchDetails');   
+    script.src = 'https://api.vk.com/method/users.get?v=5.101&user_ids='.concat(id,y,'&lang=ru&fields=first_name,last_name,city,country,universities,schools,sex,bdate,home_town,photo_200,status,photo_100&callback=api_FetchDetails');   
     document.getElementsByTagName("head")[0].appendChild(script);
     }
 
