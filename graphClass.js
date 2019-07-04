@@ -25,7 +25,6 @@ class graph {
   }
 
   init_friends(res){
-    console.log("init_friends",res);
     this.unCheckedFriends = res;
     this.friends = res.slice(0);
     this.gotoNextNode();
@@ -35,12 +34,21 @@ class graph {
     for (var i = 0; i < res_array.length; i++) {
       this.add_details(res_array[i])
     };
+    console.log(this.nodes);
   }
 
   add_details(res){
     if (res.photo_200 == undefined) {res.photo_200 = "http://vk.com/images/camera_200.png"};
-    this.nodes.push( {"id": res.uid, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>", small_pic:res.photo_100, group:res.city } );
-    if (!(this.unique_cities.includes(res.city))){this.unique_cities.push(res.city)}
+    // console.log(res.city.tite);
+    var newNode = {"id": res.id, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>", small_pic:res.photo_100, group:"undefined"} 
+    try {
+      newNode.group = res.city.tite;
+      console.log(res.city);
+    } catch (error) {
+      console.log(error);
+    }
+    this.nodes.push(newNode);
+
   } 
 
   add_city_info(){
