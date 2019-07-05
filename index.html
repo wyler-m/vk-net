@@ -2,21 +2,17 @@
 <html>
 	<head>
 		<title>VK Visualizer</title>
-		<link rel="stylesheet" href="vis.css">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="w3.css">
 		<meta charset="utf-8">
-		<!-- // <script src="https://d3js.org/d3.v4.min.js"></script> -->
-    <script src="setOps.js"></script>
-    <script src="cb.js"></script>
-		<script src="poster.js"></script>
-		<script src="graphClass.js"></script>
-		<!-- // <script src="test_wyler.js"></script> -->
-		<script src="test_data.js"></script>
-		<!-- // <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> -->
-		<script type="text/javascript" src="vis.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-		<!-- // <script type="text/javascript" src="jLouvain.js"></script> -->
+		<link rel="stylesheet" href="css/vis.css">
+		<link rel="stylesheet" href="css/w3.css">
+    <script type="text/javascript" src="lib/setOps.js"></script>
+    <script type="text/javascript" src="lib/cb.js"></script>
+		<script type="text/javascript" src="lib/vis.js"></script>
+		<script src="classes/poster.js"></script>
+		<script src="classes/graphClass.js"></script>
+		<script src="tests/test_data.js"></script>
 
 	</head>
  
@@ -24,7 +20,7 @@
 
 <menu id = "controlDiv" >
 <div id = "hideDiv" >
-  <h1 id="logo"><img src= "vk.svg"> visualizer</h1>
+  <h1 id="logo"><img src= "img/vk.svg"> visualizer</h1>
   <h4 id="foundName"></h4>
   <input id="vkId" class="w3-input w3-border w3-hover-blue" value="180440651"></p>
   <a id="buildGraphButton" class="w3-btn-block w3-hover-blue w3-border w3-border-blue w3-white" onclick="build_graph()">Строй График</a>
