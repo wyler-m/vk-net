@@ -39,7 +39,9 @@ class graph {
 
   add_details(res){
     if (res.photo_200 == undefined) {res.photo_200 = "http://vk.com/images/camera_200.png"};
-    if (res.city == undefined) { var city = ""; var cityId = 1} else { var city = res.city.title; var cityId = res.city.id; } 
+    var cityId = 99;
+    var city = ""; 
+    if (res.city != undefined) { var city = res.city.title; var cityId = res.city.id; } 
     var newNode = {"id": res.id, "label": res.first_name + " " + res.last_name, title: "<img src="+ res.photo_200 +" alt="+res.first_name + " " + res.last_name + "><p>" + res.first_name + " " + res.last_name + "</p><p>" + city, small_pic:res.photo_100, group:cityId} 
     this.nodes.push(newNode);
   } 
