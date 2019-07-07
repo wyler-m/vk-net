@@ -10,6 +10,7 @@
     <script type="text/javascript" src="lib/setOps.js"></script>
     <script type="text/javascript" src="lib/cb.js"></script>
 		<script type="text/javascript" src="lib/vis.js"></script>
+    <script type="text/javascript" src="lib/buttonControl.js"></script>
 		<script type="text/javascript" src="classes/poster.js"></script>
 		<script type="text/javascript" src="classes/graphClass.js"></script>
 		<script type="text/javascript" src="tests/test_data.js"></script>
@@ -353,6 +354,7 @@ function fetchDetails(id) {
 
 function api_FetchDetails(result) {
     if ('error' in result) {
+      console.log(result);
       
     } 
     else {
@@ -362,6 +364,7 @@ function api_FetchDetails(result) {
         // fetchCityInfo();
       } 
       else {
+        console.log(result);
       var res = result["response"][0];
         cur_graph.first_pass = false;
         cur_graph.init_owner(res);
@@ -533,7 +536,7 @@ function change_weights_centrality(){
 
 function change_node_size(weight_type,normilization){
   //normilzation can be linear, quad, or log
-  //weigh_type is the name of the weight dictionary being used
+  //weight_type is the name of the weight dictionary being used
   if (normilization) {
     cur_graph.normalize_weights(normilization,weight_type);
     cur_graph.set_weights(normilization+" "+weight_type,data_set);
