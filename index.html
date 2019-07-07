@@ -143,11 +143,28 @@ if (params) {
         $("#loginP").hide();  
         $("#searchDiv").show(); 
         $("#calcLikes").show();
-
         access_token = params.access_token;
       }
    }; 
 };
+
+w3_close()
+$("#loginDiv").show();
+$("#nodeInfo").hide();
+$("#givenLikes").hide();
+$("#receivedLikes").hide();
+$("#buildSelected").hide();
+$("#calcLikes").hide();
+
+
+$("#selectedName").click(function(){
+    ga_onclick("#selectedName","Check Profile");
+});
+
+$("#buildSelected").click(function(){
+    ga_onclick("#buildSelected","Строй График");
+});
+
 
 function build_graph(test){
   $("#searchCard").hide();
@@ -204,22 +221,6 @@ function build_graph(test){
 
 	if (!test) {fetchFriendList()};
 	};
-w3_close()
-$("#loginDiv").show();
-$("#nodeInfo").hide();
-$("#givenLikes").hide();
-$("#receivedLikes").hide();
-$("#buildSelected").hide();
-$("#calcLikes").hide();
-
-
-$("#selectedName").click(function(){
-    ga_onclick("#selectedName","Check Profile");
-});
-
-$("#buildSelected").click(function(){
-    ga_onclick("#buildSelected","Строй График");
-});
 
 function ga_onclick(element,action){
       ga( 'send', 'event', {
@@ -451,34 +452,23 @@ function constuct_like_dict(){
 
 function showNodesCB(){
 
-options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0 
-// var cur_class = $("#toggleLabels").attr("class");
-var text = $("#toggleLabels").text();
-// $("#toggleLabels").attr("class", cur_class == "w3-btn-block w3-blue w3-hover-black" ? "w3-btn-block w3-black w3-hover-blue" : "w3-btn-block w3-blue w3-hover-black"); 
-$("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
+  options.nodes.font.size = (options.nodes.font.size == 0) ? 14 : 0 
+  // var cur_class = $("#toggleLabels").attr("class");
+  var text = $("#toggleLabels").text();
+  // $("#toggleLabels").attr("class", cur_class == "w3-btn-block w3-blue w3-hover-black" ? "w3-btn-block w3-black w3-hover-blue" : "w3-btn-block w3-blue w3-hover-black"); 
+  $("#toggleLabels").text(text == "Show Labels" ? "Hide Labels" :"Show Labels");
 
-// if(options.nodes.font.size == 0) {options.nodes.font.size = 14;
-// $("#toggleLabels").attr("class","w3-btn-block w3-black w3-hover-blue")
-// } 
-  // else {options.nodes.font.size = 0;
-  // $("#toggleLabels").toggleClass( w3-btn-block w3-black w3-hover-blue")}
-       
+  // if(options.nodes.font.size == 0) {options.nodes.font.size = 14;
+  // $("#toggleLabels").attr("class","w3-btn-block w3-black w3-hover-blue")
+  // } 
+    // else {options.nodes.font.size = 0;
+    // $("#toggleLabels").toggleClass( w3-btn-block w3-black w3-hover-blue")}
+         
        network.setOptions(options);
        network.redraw();
        network.stopSimulation();
  };
 
-function change_weights_d(){
-  // cur_graph.normalize_weights("log","degree");
-  cur_graph.set_weights("degree",data_set);
-  network.redraw();
-
-  network.stopSimulation()
-  ga( 'send', 'event', {
-          'eventCategory': 'change weight',
-          'eventAction': 'degree'
-        }); 
-}
 
 function change_weights_p(){
   cur_graph.normalize_weights("quad","degree",false);
@@ -522,24 +512,17 @@ function change_node_size(weight_type,normilization){
   }else{
     cur_graph.set_weights(weight_type,data_set)
   };
-  // cur_graph.set_weights(weight_type,data_set);    
-  // cur_graph.set_weights("degree",data_set);
-
   network.redraw();
   network.stopSimulation()
 }
 
 function change_weights_received(){
-  // cur_graph.normalize_weights("log","received");
-  // cur_graph.set_weights("log received",data_set);
   cur_graph.set_weights("received",data_set);
   network.redraw();
   network.stopSimulation()
 }
 
 function change_weights_given(){
-  // cur_graph.normalize_weights("log","given");
-  // cur_graph.set_weights("log given",data_set);
   cur_graph.set_weights("given",data_set);
   network.redraw();
   network.stopSimulation()
@@ -547,19 +530,19 @@ function change_weights_given(){
 
 function test_build(){
   build_graph(true);
-cur_graph.currentNode = test_data.currentNode  
-cur_graph.edges = test_data.edges   
-cur_graph.first_pass = test_data.first_pass   
-cur_graph.friends = test_data.friends   
-cur_graph.nodeToFriends = test_data.nodeToFriends  
-cur_graph.nodeToInfo = test_data.nodeToInfo   
-cur_graph.nodes = test_data.nodes   
-cur_graph.nodesRetrieved = test_data.nodesRetrieved   
-cur_graph.ownerInfo = test_data.ownerInfo   
-cur_graph.unCheckedFriends = test_data.unCheckedFriends   
-cur_graph.weightsDictionary = test_data.weightsDictionary  
-redrawAll()
-change_weights_centrality();
+  cur_graph.currentNode = test_data.currentNode  
+  cur_graph.edges = test_data.edges   
+  cur_graph.first_pass = test_data.first_pass   
+  cur_graph.friends = test_data.friends   
+  cur_graph.nodeToFriends = test_data.nodeToFriends  
+  cur_graph.nodeToInfo = test_data.nodeToInfo   
+  cur_graph.nodes = test_data.nodes   
+  cur_graph.nodesRetrieved = test_data.nodesRetrieved   
+  cur_graph.ownerInfo = test_data.ownerInfo   
+  cur_graph.unCheckedFriends = test_data.unCheckedFriends   
+  cur_graph.weightsDictionary = test_data.weightsDictionary  
+  redrawAll()
+  change_weights_centrality();
 }
 
 function save_build(){
@@ -601,32 +584,18 @@ function canvas_image(){
 
 //Строй График
 function redrawAll() {
-
     $("#graphingCard").attr("class","w3-card-4 w3-display-topmiddle w3-white w3-border w3-border-blue w3-round-xlarge");
     $("#progressContainer").hide();
     $("#mynetwork").show();
-
-
     // create a network
-    var container = document.getElementById('mynetwork');
-    
+    var container = document.getElementById('mynetwork');    
     data_set.add(cur_graph.nodes);
-
-    // data_set.add(cur_graph.edges);
-    
     var data = {
       nodes: data_set,
-      // nodes: cur_graph.nodes,
-      // nodes: test_data.nodes,
-      // edges: data_set
       edges: cur_graph.edges
-      // edges: test_data.links
     };
 
     network = new vis.Network(container, data, options);
- 
-
-
     network.on("stabilized", function (params) { $("#freezeGraph").hide();});
     network.on("startStabilizing", function (params) { $("#freezeGraph").show();});
     network.on("selectNode", function (params) {        
@@ -637,10 +606,8 @@ function redrawAll() {
         hide_unhide_selected(so.complement(data_set.getIds(), selected),true)
         network.stopSimulation()
     });
-
     network.on("dragEnd", function (params) {
       network.stopSimulation()});
-
     network.on("deselectNode", function (params) {
         $("#nodeInfo").hide();
         var parent = params.nodes[0];
@@ -648,7 +615,6 @@ function redrawAll() {
         selected.push(parent)
         hide_unhide_selected(data_set.getIds(),false)
         network.stopSimulation()
-
     });
   }
 
